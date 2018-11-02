@@ -1,0 +1,10 @@
+[package]
+name = "mos"
+version = "0.0.1"
+authors = ["Alexander Akhmetov <me@aleks.sh>"]
+
+[dependencies]
+bootloader_precompiled = "0.3.0"
+
+[package.metadata.bootimage]
+default-target = "x86_64-mos.json"
