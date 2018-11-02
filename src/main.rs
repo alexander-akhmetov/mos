@@ -26,7 +26,7 @@ pub extern "C" fn _start() -> ! {
     // initialize IDT
     mos::interrupts::init();
 
-    divide_by_zero();
+    // divide_by_zero();
     unsafe {
         *(0xdeadbeef as *mut u64) = 42;
     };
