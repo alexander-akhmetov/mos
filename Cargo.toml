@@ -7,6 +7,8 @@ authors = ["Alexander Akhmetov <me@aleks.sh>"]
 bootloader_precompiled = "0.3.0"
 volatile = "0.2.3"
 spin = "0.4.10"
+uart_16550 = "0.1.0"
+x86_64 = "0.2.8"
 
 [package.metadata.bootimage]
 default-target = "x86_64-mos.json"
@@ -17,3 +19,6 @@ features = ["spin_no_std"]
 
 [dev-dependencies]
 array-init = "0.0.3"
+
+[features]
+integration-test = []

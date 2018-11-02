@@ -3,22 +3,10 @@
 #![no_std]  // disable rust std library
 #![cfg_attr(not(test), no_main)]  // disable rust entry point
 
+#[macro_use]
+extern crate mos;
+
 use core::panic::PanicInfo;
-
-extern crate bootloader_precompiled;
-extern crate volatile;
-extern crate spin;
-
-#[cfg(test)]
-extern crate array_init;
-#[cfg(test)]
-extern crate std;
-
-#[macro_use]
-extern crate lazy_static;
-
-#[macro_use]
-mod vga_buffer;
 
 
 #[panic_handler]
@@ -33,5 +21,6 @@ fn panic(info: &PanicInfo) -> ! {
 pub extern "C" fn _start() -> ! {
     // kernel entrypoint
     print!("Hello, world!\n");
+
     loop {}
 }
