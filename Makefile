@@ -24,10 +24,10 @@ build:
 build/%:
 	bootimage build --bin $*
 
-test:
+unit-tests:
 	cargo test
 
-tests: test
+tests: unit-tests integration-tests
 
 integration-test/%:
 	make build/$*

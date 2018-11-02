@@ -1,4 +1,8 @@
 #![no_std]
+#![feature(asm)]
+#![feature(naked_functions)]
+#![feature(core_intrinsics)]
+#![feature(rustc_private)]
 
 extern crate bootloader_precompiled;
 extern crate spin;
