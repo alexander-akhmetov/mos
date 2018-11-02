@@ -21,10 +21,28 @@ build:
 	# bootloader: https://github.com/rust-osdev/bootloader
 	bootimage build
 
+build/%:
+	bootimage build --bin $*
 
 test:
 	cargo test
 
+tests: test
+
+integration-test/%:
+	make build/$*
+
+	-qemu-system-x86_64 \
+		-serial mon:stdio \
+		-drive format=raw,file=target/x86_64-mos/debug/bootimage-$*.bin \
+		-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
+		-display none
+	exit 0
+
+integration-tests:
+	bash run-tests.sh
+
 
 qemu-run: build
 	qemu-system-x86_64 -drive format=raw,file=target/x86_64-mos/debug/bootimage-mos.bin
+
