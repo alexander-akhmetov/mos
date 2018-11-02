@@ -1,6 +1,4 @@
-NASM=/usr/local/bin/nasm
-LD=~/opt/cross/bin/x86_64-elf-ld
-BUILD_DIR=_build/
+BUILD_DIR=target
 
 
 install-requirements:
@@ -10,22 +8,11 @@ install-requirements:
 
 	cargo install bootimage --version "^0.5.0"
 
-
 clean:
 	rm -rf $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)
 
-build-bootloader: clean
-	$(NASM) -f elf64 src/bootsector/multiboot_header.asm -o $(BUILD_DIR)/multiboot_header.o
-	$(NASM) -f elf64 src/bootsector/boot.asm -o $(BUILD_DIR)/boot.o
-	$(LD) --nmagic \
-			-o $(BUILD_DIR)/kernel.bin \
-			-T src/bootsector/linker.ld \
-			$(BUILD_DIR)/multiboot_header.o \
-			$(BUILD_DIR)/boot.o
-
-
-build-kernel:
+build:
 	# cargo xbuild --target x86_64-mos.json
 
 	# the next command uses previous command and also creates a bootimage
@@ -35,13 +22,9 @@ build-kernel:
 	bootimage build
 
 
-iso:
-	mkdir -p $(BUILD_DIR)/isofiles/boot/grub
-	cp src/grub/grub.cfg $(BUILD_DIR)/isofiles/boot/grub
-	cp $(BUILD_DIR)/kernel.bin $(BUILD_DIR)/isofiles/boot
-
-	docker-compose run build_os grub-mkrescue -o /src/$(BUILD_DIR)/os.iso /src/$(BUILD_DIR)/isofiles
+test:
+	cargo test
 
 
-qemu-run:
+qemu-run: build
 	qemu-system-x86_64 -drive format=raw,file=target/x86_64-mos/debug/bootimage-mos.bin

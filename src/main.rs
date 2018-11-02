@@ -1,34 +1,37 @@
+#![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
+
 #![no_std]  // disable rust std library
-#![no_main]  // disable rust entry point
+#![cfg_attr(not(test), no_main)]  // disable rust entry point
 
 use core::panic::PanicInfo;
 
 extern crate bootloader_precompiled;
+extern crate volatile;
+extern crate spin;
+
+#[cfg(test)]
+extern crate array_init;
+#[cfg(test)]
+extern crate std;
+
+#[macro_use]
+extern crate lazy_static;
+
+#[macro_use]
+mod vga_buffer;
 
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+#[cfg(not(test))] // only compile when the test flag is not set
+fn panic(info: &PanicInfo) -> ! {
+    println!("[KERNEL PANIC] {}", info);
     loop {}
 }
 
-static HELLO: &[u8] = b"Hello, World!";
-
-fn print_hello_world() {
-    // 0xb8000 is the VGA buffer's address
-    let vga_buffer = 0xb8000 as *mut u8;
-
-    for (i, &byte) in HELLO.iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = byte;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
-        }
-    }
-}
-
+#[cfg(not(test))]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     // kernel entrypoint
-
-    print_hello_world();
+    print!("Hello, world!\n");
     loop {}
 }
