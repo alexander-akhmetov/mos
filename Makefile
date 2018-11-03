@@ -1,4 +1,9 @@
-BUILD_DIR=target
+NASM=/usr/local/bin/nasm
+QEMU=qemu-system-x86_64
+LD=~/opt/cross/bin/x86_64-elf-ld
+
+BUILD_DIR=_build/
+RUST_BUILD_DIR=target
 
 
 install-requirements:
@@ -12,17 +17,35 @@ clean:
 	rm -rf $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)
 
-build:
-	# cargo xbuild --target x86_64-mos.json
+build-bootloader: clean
+	$(NASM) -f elf64 src/boot/multiboot_header.asm -o $(BUILD_DIR)/multiboot_header.o
+	$(NASM) -f elf64 src/boot/boot.asm -o $(BUILD_DIR)/boot.o
+	$(LD) --nmagic \
+			-o $(BUILD_DIR)/kernel.bin \
+			-T src/boot/linker.ld \
+			$(BUILD_DIR)/multiboot_header.o \
+			$(BUILD_DIR)/boot.o
 
-	# the next command uses previous command and also creates a bootimage
-	#
-	# bootimage command: https://github.com/rust-osdev/bootimage
-	# bootloader: https://github.com/rust-osdev/bootloader
-	bootimage build
+
+build-kernel:
+	cargo xbuild --target x86_64-mos.json
+
+
+build:
+	make build-kernel
+	make build-bootloader
+
 
 build/%:
-	bootimage build --bin $*
+	cargo xbuild --target x86_64-mos.json --bin $*
+
+iso: build
+	mkdir -p $(BUILD_DIR)/isofiles/boot/grub
+	cp src/boot/grub.cfg $(BUILD_DIR)/isofiles/boot/grub
+	cp $(BUILD_DIR)/kernel.bin $(BUILD_DIR)/isofiles/boot
+
+	docker-compose run build_os grub-mkrescue -o /src/$(BUILD_DIR)/os.iso /src/$(BUILD_DIR)/isofiles
+
 
 unit-tests:
 	cargo test
@@ -43,6 +66,7 @@ integration-tests:
 	bash run-tests.sh
 
 
-qemu-run: build
-	qemu-system-x86_64 -drive format=raw,file=target/x86_64-mos/debug/bootimage-mos.bin
+qemu-run:
+	# qemu-system-x86_64 -drive format=raw,file=target/x86_64-mos/debug/bootimage-mos.bin
+	$(QEMU) -cdrom $(BUILD_DIR)/os.iso
 
