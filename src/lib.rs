@@ -40,13 +40,14 @@ pub extern fn main() -> ! {
     kprintln!("Hello, world!");
 
     interrupts::init();
+    unsafe { pic8259::PICS.lock().initialize(); }
+    x86_64::instructions::interrupts::enable();
 
     // unsafe {
     //     *(0xdeadbeef as *mut u64) = 42;
     // };
-    unsafe { pic8259::PICS.lock().initialize(); }
-    let mut keyboard = keyboard::polling::PollingKeyboard::new(print_char);
 
+    let mut keyboard = keyboard::polling::PollingKeyboard::new(print_char);
     loop {
         keyboard.update();
     }
