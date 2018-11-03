@@ -3,8 +3,6 @@ use x86_64::instructions::segmentation;
 use x86_64::structures::gdt::SegmentSelector;
 use x86_64::PrivilegeLevel;
 
-pub struct IDT([Entry; 16]);
-
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
 pub struct Entry {
@@ -64,7 +62,7 @@ impl EntryOptions {
 }
 
 
-pub type HandlerFunc = extern "C" fn() -> !;
+pub type HandlerFunc = extern "C" fn();
 
 
 impl Entry {
@@ -92,10 +90,12 @@ impl Entry {
     }
 }
 
+const IDT_SIZE: usize = 48;
+pub struct IDT([Entry; IDT_SIZE]);
 
 impl IDT {
     pub fn new() -> IDT {
-        IDT([Entry::missing(); 16])
+        IDT([Entry::missing(); IDT_SIZE])
     }
 
     pub fn set_handler(&mut self, entry: u8, handler: HandlerFunc) -> &mut EntryOptions {

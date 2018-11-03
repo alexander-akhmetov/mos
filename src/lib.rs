@@ -44,12 +44,14 @@ pub extern fn main() -> ! {
     x86_64::instructions::interrupts::enable();
 
     // unsafe {
-    //     *(0xdeadbeef as *mut u64) = 42;
-    // };
+    //     asm!("int3");
+    // }
 
-    let mut keyboard = keyboard::polling::PollingKeyboard::new(print_char);
+    kprintln!("It did not crash!");
+
+    // let mut keyboard = keyboard::polling::PollingKeyboard::new(print_char);
     loop {
-        keyboard.update();
+        // keyboard.update();
     }
 }
 

@@ -119,6 +119,6 @@ impl Pic8259 {
 
 lazy_static! {
     pub static ref PICS: Mutex<Pic8259> = Mutex::new(unsafe{
-        Pic8259::new(0x20, 0x28)
+        Pic8259::new(32, 32+8)
     });
 }
