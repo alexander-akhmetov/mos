@@ -59,23 +59,18 @@ start:
     or eax, 1 << 16
     mov cr0, eax
 
-    ;;; print hello world
-    mov word [0xb8000], 0x0248 ; H
-    mov word [0xb8002], 0x0265 ; e
-    mov word [0xb8004], 0x026c ; l
-    mov word [0xb8006], 0x026c ; l
-    mov word [0xb8008], 0x026f ; o
-    mov word [0xb800a], 0x022c ; ,
-    mov word [0xb800c], 0x0220 ;
-    mov word [0xb800e], 0x0277 ; w
-    mov word [0xb8010], 0x026f ; o
-    mov word [0xb8012], 0x0272 ; r
-    mov word [0xb8014], 0x026c ; l
-    mov word [0xb8016], 0x0264 ; d
-    mov word [0xb8018], 0x0221 ; !
-    ;;;
-    ;;; end program
-    hlt
+    ; GDT
+    lgdt [gdt64.pointer]
+
+    ; finish jumping to long mode
+    ; update selectors
+    mov ax, gdt64.data  ; ax - segment register, 16 bit version of eax
+    mov ss, ax  ; stack segment
+    mov ds, ax  ; data segment
+    mov es, ax  ; extra segment
+
+    ; jump to long mode!
+    jmp gdt64.code:long_mode_start
 
 
 ; let's setup paging
@@ -89,3 +84,33 @@ p3_table:
     resb 4096
 p2_table:
     resb 4096
+
+
+;;; Global descriptor table (GDT)
+section .rodata
+gdt64:
+    dq 0  ; first entry in the GDT is special: it needs to be a zero value
+.code: equ $ - gdt64  ; set the ."code" label's value to the current address minus the address of gdt64
+    ; set 44, 47, 41, 43, 53 bits to 1
+    ;   44: 'descriptor type': This has to be 1 for code and data segments
+    ;   47: 'present': This is set to 1 if the entry is valid
+    ;   41: 'read/write': If this is a code segment, 1 means that it’s readable
+    ;   43: 'executable': Set to 1 for code segments
+    ;   53: '64-bit': this is a 64-bit GDT
+    dq (1<<44) | (1<<47) | (1<<41) | (1<<43) | (1<<53)
+.data: equ $ - gdt64
+    ; for data segments 41=1 == writable
+    dq (1<<44) | (1<<47) | (1<<41)
+.pointer:
+    dw .pointer - gdt64 - 1
+    dq gdt64
+
+
+section .text
+bits 64
+long_mode_start:
+
+    mov rax, 0x2f592f412f4b2f4f  ; OKAY
+    mov qword [0xb8000], rax
+
+    hlt
