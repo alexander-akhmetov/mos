@@ -11,5 +11,8 @@
     "linker": "rust-lld",
     "panic-strategy": "abort",
     "disable-redzone": true,
-    "features": "-mmx,-sse,+soft-float"
+    "eliminate-frame-pointer": true,
+    "linker-is-gnu": true,
+    "no-compiler-rt": true,
+    "features": "-mmx,-sse,-sse2,-sse3,-ssse3,-sse4.1,-sse4.2,-3dnow,-3dnowa,-avx,-avx2"
 }

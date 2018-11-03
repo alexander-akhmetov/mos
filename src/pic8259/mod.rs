@@ -2,6 +2,8 @@ use spin::Mutex;
 
 use cpuio::UnsafePort;
 use cpuio::Port;
+#[macro_use]
+use logging;
 
 // Command sent to begin PIC initialization.
 const CMD_INIT: u8 = 0x11;
@@ -117,8 +119,8 @@ impl Pic8259 {
 }
 
 
-pub const PIC_1_OFFSET: u8 = 32;
-pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
+pub const PIC_1_OFFSET: u8 = 0x20;
+pub const PIC_2_OFFSET: u8 = 0x28;
 
 
 lazy_static! {
