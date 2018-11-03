@@ -26,7 +26,8 @@ build-bootloader: clean
 			-o $(BUILD_DIR)/kernel.bin \
 			-T src/boot/linker.ld \
 			$(BUILD_DIR)/multiboot_header.o \
-			$(BUILD_DIR)/boot.o
+			$(BUILD_DIR)/boot.o \
+			$(RUST_BUILD_DIR)/x86_64-mos/debug/libmos.a
 
 
 build-kernel:
@@ -69,6 +70,5 @@ integration-tests:
 	bash run-tests.sh
 
 
-qemu-run:
+qemu-run: iso
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso
-

@@ -111,6 +111,12 @@ impl Writer {
             self.buffer.chars[row][col].write(empty_symbol);
         }
     }
+
+    fn clear_screen(&mut self) {
+        for row in 0..BUFFER_HEIGHT*BUFFER_WIDTH {
+            self.write_byte(b' ');
+        }
+    }
 }
 
 
@@ -138,6 +144,10 @@ macro_rules! println {
 pub fn print(args: fmt::Arguments) {
     use core::fmt::Write;
     WRITER.lock().write_fmt(args).unwrap();
+}
+
+pub fn clear_screen() {
+    WRITER.lock().clear_screen();
 }
 
 

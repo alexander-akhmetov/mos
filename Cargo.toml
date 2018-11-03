@@ -3,6 +3,9 @@ name = "mos"
 version = "0.0.1"
 authors = ["Alexander Akhmetov <me@aleks.sh>"]
 
+[lib]
+crate-type = ["staticlib"]
+
 [dependencies]
 bootloader_precompiled = "0.3.0"
 volatile = "0.2.3"
