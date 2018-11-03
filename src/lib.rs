@@ -36,10 +36,11 @@ pub extern fn main() -> ! {
     vga_buffer::clear_screen();
     print!("Hello, world!\n");
 
-    // divide_by_zero();
-    // unsafe {
-    //     *(0xdeadbeef as *mut u64) = 42;
-    // };
+    interrupts::init();
+
+    unsafe {
+        *(0xdeadbeef as *mut u64) = 42;
+    };
 
     println!("It did not crash!");
 
