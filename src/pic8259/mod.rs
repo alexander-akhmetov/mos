@@ -117,8 +117,12 @@ impl Pic8259 {
 }
 
 
+pub const PIC_1_OFFSET: u8 = 32;
+pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
+
+
 lazy_static! {
     pub static ref PICS: Mutex<Pic8259> = Mutex::new(unsafe{
-        Pic8259::new(32, 32+8)
+        Pic8259::new(PIC_1_OFFSET, PIC_2_OFFSET)
     });
 }

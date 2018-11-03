@@ -39,9 +39,9 @@ pub extern fn main() -> ! {
     vga_buffer::clear_screen();
     kprintln!("Hello, world!");
 
-    interrupts::init();
-    unsafe { pic8259::PICS.lock().initialize(); }
-    x86_64::instructions::interrupts::enable();
+    // interrupts::init();
+    // unsafe { pic8259::PICS.lock().initialize(); }
+    // interrupts::enable();
 
     // unsafe {
     //     asm!("int3");
