@@ -13,9 +13,11 @@ install-requirements:
 
 	cargo install bootimage --version "^0.5.0"
 
+
 clean:
 	rm -rf $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)
+
 
 build-bootloader: clean
 	$(NASM) -f elf64 src/boot/multiboot_header.asm -o $(BUILD_DIR)/multiboot_header.o
@@ -52,6 +54,7 @@ unit-tests:
 
 tests: unit-tests integration-tests
 
+
 integration-test/%:
 	make build/$*
 
@@ -67,6 +70,5 @@ integration-tests:
 
 
 qemu-run:
-	# qemu-system-x86_64 -drive format=raw,file=target/x86_64-mos/debug/bootimage-mos.bin
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso
 
