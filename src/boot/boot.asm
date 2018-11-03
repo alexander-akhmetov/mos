@@ -3,7 +3,7 @@ global start
 section .text
 bits 32
 start:
-
+    mov esp, stack_top
     ; before enabling paging we have to create page table
     ; after, to enable paging we have to do 4 steps:
     ;   - 1) We have to put the address of the p4_table to a special register
@@ -75,7 +75,6 @@ start:
 
 ; let's setup paging
 section .bss  ; section "block started by symbol"
-
 align 4096
 
 p4_table:
@@ -84,6 +83,12 @@ p3_table:
     resb 4096
 p2_table:
     resb 4096
+
+section .bss
+stack_bottom:
+    resb 64
+stack_top:
+
 
 
 ;;; Global descriptor table (GDT)
@@ -109,7 +114,6 @@ gdt64:
 section .text
 bits 64
 long_mode_start:
-
     ; call the rust main
     extern main
     call main

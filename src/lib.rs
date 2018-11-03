@@ -15,17 +15,19 @@ extern crate uart_16550;
 extern crate x86_64;
 
 #[macro_use]
-pub mod vga_buffer;
+mod vga_buffer;
 #[macro_use]
-pub mod serial;
-pub mod interrupts;
+mod serial;
+mod interrupts;
+mod cpuio;
+mod keyboard;
 
 use core::panic::PanicInfo;
 
 #[panic_handler]
 #[cfg(not(test))] // only compile when the test flag is not set
 fn panic(info: &PanicInfo) -> ! {
-    println!("[KERNEL PANIC] {}", info);
+    kprintln!("[KERNEL PANIC] {}", info);
     loop {}
 }
 
@@ -34,17 +36,23 @@ fn panic(info: &PanicInfo) -> ! {
 pub extern fn main() -> ! {
     // kernel entrypoint
     vga_buffer::clear_screen();
-    print!("Hello, world!\n");
+    kprintln!("Hello, world!");
 
     interrupts::init();
 
-    unsafe {
-        *(0xdeadbeef as *mut u64) = 42;
-    };
+    // unsafe {
+    //     *(0xdeadbeef as *mut u64) = 42;
+    // };
+    let mut keyboard = keyboard::polling::PollingKeyboard::new(print_char);
 
-    println!("It did not crash!");
+    loop {
+        keyboard.update();
+    }
+}
 
-    loop {}
+
+fn print_char(c: char) {
+    kprint!("{}", c);
 }
 
 pub unsafe fn exit_qemu() {

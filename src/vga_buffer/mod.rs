@@ -113,7 +113,7 @@ impl Writer {
     }
 
     fn clear_screen(&mut self) {
-        for row in 0..BUFFER_HEIGHT*BUFFER_WIDTH {
+        for _row in 0..BUFFER_HEIGHT*BUFFER_WIDTH {
             self.write_byte(b' ');
         }
     }
@@ -129,16 +129,16 @@ impl fmt::Write for Writer {
 
 
 #[macro_export]
-macro_rules! print {
+macro_rules! kprint {
     ($($arg:tt)*) => ($crate::vga_buffer::print(format_args!($($arg)*)));
 }
 
 
 #[macro_export]
-macro_rules! println {
-    () => (print!("\n"));
-    ($fmt:expr) => (print!(concat!($fmt, "\n")));
-    ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
+macro_rules! kprintln {
+    () => (kprint!("\n"));
+    ($fmt:expr) => (kprint!(concat!($fmt, "\n")));
+    ($fmt:expr, $($arg:tt)*) => (kprint!(concat!($fmt, "\n"), $($arg)*));
 }
 
 pub fn print(args: fmt::Arguments) {
@@ -154,7 +154,7 @@ pub fn clear_screen() {
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        color_code: ColorCode::new(Color::LightGreen, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     });
 }
