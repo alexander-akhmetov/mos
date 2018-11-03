@@ -19,24 +19,24 @@ pub struct ExceptionStackFrame {
 
 
 extern "C" fn divide_by_zero_handler(stack_frame: &ExceptionStackFrame) -> ! {
-    println!("\n[KERNEL] EXCEPTION: DIVIDE BY ZERO\n{:#?}", stack_frame);
+    kprintln!("\n[KERNEL] EXCEPTION: DIVIDE BY ZERO\n{:#?}", stack_frame);
     loop {}
 }
 
 
 pub extern "C" fn double_fault_handler(stack_frame: &ExceptionStackFrame) -> ! {
-    println!("\n[KERNEL] EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+    kprintln!("\n[KERNEL] EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
     loop {}
 }
 
 extern "C" fn invalid_opcode_handler(stack_frame: &ExceptionStackFrame) -> ! {
     let stack_frame = unsafe { &*stack_frame };
-    println!("\nEXCEPTION: INVALID OPCODE at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln!("\nEXCEPTION: INVALID OPCODE at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
     loop {}
 }
 
 extern "C" fn page_fault_handler(stack_frame: &ExceptionStackFrame, error_code: u64) -> ! {
-    println!(
+    kprintln!(
         "\nEXCEPTION: PAGE FAULT with error code {:?}\n{:#?}",
         error_code, unsafe { &*stack_frame });
     loop {}
