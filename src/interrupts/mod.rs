@@ -1,6 +1,6 @@
 #[macro_use]
 mod idt;
-
+mod pic8259;
 
 pub fn init() {
     GLOBAL_IDT.load();
@@ -39,6 +39,18 @@ extern "C" fn page_fault_handler(stack_frame: &ExceptionStackFrame, error_code: 
     kprintln!(
         "\nEXCEPTION: PAGE FAULT with error code {:?}\n{:#?}",
         error_code, unsafe { &*stack_frame });
+    loop {}
+}
+
+extern "C" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) -> ! {
+    let stack_frame = unsafe { &*stack_frame };
+    kprintln!("\nEXCEPTION: BREAKPOINT at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    loop {}
+}
+
+extern "C" fn timer_interrupt_handler(stack_frame: &ExceptionStackFrame) -> ! {
+    kprint!(".");
+    unsafe { pic8259::PICS.lock().notify_end_of_interrupt(TIMER_INTERRUPT_ID) }
     loop {}
 }
 
@@ -81,13 +93,23 @@ macro_rules! handler_with_error_code {
 }
 
 
+pub const DIVIDE_BY_ZERO_EXCEPTION_INTERRUPT_ID: u8 = 8;
+pub const TIMER_INTERRUPT_ID: u8 = 32;
+pub const BREAKPOINT_EXCEPTION_INTERRUPT_ID: u8 = 3;
+
+
 lazy_static! {
     static ref GLOBAL_IDT: idt::IDT = {
         let mut idt = idt::IDT::new();
 
-        idt.set_handler(0, handler!(divide_by_zero_handler));
+        idt.set_handler(DIVIDE_BY_ZERO_EXCEPTION_INTERRUPT_ID, handler!(divide_by_zero_handler));
+        idt.set_handler(BREAKPOINT_EXCEPTION_INTERRUPT_ID, handler!(breakpoint_handler));
         idt.set_handler(6, handler!(invalid_opcode_handler));
+        idt.set_handler(8, handler!(double_fault_handler));
         idt.set_handler(14, handler_with_error_code!(page_fault_handler));
+
+        // PIC
+        idt.set_handler(TIMER_INTERRUPT_ID, handler!(timer_interrupt_handler));
 
         idt
     };
