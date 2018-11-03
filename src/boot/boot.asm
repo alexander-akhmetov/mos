@@ -86,7 +86,7 @@ p2_table:
 
 section .bss
 stack_bottom:
-    resb 128
+    resb 4096 * 4
 stack_top:
 
 
