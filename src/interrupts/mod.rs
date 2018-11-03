@@ -20,20 +20,24 @@ pub struct ExceptionStackFrame {
 
 // https://wiki.osdev.org/Exceptions
 
+fn kprintln_exception(name: &str, stack_frame: &ExceptionStackFrame) {
+    let stack_frame = unsafe { &*stack_frame };
+    kprintln!("\n[KERNEL] EXCEPTION: {}: {:#x}\n{:#?}", name, stack_frame.instruction_pointer, stack_frame);
+}
+
 extern "C" fn divide_by_zero_irq(stack_frame: &ExceptionStackFrame) {
-    kprintln!("\n[KERNEL] EXCEPTION: DIVIDE BY ZERO\n{:#?}", stack_frame);
+    kprintln_exception("Divide by zero", stack_frame);
     loop {}
 }
 
 
 pub extern "C" fn double_fault_irq(stack_frame: &ExceptionStackFrame) {
-    kprintln!("\n[KERNEL] EXCEPTION: DOUBLE FAULT: {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Double fault", stack_frame);
     loop {}
 }
 
 extern "C" fn invalid_opcode_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: INVALID OPCODE at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Invalid Opcode", stack_frame);
     loop {}
 }
 
@@ -45,8 +49,7 @@ extern "C" fn page_fault_irq(stack_frame: &ExceptionStackFrame, error_code: u64)
 }
 
 extern "C" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: BREAKPOINT at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Breakpoint", stack_frame);
 }
 
 extern "C" fn timer_interrupt_irq(stack_frame: &ExceptionStackFrame) {
@@ -55,56 +58,47 @@ extern "C" fn timer_interrupt_irq(stack_frame: &ExceptionStackFrame) {
 }
 
 extern "C" fn general_protection_fault_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: GENERAL PROTECTION FAULT at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("General protection fault", stack_frame);
     loop {}
 }
 
 extern "C" fn debug_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: DEBUG at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Debug", stack_frame);
     loop {}
 }
 
 extern "C" fn overflow_irq_handler(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: OVERFLOW at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Overflow", stack_frame);
     loop {}
 }
 
 extern "C" fn non_maskable_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: NON MASKABLE at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Non Maskable", stack_frame);
     loop {}
 }
 
 extern "C" fn bound_range_exceeded_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: BOUND RANGE EXCEEDED at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Bound Range Exceeded", stack_frame);
     loop {}
 }
 
 extern "C" fn invalid_tss_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: INVALID TSS at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Invalid TSS", stack_frame);
     loop {}
 }
 
 extern "C" fn segment_not_present_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: SEGMENT NOT PRESENT at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Segment Not Present", stack_frame);
     loop {}
 }
 
 extern "C" fn stack_segment_fault_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: STACK-SEGMENT FAULT at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Stack-Segment Fault", stack_frame);
     loop {}
 }
 
 extern "C" fn device_not_available_irq(stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\nEXCEPTION: DEVICE NOT AVAILABLE at {:#x}\n{:#?}", stack_frame.instruction_pointer, stack_frame);
+    kprintln_exception("Device Not Available", stack_frame);
     loop {}
 }
 
@@ -114,7 +108,7 @@ macro_rules! default_handler {
 
         extern "C" fn hndlr(stack_frame: &ExceptionStackFrame) {
             let stack_frame = unsafe { &*stack_frame };
-            kprintln!("\nEXCEPTION: {} at {:#x}\n{:#?}", $name, stack_frame.instruction_pointer, stack_frame);
+            kprintln_exception($name, stack_frame);
             loop {}
         }
 
@@ -218,8 +212,6 @@ lazy_static! {
         idt.set_handler(28, default_handler!("Exception 28"));
         idt.set_handler(29, default_handler!("Exception 29"));
         idt.set_handler(30, default_handler!("Security Exception"));
-        idt.set_handler(31, default_handler!("Exception 31"));
-
 
         // PIC
         idt.set_handler(TIMER_INTERRUPT_ID, handler!(timer_interrupt_irq));
@@ -240,7 +232,6 @@ lazy_static! {
         idt.set_handler(45, default_handler!("Exception 45"));
         idt.set_handler(46, default_handler!("Exception 46"));
         idt.set_handler(47, default_handler!("Exception 47"));
-        // idt.set_handler(48, default_handler!("Exception 48"));
 
         idt
     };
