@@ -18,7 +18,7 @@ pub fn print(args: ::core::fmt::Arguments) {
 
 
 #[macro_export]
-macro_rules! serial_print {
+macro_rules! serial_kprint {
     ($($arg:tt)*) => {
         $crate::serial::print(format_args!($($arg)*));
     };
@@ -26,7 +26,7 @@ macro_rules! serial_print {
 
 
 #[macro_export]
-macro_rules! serial_println {
+macro_rules! serial_kprintln {
     () => (serial_kprint!("\n"));
     ($fmt:expr) => (serial_kprint!(concat!($fmt, "\n")));
     ($fmt:expr, $($arg:tt)*) => (serial_kprint!(concat!($fmt, "\n"), $($arg)*));

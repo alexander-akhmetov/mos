@@ -17,6 +17,8 @@ extern crate x86_64;
 #[macro_use]
 mod vga_buffer;
 #[macro_use]
+mod logging;
+#[macro_use]
 mod serial;
 mod interrupts;
 mod cpuio;
@@ -39,7 +41,7 @@ pub extern fn main() -> ! {
     vga_buffer::clear_screen();
     kprintln!("Hello, world!");
 
-    // interrupts::init();
+    interrupts::init();
     // unsafe { pic8259::PICS.lock().initialize(); }
     // interrupts::enable();
 
@@ -66,3 +68,4 @@ pub unsafe fn exit_qemu() {
     let mut port = Port::<u32>::new(0xf4);
     port.write(0);
 }
+

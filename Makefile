@@ -71,4 +71,4 @@ integration-tests:
 
 
 qemu-run: iso
-	$(QEMU) -cdrom $(BUILD_DIR)/os.iso
+	$(QEMU) -cdrom $(BUILD_DIR)/os.iso -serial mon:stdio
