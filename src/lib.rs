@@ -21,6 +21,7 @@ mod serial;
 mod interrupts;
 mod cpuio;
 mod keyboard;
+mod pic8259;
 
 use core::panic::PanicInfo;
 
@@ -43,6 +44,7 @@ pub extern fn main() -> ! {
     // unsafe {
     //     *(0xdeadbeef as *mut u64) = 42;
     // };
+    unsafe { pic8259::PICS.lock().initialize(); }
     let mut keyboard = keyboard::polling::PollingKeyboard::new(print_char);
 
     loop {
