@@ -1,7 +1,6 @@
 use memory::{Frame, FrameAllocator};
 use multiboot2::{MemoryArea, MemoryAreaIter};
 
-
 // #[derive(Debug)]
 // #[repr(C)]
 // pub struct MemoryArea {
@@ -20,7 +19,6 @@ use multiboot2::{MemoryArea, MemoryAreaIter};
 //     _reserved: u32,  // set to 0 by the bootloader and must be ignored by OS
 // }
 
-
 pub struct SimpleFrameAllocator {
     next_free_frame: Frame,
     current_area: Option<&'static MemoryArea>,
@@ -31,12 +29,13 @@ pub struct SimpleFrameAllocator {
     multiboot_end: Frame,
 }
 
-
 impl FrameAllocator for SimpleFrameAllocator {
     fn allocate_frame(&mut self) -> Option<Frame> {
         if let Some(area) = self.current_area {
             // at first we create a frame structure
-            let frame = Frame{ index: self.next_free_frame.index };
+            let frame = Frame {
+                index: self.next_free_frame.index,
+            };
             let current_area_last_frame = {
                 let address = area.base_addr + area.length - 1;
                 Frame::get_for_address(address as usize)
@@ -63,7 +62,7 @@ impl FrameAllocator for SimpleFrameAllocator {
             // so let's try again with the new self.next_free_frame.index (we had to do += 1 before!)
             self.allocate_frame()
         } else {
-            None  // no frames left
+            None // no frames left
         }
     }
 
@@ -72,12 +71,14 @@ impl FrameAllocator for SimpleFrameAllocator {
     }
 }
 
-
 impl SimpleFrameAllocator {
-    pub fn new(kernel_start: usize, kernel_end: usize,
-               multiboot_start: usize, multiboot_end: usize,
-               memory_areas: MemoryAreaIter) -> SimpleFrameAllocator {
-
+    pub fn new(
+        kernel_start: usize,
+        kernel_end: usize,
+        multiboot_start: usize,
+        multiboot_end: usize,
+        memory_areas: MemoryAreaIter,
+    ) -> SimpleFrameAllocator {
         let mut allocator = SimpleFrameAllocator {
             next_free_frame: Frame::get_for_address(0),
             current_area: None,
@@ -93,10 +94,14 @@ impl SimpleFrameAllocator {
     }
 
     fn switch_to_next_memory_area(&mut self) {
-        self.current_area = self.areas.clone().filter(|area| {
-            let address = area.base_addr + area.length - 1;
-            Frame::get_for_address(address as usize) >= self.next_free_frame
-        }).min_by_key(|area| area.base_addr);
+        self.current_area = self
+            .areas
+            .clone()
+            .filter(|area| {
+                let address = area.base_addr + area.length - 1;
+                Frame::get_for_address(address as usize) >= self.next_free_frame
+            })
+            .min_by_key(|area| area.base_addr);
 
         if let Some(area) = self.current_area {
             let start_frame = Frame::get_for_address(area.base_addr as usize);

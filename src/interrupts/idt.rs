@@ -3,15 +3,13 @@ use x86_64::instructions::segmentation;
 use x86_64::structures::gdt::SegmentSelector;
 use x86_64::PrivilegeLevel;
 
-
 const IDT_SIZE: usize = 48;
 #[allow(dead_code)]
-extern {
+extern "C" {
     /// The offset of the main code segment in our GDT.  Exported by our
     /// assembly code.
     static gdt64_code_offset: u16;
 }
-
 
 #[derive(Debug, Clone, Copy)]
 pub struct EntryOptions(u16);
@@ -19,7 +17,7 @@ pub struct EntryOptions(u16);
 impl EntryOptions {
     fn minimal() -> Self {
         let mut options = 0;
-        options |= 0b111 << 9;  // "must be one" bits: 0b0000_0111_0000_0000
+        options |= 0b111 << 9; // "must be one" bits: 0b0000_0111_0000_0000
         EntryOptions(options)
     }
 
@@ -60,7 +58,6 @@ impl EntryOptions {
     }
 }
 
-
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
 pub struct Entry {
@@ -71,7 +68,6 @@ pub struct Entry {
     pointer_high: u32,
     reserved: u32,
 }
-
 
 impl Entry {
     fn new(gdt_selector: SegmentSelector, handler_fn_pointer: u64) -> Self {
@@ -97,7 +93,6 @@ impl Entry {
     }
 }
 
-
 pub struct IDT([Entry; IDT_SIZE]);
 
 impl IDT {
@@ -111,8 +106,8 @@ impl IDT {
     }
 
     pub fn load(&'static self) {
-        use x86_64::instructions::tables::{DescriptorTablePointer, lidt};
         use core::mem::size_of;
+        use x86_64::instructions::tables::{lidt, DescriptorTablePointer};
 
         let ptr = DescriptorTablePointer {
             base: self as *const _ as u64,
