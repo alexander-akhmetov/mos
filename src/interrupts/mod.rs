@@ -50,7 +50,7 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_interrupt_irq(stack_frame: &ExceptionStackFrame) {
-    kprint!(".");
+    // kprint!(".");
     unsafe { pic8259::PICS.lock().notify_end_of_interrupt(TIMER_INTERRUPT_ID); }
 }
 

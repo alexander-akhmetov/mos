@@ -17,9 +17,10 @@ install-requirements:
 clean:
 	rm -rf $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)
+	rm -rf $(RUST_BUILD_DIR)
 
 
-build-bootloader: clean
+build-bootloader:
 	$(NASM) -f elf64 src/boot/multiboot_header.asm -o $(BUILD_DIR)/multiboot_header.o
 	$(NASM) -f elf64 src/boot/boot.asm -o $(BUILD_DIR)/boot.o
 	$(NASM) -f elf64 src/boot/long_mode_init.asm -o $(BUILD_DIR)/long_mode_init.o
