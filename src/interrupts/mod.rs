@@ -4,7 +4,6 @@ mod idt;
 use keyboard;
 use pic8259;
 
-
 #[derive(Debug)]
 #[repr(C)]
 pub struct ExceptionStackFrame {
@@ -19,14 +18,18 @@ pub struct ExceptionStackFrame {
 
 fn kprintln_exception(name: &str, stack_frame: &ExceptionStackFrame) {
     let stack_frame = unsafe { &*stack_frame };
-    kprintln!("\n[KERNEL] EXCEPTION: {}: {:#x}\n{:#?}", name, stack_frame.instruction_pointer, stack_frame);
+    kprintln!(
+        "\n[KERNEL] EXCEPTION: {}: {:#x}\n{:#?}",
+        name,
+        stack_frame.instruction_pointer,
+        stack_frame
+    );
 }
 
 extern "x86-interrupt" fn divide_by_zero_irq(stack_frame: &ExceptionStackFrame) {
     kprintln_exception("Divide by zero", stack_frame);
     loop {}
 }
-
 
 pub extern "x86-interrupt" fn double_fault_irq(stack_frame: &ExceptionStackFrame) {
     kprintln_exception("Double fault", stack_frame);
@@ -41,7 +44,9 @@ extern "x86-interrupt" fn invalid_opcode_irq(stack_frame: &ExceptionStackFrame) 
 extern "x86-interrupt" fn page_fault_irq(stack_frame: &ExceptionStackFrame, error_code: u64) {
     kprintln!(
         "\nEXCEPTION: PAGE FAULT with error code {:?}\n{:#?}",
-        error_code, unsafe { &*stack_frame });
+        error_code,
+        unsafe { &*stack_frame }
+    );
     loop {}
 }
 
@@ -51,7 +56,11 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 
 extern "x86-interrupt" fn timer_interrupt_irq(stack_frame: &ExceptionStackFrame) {
     // kprint!(".");
-    unsafe { pic8259::PICS.lock().notify_end_of_interrupt(TIMER_INTERRUPT_ID); }
+    unsafe {
+        pic8259::PICS
+            .lock()
+            .notify_end_of_interrupt(TIMER_INTERRUPT_ID);
+    }
 }
 
 extern "x86-interrupt" fn keyboard_irq(stack_frame: &ExceptionStackFrame) {
@@ -59,7 +68,11 @@ extern "x86-interrupt" fn keyboard_irq(stack_frame: &ExceptionStackFrame) {
     if let Some(character) = character {
         kprint!("{}", character);
     }
-    unsafe { pic8259::PICS.lock().notify_end_of_interrupt(KEYBOARD_INTERRUPT_ID); }
+    unsafe {
+        pic8259::PICS
+            .lock()
+            .notify_end_of_interrupt(KEYBOARD_INTERRUPT_ID);
+    }
 }
 
 extern "x86-interrupt" fn general_protection_fault_irq(stack_frame: &ExceptionStackFrame) {
@@ -107,7 +120,6 @@ extern "x86-interrupt" fn device_not_available_irq(stack_frame: &ExceptionStackF
     loop {}
 }
 
-
 macro_rules! default_handler {
     ($name: expr) => {{
         extern "x86-interrupt" fn hndlr(stack_frame: &ExceptionStackFrame) {
@@ -115,13 +127,11 @@ macro_rules! default_handler {
             loop {}
         }
         hndlr
-    }}
+    }};
 }
-
 
 const TIMER_INTERRUPT_ID: u8 = pic8259::PIC_1_OFFSET;
 const KEYBOARD_INTERRUPT_ID: u8 = pic8259::PIC_1_OFFSET + 1;
-
 
 lazy_static! {
     static ref GLOBAL_IDT: idt::IDT = {
@@ -157,13 +167,11 @@ lazy_static! {
     };
 }
 
-
 pub fn enable() {
     unsafe {
         asm!("sti");
     }
 }
-
 
 // breakpoint exception
 pub fn int3() {
@@ -171,7 +179,6 @@ pub fn int3() {
         asm!("int3");
     }
 }
-
 
 pub fn init() {
     GLOBAL_IDT.load();

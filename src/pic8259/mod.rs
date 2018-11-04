@@ -20,7 +20,6 @@ struct Pic {
     data: cpuio::UnsafePort<u8>,
 }
 
-
 impl Pic {
     fn handles_interrupt(&self, interupt_id: u8) -> bool {
         // helper to check is this pic can processe this interrupt_id or not
@@ -32,7 +31,6 @@ impl Pic {
         self.command.write(CMD_END_OF_INTERRUPT);
     }
 }
-
 
 pub struct Pic8259 {
     pics: [Pic; 2],
@@ -52,7 +50,7 @@ impl Pic8259 {
                     command: cpuio::UnsafePort::new(0xA0),
                     data: cpuio::UnsafePort::new(0xA1),
                 },
-            ]
+            ],
         }
     }
 
@@ -66,7 +64,7 @@ impl Pic8259 {
         //      outb	%al, $0x80	/* A short delay */
         //
         let mut wait_port: cpuio::Port<u8> = cpuio::Port::new(0x80);
-        let mut wait = || { wait_port.write(0) };
+        let mut wait = || wait_port.write(0);
 
         // save original pics data
         // why do I need to do this?  "save masks" osdev wiki
@@ -117,13 +115,10 @@ impl Pic8259 {
     }
 }
 
-
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
-
 lazy_static! {
-    pub static ref PICS: Mutex<Pic8259> = Mutex::new(unsafe{
-        Pic8259::new(PIC_1_OFFSET, PIC_2_OFFSET)
-    });
+    pub static ref PICS: Mutex<Pic8259> =
+        Mutex::new(unsafe { Pic8259::new(PIC_1_OFFSET, PIC_2_OFFSET) });
 }

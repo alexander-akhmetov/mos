@@ -1,6 +1,6 @@
 use core::fmt;
-use volatile::Volatile;
 use spin::Mutex;
+use volatile::Volatile;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -23,7 +23,6 @@ pub enum Color {
     Yellow = 14,
     White = 15,
 }
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct ColorCode(u8);
@@ -48,13 +47,11 @@ struct Buffer {
     chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
-
 pub struct Writer {
     column_position: usize,
     color_code: ColorCode,
     buffer: &'static mut Buffer,
 }
-
 
 impl Writer {
     pub fn write_string(&mut self, s: &str) {
@@ -63,7 +60,7 @@ impl Writer {
                 // printable ASCII byte or newline 32...126 (code page 437)
                 0x20...0x7e | b'\n' => self.write_byte(byte),
                 // not ASCII
-                _ => self.write_byte(0xfe),  // ■
+                _ => self.write_byte(0xfe), // ■
             }
         }
     }
@@ -113,12 +110,11 @@ impl Writer {
     }
 
     fn clear_screen(&mut self) {
-        for _row in 0..BUFFER_HEIGHT*BUFFER_WIDTH {
+        for _row in 0..BUFFER_HEIGHT * BUFFER_WIDTH {
             self.write_byte(b' ');
         }
     }
 }
-
 
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
@@ -127,12 +123,10 @@ impl fmt::Write for Writer {
     }
 }
 
-
 #[macro_export]
 macro_rules! kprint {
     ($($arg:tt)*) => ($crate::vga_buffer::print(format_args!($($arg)*)));
 }
-
 
 #[macro_export]
 macro_rules! kprintln {
@@ -150,7 +144,6 @@ pub fn clear_screen() {
     WRITER.lock().clear_screen();
 }
 
-
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
@@ -158,7 +151,6 @@ lazy_static! {
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     });
 }
-
 
 #[cfg(test)]
 mod test {

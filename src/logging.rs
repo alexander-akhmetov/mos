@@ -3,8 +3,6 @@ use vga_buffer;
 #[macro_use]
 use serial;
 
-
-
 #[macro_export]
 macro_rules! system_log {
     () => (
