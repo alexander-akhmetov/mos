@@ -1,7 +1,6 @@
 use spin::Mutex;
 
 use cpuio;
-#[macro_use]
 use logging;
 
 // Command sent to begin PIC initialization.

@@ -5,9 +5,10 @@
     core_intrinsics,
     rustc_private,
     abi_x86_interrupt,
-    no_std
+    naked_functions,
 )]
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
+#![allow(dead_code, unused_imports)]
 
 extern crate bootloader_precompiled;
 extern crate multiboot2;
@@ -29,7 +30,6 @@ mod interrupts;
 mod keyboard;
 mod memory;
 mod pic8259;
-use memory::FrameAllocator;
 
 use core::panic::PanicInfo;
 
@@ -58,6 +58,10 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // }
     // divide_by_zero();
 
+    unsafe {
+        interrupts::irs::make_system_call();
+    }
+
     kprintln!("It did not crash!");
     print_kernel_info(multiboot_information_address);
 
@@ -68,7 +72,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
 
 fn print_kernel_info(multiboot_information_address: usize) {
     let boot_info = unsafe { multiboot2::load(multiboot_information_address) };
-    let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
+    // let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
 
     let elf_sections_tag = boot_info
         .elf_sections_tag()
@@ -96,27 +100,23 @@ fn print_kernel_info(multiboot_information_address: usize) {
         multiboot_end - multiboot_start
     );
 
-    let mut frame_allocator = memory::SimpleFrameAllocator::new(
-        kernel_start as usize,
-        kernel_end as usize,
-        multiboot_start,
-        multiboot_end,
-        memory_map_tag.memory_areas(),
-    );
-    for i in 0.. {
-        if let None = frame_allocator.allocate_frame() {
-            system_log!("allocated {} frames", i);
-            break;
-        }
-    }
+    // let mut frame_allocator = memory::SimpleFrameAllocator::new(
+    //     kernel_start as usize,
+    //     kernel_end as usize,
+    //     multiboot_start,
+    //     multiboot_end,
+    //     memory_map_tag.memory_areas(),
+    // );
+    // for i in 0.. {
+    //     if let None = frame_allocator.allocate_frame() {
+    //         system_log!("allocated {} frames", i);
+    //         break;
+    //     }
+    // }
 }
 
 fn divide_by_zero() {
     unsafe { asm!("mov dx, 0; div dx" ::: "ax", "dx" : "volatile", "intel") }
-}
-
-fn print_char(c: char) {
-    kprint!("{}", c);
 }
 
 pub unsafe fn exit_qemu() {
