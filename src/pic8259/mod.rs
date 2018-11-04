@@ -1,7 +1,6 @@
 use spin::Mutex;
 
-use cpuio::UnsafePort;
-use cpuio::Port;
+use cpuio;
 #[macro_use]
 use logging;
 
@@ -17,8 +16,8 @@ const MODE_8086: u8 = 0x01;
 // and each handles 8 interrupts
 struct Pic {
     offset: u8,
-    command: UnsafePort<u8>,
-    data: UnsafePort<u8>,
+    command: cpuio::UnsafePort<u8>,
+    data: cpuio::UnsafePort<u8>,
 }
 
 
@@ -45,13 +44,13 @@ impl Pic8259 {
             pics: [
                 Pic {
                     offset: offset1,
-                    command: UnsafePort::new(0x20),
-                    data: UnsafePort::new(0x21),
+                    command: cpuio::UnsafePort::new(0x20),
+                    data: cpuio::UnsafePort::new(0x21),
                 },
                 Pic {
                     offset: offset2,
-                    command: UnsafePort::new(0xA0),
-                    data: UnsafePort::new(0xA1),
+                    command: cpuio::UnsafePort::new(0xA0),
+                    data: cpuio::UnsafePort::new(0xA1),
                 },
             ]
         }
@@ -66,7 +65,7 @@ impl Pic8259 {
         //
         //      outb	%al, $0x80	/* A short delay */
         //
-        let mut wait_port: Port<u8> = Port::new(0x80);
+        let mut wait_port: cpuio::Port<u8> = cpuio::Port::new(0x80);
         let mut wait = || { wait_port.write(0) };
 
         // save original pics data
@@ -74,9 +73,9 @@ impl Pic8259 {
         let saved_mask1 = self.pics[0].data.read();
         let saved_mask2 = self.pics[1].data.read();
 
-        self.pics[0].data.write(CMD_INIT);
+        self.pics[0].command.write(CMD_INIT);
         wait();
-        self.pics[1].data.write(CMD_INIT);
+        self.pics[1].command.write(CMD_INIT);
         wait();
 
         // now we send three commands: offsets, chaining between pic1 and pic2 and our mode
@@ -119,8 +118,8 @@ impl Pic8259 {
 }
 
 
-pub const PIC_1_OFFSET: u8 = 0x20;
-pub const PIC_2_OFFSET: u8 = 0x28;
+pub const PIC_1_OFFSET: u8 = 32;
+pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
 
 lazy_static! {

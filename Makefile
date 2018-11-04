@@ -22,11 +22,15 @@ clean:
 build-bootloader: clean
 	$(NASM) -f elf64 src/boot/multiboot_header.asm -o $(BUILD_DIR)/multiboot_header.o
 	$(NASM) -f elf64 src/boot/boot.asm -o $(BUILD_DIR)/boot.o
+	$(NASM) -f elf64 src/boot/long_mode_init.asm -o $(BUILD_DIR)/long_mode_init.o
+	$(NASM) -f elf64 src/boot/checks.asm -o $(BUILD_DIR)/checks.o
 	$(LD) --nmagic \
 			-o $(BUILD_DIR)/kernel.bin \
 			-T src/boot/linker.ld \
 			$(BUILD_DIR)/multiboot_header.o \
 			$(BUILD_DIR)/boot.o \
+			$(BUILD_DIR)/long_mode_init.o \
+			$(BUILD_DIR)/checks.o \
 			$(RUST_BUILD_DIR)/x86_64-mos/debug/libmos.a
 
 
@@ -71,4 +75,4 @@ integration-tests:
 
 
 qemu-run: iso
-	$(QEMU) -cdrom $(BUILD_DIR)/os.iso -serial mon:stdio
+	$(QEMU) -cdrom $(BUILD_DIR)/os.iso -serial mon:stdio -m 512M

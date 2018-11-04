@@ -1,5 +1,3 @@
-#![feature(asm)]
-
 use core::marker::PhantomData;
 
 mod x86;
@@ -37,7 +35,7 @@ impl InOut for u32 {
 
 
 impl<T: InOut> Port<T> {
-    pub fn new(port: u16) -> Port<T> {
+    pub const unsafe fn new(port: u16) -> Port<T> {
         Port { port: port, phantom: PhantomData }
     }
 
@@ -57,7 +55,7 @@ pub struct UnsafePort<T: InOut> {
 }
 
 impl<T: InOut> UnsafePort<T> {
-    pub unsafe fn new(port: u16) -> UnsafePort<T> {
+    pub const unsafe fn new(port: u16) -> UnsafePort<T> {
         UnsafePort { port: port, phantom: PhantomData }
     }
 
