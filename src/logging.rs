@@ -1,6 +1,4 @@
-#[macro_use]
 use vga_buffer;
-#[macro_use]
 use serial;
 
 #[macro_export]

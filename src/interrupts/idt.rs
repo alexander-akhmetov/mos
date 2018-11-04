@@ -3,7 +3,7 @@ use x86_64::instructions::segmentation;
 use x86_64::structures::gdt::SegmentSelector;
 use x86_64::PrivilegeLevel;
 
-const IDT_SIZE: usize = 48;
+const IDT_SIZE: usize = 256;
 #[allow(dead_code)]
 extern "C" {
     /// The offset of the main code segment in our GDT.  Exported by our

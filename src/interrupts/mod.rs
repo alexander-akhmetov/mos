@@ -1,5 +1,6 @@
 #[macro_use]
 mod idt;
+pub mod irs;
 
 use keyboard;
 use pic8259;
@@ -17,12 +18,11 @@ pub struct ExceptionStackFrame {
 // https://wiki.osdev.org/Exceptions
 
 fn kprintln_exception(name: &str, stack_frame: &ExceptionStackFrame) {
-    let stack_frame = unsafe { &*stack_frame };
     kprintln!(
         "\n[KERNEL] EXCEPTION: {}: {:#x}\n{:#?}",
         name,
         stack_frame.instruction_pointer,
-        stack_frame
+        &*stack_frame,
     );
 }
 
@@ -45,7 +45,7 @@ extern "x86-interrupt" fn page_fault_irq(stack_frame: &ExceptionStackFrame, erro
     kprintln!(
         "\nEXCEPTION: PAGE FAULT with error code {:?}\n{:#?}",
         error_code,
-        unsafe { &*stack_frame }
+        &*stack_frame,
     );
     loop {}
 }
@@ -54,7 +54,7 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
     kprintln_exception("Breakpoint", stack_frame);
 }
 
-extern "x86-interrupt" fn timer_interrupt_irq(stack_frame: &ExceptionStackFrame) {
+extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame) {
     // kprint!(".");
     unsafe {
         pic8259::PICS
@@ -63,7 +63,7 @@ extern "x86-interrupt" fn timer_interrupt_irq(stack_frame: &ExceptionStackFrame)
     }
 }
 
-extern "x86-interrupt" fn keyboard_irq(stack_frame: &ExceptionStackFrame) {
+extern "x86-interrupt" fn keyboard_irq(_stack_frame: &ExceptionStackFrame) {
     let character = keyboard::read_character();
     if let Some(character) = character {
         kprint!("{}", character);
@@ -130,6 +130,27 @@ macro_rules! default_handler {
     }};
 }
 
+extern "C" fn system_call(system_call_number: u64) {
+    kprintln!("System call: '{}'", system_call_number);
+}
+
+macro_rules! system_call_handler {
+    ($name: ident) => {{
+        #[naked]
+        extern "C" fn wrapper() {
+            unsafe {
+                asm!("mov rdi, rax
+                      call $0"
+                      :: "i"($name as extern "C" fn(system_call_number: u64))
+                      : "rdi" : "intel",
+                );
+                asm!("iretq" :::: "intel", "volatile");
+            }
+        }
+        wrapper
+    }}
+}
+
 const TIMER_INTERRUPT_ID: u8 = pic8259::PIC_1_OFFSET;
 const KEYBOARD_INTERRUPT_ID: u8 = pic8259::PIC_1_OFFSET + 1;
 
@@ -162,6 +183,9 @@ lazy_static! {
         // PIC
         idt.set_handler(TIMER_INTERRUPT_ID, timer_interrupt_irq as u64);
         idt.set_handler(KEYBOARD_INTERRUPT_ID, keyboard_irq as u64);
+
+        // API
+        idt.set_handler(128, system_call_handler!(system_call) as u64);
 
         idt
     };
