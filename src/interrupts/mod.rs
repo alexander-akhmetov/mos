@@ -1,6 +1,7 @@
 #[macro_use]
 mod idt;
 
+use keyboard;
 use pic8259;
 
 
@@ -50,7 +51,15 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 
 extern "x86-interrupt" fn timer_interrupt_irq(stack_frame: &ExceptionStackFrame) {
     kprint!(".");
-    unsafe { pic8259::PICS.lock().notify_end_of_interrupt(TIMER_INTERRUPT_ID) }
+    unsafe { pic8259::PICS.lock().notify_end_of_interrupt(TIMER_INTERRUPT_ID); }
+}
+
+extern "x86-interrupt" fn keyboard_irq(stack_frame: &ExceptionStackFrame) {
+    let character = keyboard::read_character();
+    if let Some(character) = character {
+        kprint!("{}", character);
+    }
+    unsafe { pic8259::PICS.lock().notify_end_of_interrupt(KEYBOARD_INTERRUPT_ID); }
 }
 
 extern "x86-interrupt" fn general_protection_fault_irq(stack_frame: &ExceptionStackFrame) {
@@ -110,7 +119,8 @@ macro_rules! default_handler {
 }
 
 
-const TIMER_INTERRUPT_ID: u8 = 32;
+const TIMER_INTERRUPT_ID: u8 = pic8259::PIC_1_OFFSET;
+const KEYBOARD_INTERRUPT_ID: u8 = pic8259::PIC_1_OFFSET + 1;
 
 
 lazy_static! {
@@ -141,6 +151,7 @@ lazy_static! {
 
         // PIC
         idt.set_handler(TIMER_INTERRUPT_ID, timer_interrupt_irq as u64);
+        idt.set_handler(KEYBOARD_INTERRUPT_ID, keyboard_irq as u64);
 
         idt
     };

@@ -56,9 +56,6 @@ pub fn char_from_scancode(code: usize) -> Option<char> {
         0x33 => ',',
         0x34 => '.',
         0x35 => '/',
-        0x37 => '*', // Keypad
-        0x4a => '-', // Keypad
-        0x4e => '+', // Keypad
         _ => return None,
     };
 

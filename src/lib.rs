@@ -42,21 +42,15 @@ pub extern fn main(multiboot_information_address: usize) -> ! {
     unsafe { pic8259::PICS.lock().initialize(); }
     interrupts::enable();
 
-    unsafe {
-        asm!("int3");
-    }
-
+    // unsafe {
+    //     asm!("int3");
+    // }
     // divide_by_zero();
 
     kprintln!("It did not crash!");
-
     print_kernel_info(multiboot_information_address);
 
-    let mut keyboard = keyboard::polling::PollingKeyboard::new(print_char);
-    loop {
-        // keyboard.update();
-        // unsafe {halt()}
-    }
+    unsafe { hlt_loop(); }
 }
 
 
@@ -104,6 +98,8 @@ pub unsafe fn exit_qemu() {
 
 /// Halts the CPU by executing the `hlt` instruction.
 #[inline(always)]
-pub unsafe fn halt() {
-    asm!("hlt" :::: "volatile");
+pub unsafe fn hlt_loop() -> ! {
+    loop {
+        asm!("hlt" :::: "volatile");
+    }
 }
