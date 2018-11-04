@@ -3,16 +3,15 @@ use x86_64::instructions::segmentation;
 use x86_64::structures::gdt::SegmentSelector;
 use x86_64::PrivilegeLevel;
 
-#[derive(Debug, Clone, Copy)]
-#[repr(C, packed)]
-pub struct Entry {
-    pointer_low: u16,
-    gdt_selector: SegmentSelector,
-    options: EntryOptions,
-    pointer_middle: u16,
-    pointer_high: u32,
-    reserved: u32,
+
+const IDT_SIZE: usize = 48;
+#[allow(dead_code)]
+extern {
+    /// The offset of the main code segment in our GDT.  Exported by our
+    /// assembly code.
+    static gdt64_code_offset: u16;
 }
+
 
 #[derive(Debug, Clone, Copy)]
 pub struct EntryOptions(u16);
@@ -62,17 +61,25 @@ impl EntryOptions {
 }
 
 
-pub type HandlerFunc = extern "C" fn();
+#[derive(Debug, Clone, Copy)]
+#[repr(C, packed)]
+pub struct Entry {
+    pointer_low: u16,
+    gdt_selector: SegmentSelector,
+    options: EntryOptions,
+    pointer_middle: u16,
+    pointer_high: u32,
+    reserved: u32,
+}
 
 
 impl Entry {
-    fn new(gdt_selector: SegmentSelector, handler: HandlerFunc) -> Self {
-        let pointer = handler as u64;
+    fn new(gdt_selector: SegmentSelector, handler_fn_pointer: u64) -> Self {
         Entry {
             gdt_selector: gdt_selector,
-            pointer_low: pointer as u16,
-            pointer_middle: (pointer >> 16) as u16,
-            pointer_high: (pointer >> 32) as u32,
+            pointer_low: handler_fn_pointer as u16,
+            pointer_middle: (handler_fn_pointer >> 16) as u16,
+            pointer_high: (handler_fn_pointer >> 32) as u32,
             options: EntryOptions::new(),
             reserved: 0,
         }
@@ -90,7 +97,7 @@ impl Entry {
     }
 }
 
-const IDT_SIZE: usize = 48;
+
 pub struct IDT([Entry; IDT_SIZE]);
 
 impl IDT {
@@ -98,8 +105,8 @@ impl IDT {
         IDT([Entry::missing(); IDT_SIZE])
     }
 
-    pub fn set_handler(&mut self, entry: u8, handler: HandlerFunc) -> &mut EntryOptions {
-        self.0[entry as usize] = Entry::new(segmentation::cs(), handler);
+    pub fn set_handler(&mut self, entry: u8, handler_pointer: u64) -> &mut EntryOptions {
+        self.0[entry as usize] = Entry::new(segmentation::cs(), handler_pointer);
         &mut self.0[entry as usize].options
     }
 

@@ -12,11 +12,11 @@ macro_rules! system_log {
         kprintln!();
     );
     ($fmt:expr) => (
-        serial_kprintln!($fmt);
-        kprintln!($fmt);
+        serial_kprintln!(concat!("[klog] ", $fmt));
+        kprintln!(concat!("[klog] ", $fmt));
     );
     ($fmt:expr, $($arg:tt)*) => (
-        serial_kprintln!($fmt, $($arg)*);
-        kprintln!($fmt, $($arg)*);
+        serial_kprintln!(concat!("[klog] ", $fmt), $($arg)*);
+        kprintln!(concat!("[klog] ", $fmt), $($arg)*);
     );
 }

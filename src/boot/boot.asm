@@ -1,9 +1,32 @@
 global start
 
+extern long_mode_start
+extern check_long_mode
+
 section .text
 bits 32
 start:
     mov esp, stack_top
+    ; Move Multiboot info pointer to edi register
+    mov edi, ebx
+
+    call check_long_mode
+    call enable_paging
+    ; GDT
+    cli ; disable interrupts
+    lgdt [gdt64.pointer]
+
+    ; finish jumping to long mode
+    ; update selectors
+    mov ax, gdt64.data  ; ax - segment register, 16 bit version of eax
+    mov ss, ax  ; stack segment
+    mov ds, ax  ; data segment
+    mov es, ax  ; extra segment
+
+    ; jump to long mode!
+    jmp gdt64.code:long_mode_start
+
+enable_paging:
     ; before enabling paging we have to create page table
     ; after, to enable paging we have to do 4 steps:
     ;   - 1) We have to put the address of the p4_table to a special register
@@ -58,20 +81,7 @@ start:
     or eax, 1 << 31
     or eax, 1 << 16
     mov cr0, eax
-
-    ; GDT
-    lgdt [gdt64.pointer]
-
-    ; finish jumping to long mode
-    ; update selectors
-    mov ax, gdt64.data  ; ax - segment register, 16 bit version of eax
-    mov ss, ax  ; stack segment
-    mov ds, ax  ; data segment
-    mov es, ax  ; extra segment
-
-    ; jump to long mode!
-    jmp gdt64.code:long_mode_start
-
+    ret
 
 ; let's setup paging
 section .bss  ; section "block started by symbol"
@@ -111,9 +121,8 @@ gdt64:
     dq gdt64
 
 
-section .text
-bits 64
-long_mode_start:
-    ; call the rust main
-    extern main
-    call main
+; Export so Rust can access this
+gdt64_code_offset:
+    dw gdt64.code
+
+
