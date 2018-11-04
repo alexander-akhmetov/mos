@@ -1,13 +1,19 @@
+pub use self::simple_allocator::SimpleFrameAllocator;
+
+mod simple_allocator;
+
 pub const PAGE_SIZE: usize = 4096;
+
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Frame {
-    number: usize,
+    index: usize,
 }
 
 impl Frame {
-    fn containing_address(address: usize) -> Frame {
-        Frame {number: address / PAGE_SIZE}
+    fn get_for_address(address: usize) -> Frame {
+        // returns frame for a given physical memory address
+        Frame {index: address / PAGE_SIZE}
     }
 }
 
