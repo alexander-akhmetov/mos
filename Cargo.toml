@@ -12,7 +12,7 @@ volatile = "0.2.3"
 spin = "0.4.10"
 uart_16550 = "0.1.0"
 x86_64 = "0.2.8"
-multiboot2 = "0.1.0"
+multiboot2 = "0.3.2"
 
 [package.metadata.bootimage]
 default-target = "x86_64-mos.json"

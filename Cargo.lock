@@ -45,7 +45,7 @@ dependencies = [
  "array-init 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "bootloader_precompiled 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "multiboot2 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiboot2 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "uart_16550 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "volatile 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -54,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "multiboot2"
-version = "0.1.0"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bitflags 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -123,7 +123,7 @@ dependencies = [
 "checksum bitflags 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "228047a76f468627ca71776ecdebd732a3423081fcf5125585bcd7c49886ce12"
 "checksum bootloader_precompiled 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0edd528c538ea18c7aa31c3678a22d01d1a5598e83c5e9ec88cc1738484bd374"
 "checksum lazy_static 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ca488b89a5657b0a2ecd45b95609b3e848cf1755da332a0da46e2b2b1cb371a7"
-"checksum multiboot2 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b209a4456a3cc81fb69ad318ed6d47af81a90b829701f151354e3994d8b216d4"
+"checksum multiboot2 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "dcea5906310f2607ea39a42b8af0745dc487d7583db9d981142a63b538647f69"
 "checksum nodrop 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)" = "9a2228dca57108069a5262f2ed8bd2e82496d2e074a06d1ccc7ce1687b6ae0a2"
 "checksum os_bootinfo 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "66481dbeb5e773e7bd85b63cd6042c30786f834338288c5ec4f3742673db360a"
 "checksum spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)" = "ceac490aa12c567115b40b7b7fceca03a6c9d53d5defea066123debc83c5dc1f"
