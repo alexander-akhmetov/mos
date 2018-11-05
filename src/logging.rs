@@ -1,5 +1,5 @@
-use vga_buffer;
 use serial;
+use vga_buffer;
 
 #[macro_export]
 macro_rules! system_log {

@@ -76,4 +76,11 @@ integration-tests:
 
 
 qemu-run: iso
-	$(QEMU) -cdrom $(BUILD_DIR)/os.iso -serial mon:stdio -m 512M
+	mkdir -p _floppy
+
+	# -boot d - boot from cdrom first
+	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
+		-serial mon:stdio \
+		-m 512M \
+		-boot d \
+		-fda fat:r:floppy:./_floppy

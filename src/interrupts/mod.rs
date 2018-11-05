@@ -1,9 +1,9 @@
 #[macro_use]
 mod idt;
-pub mod irs;
 
 use keyboard;
 use pic8259;
+use sys;
 
 #[derive(Debug)]
 #[repr(C)]
@@ -130,8 +130,10 @@ macro_rules! default_handler {
     }};
 }
 
-extern "C" fn system_call(system_call_number: u64) {
-    kprintln!("System call: '{}'", system_call_number);
+extern "C" fn system_call(system_call_number: u64, first_arg: u64) -> u32 {
+    sys::SYSCALL_DISPATCHER
+        .lock()
+        .process_system_call(system_call_number, first_arg)
 }
 
 macro_rules! system_call_handler {
@@ -139,12 +141,12 @@ macro_rules! system_call_handler {
         #[naked]
         extern "C" fn wrapper() {
             unsafe {
-                asm!("mov rdi, rax
-                      call $0"
-                      :: "i"($name as extern "C" fn(system_call_number: u64))
-                      : "rdi" : "intel",
+                asm!("call $0"
+                      :: "i"($name as extern "C" fn(system_call_number: u64, first_arg: u64) -> u32)
+                      : "rax", "rdi" : "intel",
                 );
                 asm!("iretq" :::: "intel", "volatile");
+                ::core::intrinsics::unreachable();
             }
         }
         wrapper
