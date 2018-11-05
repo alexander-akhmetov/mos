@@ -1,19 +1,11 @@
 use sys::SysCallArgument;
 
-pub unsafe fn system_call_test() {
-    system_log!("--- before system call ---");
-    let result = sys_time();
-    sys_syslog("<hello mos>");
-    system_log!("--- after system call ---");
-    system_log!("current time: {}", result);
-}
-
-unsafe fn sys_time() -> u32 {
+pub unsafe fn sys_time() -> u32 {
     // get timestamp
     _system_call(13)
 }
 
-unsafe fn sys_syslog(msg: &str) -> u32 {
+pub unsafe fn sys_syslog(msg: &str) -> u32 {
     // for now msg MUST be null-terminated, for example: b"hello\0"
     let ptr = msg.as_ptr();
     let arg = SysCallArgument {

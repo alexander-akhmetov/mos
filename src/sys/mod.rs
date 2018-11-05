@@ -39,10 +39,10 @@ impl SysCallDispatcher {
     }
 
     pub fn process_system_call(&mut self, system_call_number: u64, first_arg: u64) -> u32 {
-        kprintln!("system call received: '{}'", system_call_number);
+        system_log!("system call received: '{}'", system_call_number);
         let handler = self.get_handler(system_call_number);
         if handler == handlers::none_handler {
-            kprintln!("unhandled system call: {}", system_call_number);
+            system_log!("unhandled system call: {}", system_call_number);
         }
         handler(first_arg)
     }

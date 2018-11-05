@@ -32,6 +32,7 @@ mod keyboard;
 mod memory;
 mod pic8259;
 mod sys;
+mod init;
 
 use core::panic::PanicInfo;
 
@@ -47,7 +48,7 @@ fn panic(info: &PanicInfo) -> ! {
 pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // kernel entrypoint
     vga_buffer::clear_screen();
-    kprintln!("Hello, world!");
+    system_log!("kernel loading...");
 
     interrupts::init();
     unsafe {
@@ -61,11 +62,12 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // divide_by_zero();
 
     unsafe {
-        sys::lib::system_call_test();
+        init::hello_world();
     }
 
-    kprintln!("It did not crash!");
     print_kernel_info(multiboot_information_address);
+
+    system_log!("kernel started");
 
     unsafe {
         hlt_loop();
