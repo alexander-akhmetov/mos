@@ -5,7 +5,7 @@
     core_intrinsics,
     rustc_private,
     abi_x86_interrupt,
-    naked_functions,
+    naked_functions
 )]
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
 #![allow(dead_code, unused_imports)]
@@ -18,6 +18,7 @@ extern crate volatile;
 extern crate lazy_static;
 extern crate uart_16550;
 extern crate x86_64;
+extern crate cstr_core;
 
 #[macro_use]
 mod vga_buffer;
@@ -25,11 +26,13 @@ mod vga_buffer;
 mod logging;
 #[macro_use]
 mod serial;
+mod cmos;
 mod cpuio;
 mod interrupts;
 mod keyboard;
 mod memory;
 mod pic8259;
+mod sys;
 
 use core::panic::PanicInfo;
 
@@ -59,7 +62,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // divide_by_zero();
 
     unsafe {
-        interrupts::irs::make_system_call();
+        sys::lib::system_call_test();
     }
 
     kprintln!("It did not crash!");
