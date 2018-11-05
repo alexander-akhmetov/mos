@@ -7,7 +7,7 @@ pub fn none_handler(_: u64) -> u32 {
 }
 
 pub fn sys_time(_: u64) -> u32 {
-    kprintln!("syscall received: 'time'");
+    system_log!("syscall received: 'time'");
     cmos::get_timestamp()
 }
 
