@@ -3,6 +3,11 @@ mod errno;
 mod handlers;
 pub mod lib;
 
+struct SysCallArgument {
+    length: u64,
+    address: u64,
+}
+
 const SYSCALL_COUNT: usize = 14;
 type SysCallHandler = fn(first_arg: u64) -> u32;
 
