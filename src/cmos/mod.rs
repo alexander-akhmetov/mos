@@ -10,7 +10,6 @@ lazy_static! {
         Mutex::new(unsafe { cpuio::Port::new(0x71) });
 }
 
-
 pub fn get_timestamp() -> u32 {
     let seconds = bcd_to_binary(cmos_read(0));
     let minutes = bcd_to_binary(cmos_read(2));
@@ -22,13 +21,11 @@ pub fn get_timestamp() -> u32 {
     time::mk_timestamp(seconds, minutes, hour, day, month, year)
 }
 
-
 fn cmos_read(addr: u8) -> u8 {
     // 0x80 means NMI is disabled
     CMOS_WRITER.lock().write(0x80 | addr);
     CMOS_READER.lock().read()
 }
-
 
 fn bcd_to_binary(value: u8) -> u8 {
     // Binary Coded Decimal to binary

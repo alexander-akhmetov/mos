@@ -18,7 +18,6 @@ extern crate volatile;
 extern crate lazy_static;
 extern crate uart_16550;
 extern crate x86_64;
-extern crate cstr_core;
 
 #[macro_use]
 mod vga_buffer;

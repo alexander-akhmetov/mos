@@ -1,21 +1,26 @@
-use cstr_core::CStr;
-
+use sys::SysCallArgument;
 
 pub unsafe fn system_call_test() {
     system_log!("--- before system call ---");
     let result = sys_time();
-    // sys_syslog("test!");
+    sys_syslog("<hello mos>");
     system_log!("--- after system call ---");
     system_log!("current time: {}", result);
 }
 
 unsafe fn sys_time() -> u32 {
-    // get time in seconds
+    // get timestamp
     _system_call(13)
 }
 
-unsafe fn sys_syslog(msg: &str) {
-    // _system_call_with_args(0, )
+unsafe fn sys_syslog(msg: &str) -> u32 {
+    // for now msg MUST be null-terminated, for example: b"hello\0"
+    let ptr = msg.as_ptr();
+    let arg = SysCallArgument {
+        length: msg.len() as u64,
+        address: ptr as u64,
+    };
+    _system_call_with_args(0, &arg as *const _ as u64)
 }
 
 unsafe fn _system_call(number: u32) -> u32 {
