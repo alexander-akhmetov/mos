@@ -19,7 +19,7 @@ pub fn allocator_test() {
     //      alloc::collections::linked_list::LinkedList here
     // but wanted my own linked list
     let mut ll: LinkedList<u8> = LinkedList::new();
-    for i in 0..2 {
+    for i in 0..3 {
         ll.push_front(i);
     };
     kprintln!(">>> linked list: {:?}", ll);
