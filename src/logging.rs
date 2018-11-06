@@ -26,7 +26,6 @@ macro_rules! system_log {
     );
 }
 
-
 #[macro_export]
 macro_rules! system_log_without_prefix {
     () => (

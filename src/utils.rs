@@ -2,7 +2,9 @@ use sys::collections::linked_list::LinkedList;
 
 pub fn divide_by_zero() {
     /// to raise divide by zero exception interrupt
-    unsafe { asm!("mov dx, 0; div dx" ::: "ax", "dx" : "volatile", "intel") }
+    unsafe {
+        asm!("mov dx, 0; div dx" ::: "ax", "dx" : "volatile", "intel")
+    }
 }
 
 pub unsafe fn exit_qemu() {
@@ -13,7 +15,6 @@ pub unsafe fn exit_qemu() {
     port.write(0);
 }
 
-
 pub fn allocator_test() {
     // I could use
     //      alloc::collections::linked_list::LinkedList here
@@ -22,6 +23,6 @@ pub fn allocator_test() {
     let count = 1;
     for i in 0..count {
         ll.push_front(i);
-    };
+    }
     kprintln!(">>> created linked list with {} elements: {:#?}", count, ll);
 }

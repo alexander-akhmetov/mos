@@ -7,7 +7,6 @@ pub unsafe fn hlt_loop() -> ! {
     }
 }
 
-
 pub unsafe fn jmp(addr: u64) {
     asm!("call $0"
          :                            // no output

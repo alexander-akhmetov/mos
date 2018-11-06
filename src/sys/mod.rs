@@ -1,9 +1,9 @@
 use spin::Mutex;
+pub mod collections;
 mod errno;
 mod handlers;
-pub mod syscall;
 pub mod interrupts;
-pub mod collections;
+pub mod syscall;
 
 /*
     This structure is used by sys::syscall library
@@ -22,7 +22,6 @@ const SYSCALL_COUNT: usize = 14;
 pub struct SysCallDispatcher {
     handlers: [SysCallHandler; SYSCALL_COUNT],
 }
-
 
 /*
     When an interrupt occurs, if it has 0x80 number,

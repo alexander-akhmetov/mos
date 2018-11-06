@@ -1,6 +1,5 @@
-use x86;
 use multiboot2::BootInformation;
-
+use x86;
 
 pub fn get_multiboot_info(multiboot_information_address: usize) -> &'static BootInformation {
     let boot_info = unsafe { multiboot2::load(multiboot_information_address) };
@@ -45,7 +44,7 @@ pub fn print_multiboot_info(multiboot_information_address: usize) {
         // let ptr = module.start_address() as *const func;
         // unsafe { (*ptr)() };
         // unsafe { x86::jmp(module.start_address() as u64) };
-    };
+    }
 
     // let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
     // let mut frame_allocator = memory::SimpleFrameAllocator::new(

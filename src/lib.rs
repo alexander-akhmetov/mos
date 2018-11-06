@@ -30,6 +30,7 @@ extern crate alloc;
 mod drivers;
 #[macro_use]
 mod logging;
+mod boot;
 mod cmos;
 mod cpuio;
 mod init;
@@ -38,12 +39,11 @@ mod pic8259;
 mod sys;
 mod utils;
 mod x86;
-mod boot;
 
 #[cfg(test)]
-extern crate std;
-#[cfg(test)]
 extern crate array_init;
+#[cfg(test)]
+extern crate std;
 
 use core::panic::PanicInfo;
 
