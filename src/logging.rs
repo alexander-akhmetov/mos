@@ -1,18 +1,27 @@
-use serial;
-use vga_buffer;
+use drivers::serial;
 
+/// prints output to the screen and serial port 1
+/// so output will be available in the qemu running
+/// with `-serial mon:stdio` parameter
 #[macro_export]
 macro_rules! system_log {
     () => (
         serial_kprint!("\n");
-        kprintln!();
+        kprintln_color!();
     );
     ($fmt:expr) => (
-        serial_kprintln!(concat!("[klog] ", $fmt));
-        kprintln!(concat!("[klog] ", $fmt));
+        serial_kprint!(concat!("[kernel] ", $fmt));
+        kprintln_color!(
+            $crate::drivers::vga_buffer::ColorCode::new($crate::drivers::vga_buffer::Color::White, $crate::drivers::vga_buffer::Color::Black),
+            concat!("[kernel] ", $fmt),
+        );
     );
     ($fmt:expr, $($arg:tt)*) => (
-        serial_kprintln!(concat!("[klog] ", $fmt), $($arg)*);
-        kprintln!(concat!("[klog] ", $fmt), $($arg)*);
+        serial_kprint!(concat!("[kernel] ", $fmt), $($arg)*);
+        kprintln_color!(
+            $crate::drivers::vga_buffer::ColorCode::new($crate::drivers::vga_buffer::Color::White, $crate::drivers::vga_buffer::Color::Black),
+            concat!("[kernel] ", $fmt),
+            $($arg)*
+        );
     );
 }

@@ -1,6 +1,10 @@
 use spin::Mutex;
 use uart_16550::SerialPort;
 
+/// This module provides macroses to write output
+/// to serial port 0x3F8.
+/// Useful with qemu's `-serial mon:stdio` parameter
+
 lazy_static! {
     pub static ref SERIAL1: Mutex<SerialPort> = {
         // 0x3F8 - standard port number for the first serial interface
@@ -21,7 +25,7 @@ pub fn print(args: ::core::fmt::Arguments) {
 #[macro_export]
 macro_rules! serial_kprint {
     ($($arg:tt)*) => {
-        $crate::serial::print(format_args!($($arg)*));
+        $crate::drivers::serial::print(format_args!($($arg)*));
     };
 }
 

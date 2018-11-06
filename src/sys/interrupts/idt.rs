@@ -100,9 +100,8 @@ impl IDT {
         IDT([Entry::missing(); IDT_SIZE])
     }
 
-    pub fn set_handler(&mut self, entry: u8, handler_pointer: u64) -> &mut EntryOptions {
+    pub fn set_handler(&mut self, entry: u8, handler_pointer: u64) {
         self.0[entry as usize] = Entry::new(segmentation::cs(), handler_pointer);
-        &mut self.0[entry as usize].options
     }
 
     pub fn load(&'static self) {

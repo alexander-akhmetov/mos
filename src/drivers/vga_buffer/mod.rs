@@ -1,6 +1,8 @@
 use core::fmt;
 use spin::Mutex;
 use volatile::Volatile;
+#[macro_use]
+pub mod macroses;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,10 +27,10 @@ pub enum Color {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct ColorCode(u8);
+pub struct ColorCode(u8);
 
 impl ColorCode {
-    fn new(foreground: Color, background: Color) -> ColorCode {
+    pub fn new(foreground: Color, background: Color) -> ColorCode {
         ColorCode((background as u8) << 4 | (foreground as u8))
     }
 }
@@ -54,6 +56,10 @@ pub struct Writer {
 }
 
 impl Writer {
+    pub fn set_color(&mut self, color: ColorCode) {
+        self.color_code = color;
+    }
+
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {
@@ -123,21 +129,11 @@ impl fmt::Write for Writer {
     }
 }
 
-#[macro_export]
-macro_rules! kprint {
-    ($($arg:tt)*) => ($crate::vga_buffer::print(format_args!($($arg)*)));
-}
-
-#[macro_export]
-macro_rules! kprintln {
-    () => (kprint!("\n"));
-    ($fmt:expr) => (kprint!(concat!($fmt, "\n")));
-    ($fmt:expr, $($arg:tt)*) => (kprint!(concat!($fmt, "\n"), $($arg)*));
-}
-
-pub fn print(args: fmt::Arguments) {
+pub fn print(args: fmt::Arguments, color: ColorCode) {
     use core::fmt::Write;
-    WRITER.lock().write_fmt(args).unwrap();
+    let mut writer = WRITER.lock();
+    writer.set_color(color);
+    writer.write_fmt(args).unwrap();
 }
 
 pub fn clear_screen() {
@@ -147,7 +143,7 @@ pub fn clear_screen() {
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
-        color_code: ColorCode::new(Color::LightGreen, Color::Black),
+        color_code: ColorCode::new(Color::LightGray, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     });
 }
