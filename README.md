@@ -16,3 +16,9 @@ To make sure that the "disk is bootable", the BIOS checks that bytes 511 and 512
 * [binutils installation](https://os.phil-opp.com/cross-compile-binutils/)
 * [grub on macos](https://github.com/phil-opp/blog_os/issues/55)
 * [more about grub](https://gist.github.com/alexander-akhmetov/f0a07f2264047a746907c3cfa182ae81)
+
+## Todo
+
+* VGA Buffer scrolling
+* Simple filesystem and programs running
+* Start init after kernel loading and call OS if needed with syscalls

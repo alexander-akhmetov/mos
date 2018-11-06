@@ -52,6 +52,8 @@ iso: build
 	cp src/boot/loader/grub.cfg $(BUILD_DIR)/isofiles/boot/grub
 	cp $(BUILD_DIR)/kernel.bin $(BUILD_DIR)/isofiles/boot
 
+	cp src/boot/initrd/initrd $(BUILD_DIR)/isofiles/boot/initrd
+
 	docker-compose run build_os grub-mkrescue -o /src/$(BUILD_DIR)/os.iso /src/$(BUILD_DIR)/isofiles
 
 

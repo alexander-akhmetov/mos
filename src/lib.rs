@@ -84,13 +84,17 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // print multiboot info
     boot::multiboot::print_multiboot_info(multiboot_information_address);
 
+    // load initrd
+    let boot_info = boot::multiboot::get_multiboot_info(multiboot_information_address);
+    boot::initrd::init(&boot_info);
+
     // and not the OS is ready
     system_log_without_prefix!("----------------------------");
     system_log!("kernel started");
 
     // run init command!
     init::hello_world();
-    utils::allocator_test();
+    // utils::allocator_test();
 
     // loop with hlt forever
     unsafe {
