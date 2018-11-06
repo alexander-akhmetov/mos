@@ -1,2 +1,2 @@
-pub mod multiboot;
 pub mod initrd;
+pub mod multiboot;
