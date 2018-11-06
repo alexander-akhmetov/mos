@@ -1,7 +1,7 @@
 #[macro_use]
 mod idt;
 
-use keyboard;
+use drivers::keyboard;
 use pic8259;
 use sys;
 

@@ -5,7 +5,7 @@ pub unsafe fn sys_time() -> u32 {
     _system_call(13)
 }
 
-pub unsafe fn sys_syslog(msg: &str) -> u32 {
+pub unsafe fn sys_debug(msg: &str) -> u32 {
     // for now msg MUST be null-terminated, for example: b"hello\0"
     let ptr = msg.as_ptr();
     let arg = SysCallArgument {
@@ -16,6 +16,8 @@ pub unsafe fn sys_syslog(msg: &str) -> u32 {
 }
 
 unsafe fn _system_call(number: u32) -> u32 {
+    /// Executes system call with number: number,
+    /// reads the response from eax register and returns it
     asm!("mov eax, $0; int 0x80;"
          :                          // no output
          : "r"(number)              // input
@@ -23,11 +25,12 @@ unsafe fn _system_call(number: u32) -> u32 {
          : "volatile", "intel",     // options
     );
     // now we can read returned code
-    let eax: u32 = _read_eax();
-    eax
+    _read_eax()
 }
 
 unsafe fn _system_call_with_args(number: u32, first_arg: u64) -> u32 {
+    /// Executes system call with number: number, and first_arg (pointer as u64)
+    /// reads the response from eax register and returns it
     asm!("mov rsi, $0; mov eax, $1; int 0x80;"
          :                                          // no output
          : "r"(first_arg), "r"(number)              // input
@@ -35,8 +38,7 @@ unsafe fn _system_call_with_args(number: u32, first_arg: u64) -> u32 {
          : "volatile", "intel",                     // options
     );
     // now we can read returned code
-    let eax: u32 = _read_eax();
-    eax
+    _read_eax()
 }
 
 unsafe fn _read_eax() -> u32 {

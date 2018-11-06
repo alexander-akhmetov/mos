@@ -21,13 +21,13 @@ clean:
 
 
 build-bootloader:
-	$(NASM) -f elf64 src/boot/multiboot_header.asm -o $(BUILD_DIR)/multiboot_header.o
-	$(NASM) -f elf64 src/boot/boot.asm -o $(BUILD_DIR)/boot.o
-	$(NASM) -f elf64 src/boot/long_mode_init.asm -o $(BUILD_DIR)/long_mode_init.o
-	$(NASM) -f elf64 src/boot/checks.asm -o $(BUILD_DIR)/checks.o
+	$(NASM) -f elf64 src/boot/loader/multiboot_header.asm -o $(BUILD_DIR)/multiboot_header.o
+	$(NASM) -f elf64 src/boot/loader/boot.asm -o $(BUILD_DIR)/boot.o
+	$(NASM) -f elf64 src/boot/loader/long_mode_init.asm -o $(BUILD_DIR)/long_mode_init.o
+	$(NASM) -f elf64 src/boot/loader/checks.asm -o $(BUILD_DIR)/checks.o
 	$(LD) --nmagic \
 			-o $(BUILD_DIR)/kernel.bin \
-			-T src/boot/linker.ld \
+			-T src/boot/loader/linker.ld \
 			$(BUILD_DIR)/multiboot_header.o \
 			$(BUILD_DIR)/boot.o \
 			$(BUILD_DIR)/long_mode_init.o \
@@ -49,7 +49,7 @@ build/%:
 
 iso: build
 	mkdir -p $(BUILD_DIR)/isofiles/boot/grub
-	cp src/boot/grub.cfg $(BUILD_DIR)/isofiles/boot/grub
+	cp src/boot/loader/grub.cfg $(BUILD_DIR)/isofiles/boot/grub
 	cp $(BUILD_DIR)/kernel.bin $(BUILD_DIR)/isofiles/boot
 
 	docker-compose run build_os grub-mkrescue -o /src/$(BUILD_DIR)/os.iso /src/$(BUILD_DIR)/isofiles
@@ -58,7 +58,7 @@ iso: build
 unit-tests:
 	cargo test
 
-tests: unit-tests integration-tests
+tests: unit-tests
 
 
 integration-test/%:

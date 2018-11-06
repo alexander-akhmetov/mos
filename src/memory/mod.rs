@@ -1,6 +1,7 @@
-pub use self::simple_allocator::SimpleFrameAllocator;
+pub use self::simple_frame_allocator::SimpleFrameAllocator;
 
-mod simple_allocator;
+pub mod allocator;
+mod simple_frame_allocator;
 
 pub const PAGE_SIZE: usize = 4096;
 
