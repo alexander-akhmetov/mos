@@ -6,11 +6,11 @@ use drivers::serial;
 #[macro_export]
 macro_rules! system_log {
     () => (
-        serial_kprint!("\n");
+        serial_kprintln!("\n");
         kprintln_color!();
     );
     ($fmt:expr) => (
-        serial_kprint!(concat!("[kernel] ", $fmt));
+        serial_kprintln!(concat!("[kernel] ", $fmt));
         kprintln_color!(
             $crate::drivers::vga_buffer::ColorCode::new($crate::drivers::vga_buffer::Color::White, $crate::drivers::vga_buffer::Color::Black),
             concat!("[kernel] ", $fmt),
@@ -33,14 +33,14 @@ macro_rules! system_log_without_prefix {
 
     );
     ($fmt:expr) => (
-        serial_kprint!($fmt);
+        serial_kprintln!($fmt);
         kprintln_color!(
             $crate::drivers::vga_buffer::ColorCode::new($crate::drivers::vga_buffer::Color::White, $crate::drivers::vga_buffer::Color::Black),
             $fmt,
         );
     );
     ($fmt:expr, $($arg:tt)*) => (
-        serial_kprint!($fmt, $($arg)*);
+        serial_kprintln!($fmt, $($arg)*);
         kprintln_color!(
             $crate::drivers::vga_buffer::ColorCode::new($crate::drivers::vga_buffer::Color::White, $crate::drivers::vga_buffer::Color::Black),
             $fmt,
