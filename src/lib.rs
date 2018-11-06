@@ -55,7 +55,11 @@ static GLOBAL_ALLOCATOR: &'static memory::allocator::MGlobalAlloc =
 #[panic_handler]
 #[cfg(not(test))]
 fn panic(info: &PanicInfo) -> ! {
-    system_log!("\n[KERNEL PANIC] {}", info);
+    let color = drivers::vga_buffer::ColorCode::new(
+        drivers::vga_buffer::Color::Red,
+        drivers::vga_buffer::Color::Black,
+    );
+    kprintln_color!(color, "\n[KERNEL PANIC] {}", info);
     unsafe {
         x86::hlt_loop();
     }
@@ -81,6 +85,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     boot::multiboot::print_multiboot_info(multiboot_information_address);
 
     // and not the OS is ready
+    system_log_without_prefix!("----------------------------");
     system_log!("kernel started");
 
     // run init command!
