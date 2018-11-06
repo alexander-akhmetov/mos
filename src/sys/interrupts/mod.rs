@@ -18,8 +18,8 @@ pub struct ExceptionStackFrame {
 // https://wiki.osdev.org/Exceptions
 
 fn kprintln_exception(name: &str, stack_frame: &ExceptionStackFrame) {
-    kprintln!(
-        "\n[KERNEL] EXCEPTION: {}: {:#x}\n{:#?}",
+    system_log!(
+        "EXCEPTION: {}: {:#x}\n{:#?}",
         name,
         stack_frame.instruction_pointer,
         &*stack_frame,

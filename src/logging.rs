@@ -25,3 +25,26 @@ macro_rules! system_log {
         );
     );
 }
+
+
+#[macro_export]
+macro_rules! system_log_without_prefix {
+    () => (
+
+    );
+    ($fmt:expr) => (
+        serial_kprint!($fmt);
+        kprintln_color!(
+            $crate::drivers::vga_buffer::ColorCode::new($crate::drivers::vga_buffer::Color::White, $crate::drivers::vga_buffer::Color::Black),
+            $fmt,
+        );
+    );
+    ($fmt:expr, $($arg:tt)*) => (
+        serial_kprint!($fmt, $($arg)*);
+        kprintln_color!(
+            $crate::drivers::vga_buffer::ColorCode::new($crate::drivers::vga_buffer::Color::White, $crate::drivers::vga_buffer::Color::Black),
+            $fmt,
+            $($arg)*
+        );
+    );
+}

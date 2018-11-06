@@ -6,7 +6,6 @@ use core::marker::PhantomData;
 
 type NodeLink<T> = Option<Box<Node<T>>>;
 
-
 #[derive(Debug)]
 pub struct Node<T> {
     element: T,

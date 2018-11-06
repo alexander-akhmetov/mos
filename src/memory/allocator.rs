@@ -24,8 +24,6 @@ pub struct MGlobalAlloc;
 
 unsafe impl<'a> GlobalAlloc for &'a MGlobalAlloc {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        system_log!("allocator: alloc called, requested {} bytes", layout.size());
-
         let new_index = PREALLOCATED_MEM.index + layout.size();
         if new_index > PREALLOCATED_HEAP_SIZE {
             panic!("allocator: memory allocation error!")
@@ -33,6 +31,8 @@ unsafe impl<'a> GlobalAlloc for &'a MGlobalAlloc {
 
         let ptr = &mut PREALLOCATED_MEM.heap[PREALLOCATED_MEM.index] as *mut u8;
         PREALLOCATED_MEM.index = new_index;
+
+        system_log!("allocator: alloc called, allocated {} bytes at {:#X}", layout.size(), ptr as usize);
 
         ptr
     }
