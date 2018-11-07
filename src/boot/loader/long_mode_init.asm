@@ -6,6 +6,7 @@ section .text
 bits 64
 long_mode_start:
     ; call the rust main
+    call clear_data_segment_registers
     call main
 
 

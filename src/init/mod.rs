@@ -1,5 +1,6 @@
 use sys;
 
+
 pub fn hello_world() {
     kprintln!("[init] --- before system call ---");
 

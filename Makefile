@@ -39,20 +39,28 @@ build-kernel:
 	cargo xbuild --target x86_64-mos.json
 
 
+build-hello-asm:
+	$(NASM) -f bin src/boot/loader/hello.asm -o $(BUILD_DIR)/hello.bin
+
+
 build:
 	make build-kernel
 	make build-bootloader
+	make build-hello-asm
 
 
 build/%:
 	cargo xbuild --target x86_64-mos.json --bin $*
 
 iso: build
+	# copy loader
 	mkdir -p $(BUILD_DIR)/isofiles/boot/grub
 	cp src/boot/loader/grub.cfg $(BUILD_DIR)/isofiles/boot/grub
 	cp $(BUILD_DIR)/kernel.bin $(BUILD_DIR)/isofiles/boot
 
+	# copy modules
 	cp src/boot/initrd/initrd $(BUILD_DIR)/isofiles/boot/initrd
+	cp $(BUILD_DIR)/hello.bin $(BUILD_DIR)/isofiles/boot/hello
 
 	docker-compose run build_os grub-mkrescue -o /src/$(BUILD_DIR)/os.iso /src/$(BUILD_DIR)/isofiles
 
