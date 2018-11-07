@@ -1,10 +1,10 @@
 use alloc::string::String;
+use alloc::vec::Vec;
 use core::slice;
 use core::str;
-use alloc::vec::Vec;
 use multiboot2::BootInformation;
+use tar;
 use x86;
-
 
 fn get_module(boot_info: &BootInformation, name: &str) -> (u64, u64) {
     let module = boot_info
@@ -15,7 +15,6 @@ fn get_module(boot_info: &BootInformation, name: &str) -> (u64, u64) {
     (module.start_address() as u64, module.end_address() as u64)
 }
 
-
 pub fn init(boot_info: &BootInformation) {
     let (start_address, end_address) = get_module(boot_info, "initrd");
     let bytes = unsafe {
@@ -25,15 +24,19 @@ pub fn init(boot_info: &BootInformation) {
         )
     };
 
-    system_log!("module initrd loaded with size: {}", bytes.len());
-    print_as_str(bytes);
-}
+    let archive = tar::Archive::new(bytes);
+    let files_iter = archive.files();
+    for f in files_iter {
+        system_log!("--- initrd file ---");
+        system_log!("name: {}", f.name());
+        system_log!("size: {}", f.size());
+        system_log!("mtime: {}", f.mtime());
+        // let s = unsafe { String::from_utf8_unchecked(f.content.to_vec()) };
+        // system_log!("content string: '{}'", s);
+    }
 
-fn print_as_str(bytes: &[u8]) {
-    let string = unsafe { str::from_utf8_unchecked(bytes) };
-    system_log!("initrd: {:?}", string);
+    system_log!("initrd loaded; size: {}", bytes.len());
 }
-
 
 pub fn hello_asm(boot_info: &BootInformation) {
     let (start_address, end_address) = get_module(boot_info, "hello");
@@ -46,7 +49,9 @@ pub fn hello_asm(boot_info: &BootInformation) {
 
     let vec = bytes.to_vec().clone();
     let ptr = &vec as *const _ as u64;
-    unsafe { x86::jmp(ptr); };
+    unsafe {
+        x86::jmp(ptr);
+    };
 
     system_log!("module hello (asm) loaded with size: {}", bytes.len());
     // unsafe { x86::jmp(start_address); };

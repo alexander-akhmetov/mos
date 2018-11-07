@@ -23,6 +23,7 @@ extern crate x86_64;
 
 #[macro_use]
 extern crate alloc;
+extern crate tar;
 
 #[macro_use]
 mod drivers;
@@ -73,7 +74,6 @@ fn panic(info: &PanicInfo) -> ! {
 #[no_mangle]
 pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     /// kernel entrypoint
-
     // This function got "multiboot_information_address" as a parameter,
     // because when a multiboot bootloader loads a kernel, it passes a
     // pointer to a boot information structure in the ebx register.
@@ -83,7 +83,6 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     //      > passed in registers RDI, RSI, RDX, RCX, R8, and R9
     //      >
     // So in the boot asm code I set it: "mov edi, ebx;".
-
     drivers::vga_buffer::clear_screen();
     system_log!("kernel loading...");
 
