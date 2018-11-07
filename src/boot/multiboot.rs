@@ -29,7 +29,7 @@ pub fn print_multiboot_info(multiboot_information_address: usize) {
     let multiboot_start = multiboot_information_address;
     let multiboot_end = multiboot_start + (boot_info.total_size as usize);
     system_log!(
-        "       multibooot: [0x{:x} - 0x{:x}]    bytes: {}",
+        "       multiboot:  [0x{:x} - 0x{:x}]    bytes: {}",
         multiboot_start,
         multiboot_end,
         multiboot_end - multiboot_start
