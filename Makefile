@@ -43,7 +43,7 @@ build-hello-asm:
 	$(NASM) -f bin src/boot/loader/hello.asm -o $(BUILD_DIR)/hello.bin
 
 build-initrd:
-	tar -c src/boot/initrd/* > $(BUILD_DIR)/isofiles/boot/initrd
+	cd ./src/boot/initrd/ && tar --format ustar -c * > ../../../$(BUILD_DIR)/isofiles/boot/initrd
 
 build:
 	make build-kernel
@@ -88,11 +88,11 @@ integration-tests:
 
 
 qemu-run: iso
-	mkdir -p _floppy
+	# mkdir -p _floppy
 
 	# -boot d - boot from cdrom first
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
 		-serial mon:stdio \
 		-m 512M \
 		-boot d \
-		-fda fat:r:floppy:./_floppy
+		# -fda fat:r:floppy:./_floppy
