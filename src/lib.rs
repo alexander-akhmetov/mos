@@ -32,6 +32,7 @@ mod logging;
 mod boot;
 mod cmos;
 mod cpuio;
+mod fs;
 mod init;
 mod memory;
 mod pic8259;
