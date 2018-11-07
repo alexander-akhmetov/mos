@@ -42,11 +42,14 @@ build-kernel:
 build-hello-asm:
 	$(NASM) -f bin src/boot/loader/hello.asm -o $(BUILD_DIR)/hello.bin
 
+build-initrd:
+	tar -c src/boot/initrd/* > $(BUILD_DIR)/isofiles/boot/initrd
 
 build:
 	make build-kernel
 	make build-bootloader
 	make build-hello-asm
+	make build-initrd
 
 
 build/%:
@@ -59,7 +62,6 @@ iso: build
 	cp $(BUILD_DIR)/kernel.bin $(BUILD_DIR)/isofiles/boot
 
 	# copy modules
-	cp src/boot/initrd/initrd $(BUILD_DIR)/isofiles/boot/initrd
 	cp $(BUILD_DIR)/hello.bin $(BUILD_DIR)/isofiles/boot/hello
 
 	docker-compose run build_os grub-mkrescue -o /src/$(BUILD_DIR)/os.iso /src/$(BUILD_DIR)/isofiles
