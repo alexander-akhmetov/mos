@@ -16,11 +16,12 @@ install-requirements:
 
 clean:
 	rm -rf $(BUILD_DIR)
-	mkdir -p $(BUILD_DIR)
 	rm -rf $(RUST_BUILD_DIR)
 
 
 build-bootloader:
+	mkdir -p $(BUILD_DIR)
+
 	$(NASM) -f elf64 src/boot/loader/multiboot_header.asm -o $(BUILD_DIR)/multiboot_header.o
 	$(NASM) -f elf64 src/boot/loader/boot.asm -o $(BUILD_DIR)/boot.o
 	$(NASM) -f elf64 src/boot/loader/long_mode_init.asm -o $(BUILD_DIR)/long_mode_init.o
@@ -43,9 +44,11 @@ build-hello-asm:
 	$(NASM) -f bin src/boot/loader/hello.asm -o $(BUILD_DIR)/hello.bin
 
 build-initrd:
-	cd ./src/boot/initrd/ && tar --format ustar -c * > ../../../$(BUILD_DIR)/isofiles/boot/initrd
+	mkdir -p $(BUILD_DIR)/isofiles/boot/
+	cd ./src/boot/initrd/ && tar --format ustar -c * > ../../../$(BUILD_DIR)/isofiles/boot/initrd.tar
 
 build:
+	mkdir -p $(BUILD_DIR)
 	make build-kernel
 	make build-bootloader
 	make build-hello-asm
