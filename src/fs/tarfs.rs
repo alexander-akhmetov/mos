@@ -31,7 +31,7 @@ impl FileSystem for TarFS {
 
     fn get_file(&self, path: &str) -> Option<Box<FileDescriptor>> {
         for f in self.files.iter() {
-            if f.name() == path {
+            if utils::normalize(&f.name()) == utils::normalize(path) {
                 return Some(Box::new(TarFileDescriptor::new(f)));
             }
         }
