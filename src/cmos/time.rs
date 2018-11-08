@@ -69,7 +69,7 @@ impl fmt::Display for DateTime {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "{:01}-{:01}-{:01}T{:01}:{:01}:{:01}",
+            "{:02}-{:02}-{:02}T{:02}:{:02}:{:02}",
             self.full_year(),
             self.month,
             self.day,
