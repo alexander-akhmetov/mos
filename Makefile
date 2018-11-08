@@ -43,6 +43,10 @@ build-kernel:
 build-hello-asm:
 	$(NASM) -f bin src/boot/loader/hello.asm -o $(BUILD_DIR)/hello.bin
 
+build-os-binaries:
+	cd os_binaries/mos_hello && make build
+	cp os_binaries/mos_hello/target/x86_64-mos/debug/mos_hello ./initrd/mos_hello.bin
+
 build-initrd:
 	mkdir -p $(BUILD_DIR)/isofiles/boot/
 	cd ./initrd/ && tar --format ustar -c * > ../$(BUILD_DIR)/isofiles/boot/initrd.tar

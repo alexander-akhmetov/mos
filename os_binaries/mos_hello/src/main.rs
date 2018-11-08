@@ -9,9 +9,7 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
-    unsafe { asm!("mov eax, 13; int 0x80;" :::: "volatile", "intel"); };
-    loop {}
+#[start]
+fn main(argc: isize, args: *const *const u8) -> isize {
+    return 1;
 }

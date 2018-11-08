@@ -35,7 +35,7 @@ pub fn init(boot_info: &BootInformation) {
         fs::vfs::VFS.lock().list_dir("/initrd")
     );
 
-    let f = fs::vfs::VFS.lock().get_file("/initrd/hello.bin");
+    let f = fs::vfs::VFS.lock().get_file("/initrd/mos_hello.bin");
     if let Some(f) = f {
         let b = f.read();
         // unsafe {
