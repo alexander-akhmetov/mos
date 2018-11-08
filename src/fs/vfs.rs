@@ -30,6 +30,7 @@ impl VirtualFS {
         let (fs, mountpoint) = self.get_fs(path);
         if let Some(fs) = fs {
             let filepath = utils::remove_prefix(path, &mountpoint);
+            let filepath = utils::remove_prefix(&filepath, "/");
             fs.get_file(&filepath)
         } else {
             None
@@ -56,8 +57,9 @@ impl VirtualFS {
         // todo: no such directory
         let (fs, mountpoint) = self.get_fs(path);
         if let Some(fs) = fs {
-            let filepath = utils::remove_prefix(path, &mountpoint);
-            fs.list_dir(&filepath)
+            let dirpath = utils::remove_prefix(path, &mountpoint);
+            let s_dirpath = utils::add_prefix_slash(&dirpath);
+            fs.list_dir(&s_dirpath)
         } else {
             Vec::new()
         }

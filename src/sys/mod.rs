@@ -1,5 +1,6 @@
 use spin::Mutex;
 pub mod collections;
+pub mod elf;
 mod errno;
 mod handlers;
 pub mod interrupts;

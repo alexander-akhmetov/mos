@@ -13,6 +13,14 @@ pub fn add_prefix_slash(path: &str) -> String {
     }
 }
 
+pub fn add_trailing_slash(path: &str) -> String {
+    if !path.ends_with("/") {
+        String::from(path) + "/"
+    } else {
+        String::from(path)
+    }
+}
+
 pub fn remove_trailing_slash(path: &str) -> String {
     if path.ends_with("/") {
         String::from(path.trim_end_matches("/"))
@@ -22,10 +30,10 @@ pub fn remove_trailing_slash(path: &str) -> String {
 }
 
 pub fn remove_prefix(filepath: &str, path: &str) -> String {
-    let mut n_filepath = remove_trailing_slash(filepath);
-    n_filepath = add_prefix_slash(&n_filepath);
-    let n_path = add_prefix_slash(path);
-    add_prefix_slash(n_filepath.trim_left_matches(&n_path))
+    let n_filepath = normalize(filepath);
+    let n_path = normalize(path);
+    let result = n_filepath.trim_left_matches(&n_path);
+    String::from(add_prefix_slash(result))
 }
 
 pub fn is_file_in_root(filename: &str, path: &str) -> bool {
@@ -62,11 +70,13 @@ mod test {
 
     #[test]
     fn test_remove_prefix() {
+        assert_eq!(remove_prefix("/etc/nginx", "/etc/nginx/"), "/");
         assert_eq!(
             remove_prefix("/etc/nginx/nginx.conf", "/etc"),
             "/nginx/nginx.conf"
         );
 
         assert_eq!(remove_prefix("/nginx.conf", "/"), "/nginx.conf");
+        assert_eq!(remove_prefix("/initrd/hello.bin", "/initrd"), "/hello.bin");
     }
 }

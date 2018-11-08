@@ -5,6 +5,7 @@ use core::slice;
 use core::str;
 use fs;
 use multiboot2::BootInformation;
+use sys;
 use tar;
 use x86;
 
@@ -33,6 +34,15 @@ pub fn init(boot_info: &BootInformation) {
         "initrd loaded; files in '/initrd': {:?}",
         fs::vfs::VFS.lock().list_dir("/initrd")
     );
+
+    let f = fs::vfs::VFS.lock().get_file("/initrd/hello.bin");
+    if let Some(f) = f {
+        let b = f.read();
+        // unsafe {
+        //     sys::elf::exec(b.as_ptr());
+        // };
+        system_log!("hello.bin: {:?}", f);
+    }
 }
 
 pub fn hello_asm(boot_info: &BootInformation) {
