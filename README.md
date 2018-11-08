@@ -20,5 +20,7 @@ To make sure that the "disk is bootable", the BIOS checks that bytes 511 and 512
 ## Todo
 
 * VGA Buffer scrolling
-* Simple filesystem and programs running
+* -Simple filesystem- DONE
+* Program execution
+* Processes
 * Start init after kernel loading and call OS if needed with syscalls

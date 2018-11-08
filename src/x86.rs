@@ -15,7 +15,6 @@ pub unsafe fn call(addr: u64) {
     );
 }
 
-
 pub unsafe fn jmp(addr: u64) {
     asm!("jmp $0"
          :                            // no output
