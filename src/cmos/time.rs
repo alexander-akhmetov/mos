@@ -1,3 +1,5 @@
+use core::fmt;
+
 const MINUTE: u32 = 60;
 const HOUR: u32 = MINUTE * 60;
 const DAY: u32 = HOUR * 24;
@@ -17,29 +19,65 @@ static MONTH: [u32; 12] = [
     DAY * (31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30),
 ];
 
-pub fn mk_timestamp(seconds: u8, minutes: u8, hour: u8, day: u8, month: u8, year: u8) -> u32 {
-    let mut timestamp: u32 = 0;
-    let mut myear: u32 = year as u32;
+pub struct DateTime {
+    pub seconds: u8,
+    pub minutes: u8,
+    pub hour: u8,
+    pub month: u8,
+    pub day: u8,
+    pub year: u8,
+}
 
-    if year < 70 {
-        // mOS will not work proprely after 2069 :-)
-        myear += 30;
-    } else {
-        myear -= 70;
+impl DateTime {
+    pub fn timestamp(&self) -> u32 {
+        let mut timestamp: u32 = 0;
+        let mut myear: u32 = self.year as u32;
+
+        if self.year < 70 {
+            // mOS will not work proprely after 2069 :-)
+            myear += 30;
+        } else {
+            myear -= 70;
+        }
+
+        timestamp += self.seconds as u32;
+        timestamp += (self.minutes as u32) * MINUTE;
+        timestamp += (self.hour as u32) * HOUR;
+        timestamp += ((self.day as u32) - 1) * DAY; // -1 because day is in progress :-)
+        timestamp += MONTH[(self.month - 1) as usize];
+        timestamp += myear * YEAR + DAY * ((myear + 1) / 4);
+
+        if !is_leap_year(myear + 1970) && self.month > 2 {
+            timestamp -= DAY;
+        }
+
+        timestamp
     }
 
-    timestamp += seconds as u32;
-    timestamp += (minutes as u32) * MINUTE;
-    timestamp += (hour as u32) * HOUR;
-    timestamp += ((day as u32) - 1) * DAY; // -1 because day is in progress :-)
-    timestamp += MONTH[(month - 1) as usize];
-    timestamp += myear * YEAR + DAY * ((myear + 1) / 4);
-
-    if !is_leap_year(myear + 1970) && month > 2 {
-        timestamp -= DAY;
+    pub fn full_year(&self) -> u16 {
+        let mut year: u16 = self.year as u16;
+        if self.year < 70 {
+            year += 2000;
+        } else {
+            year += 1970;
+        };
+        year
     }
+}
 
-    timestamp
+impl fmt::Display for DateTime {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{:01}-{:01}-{:01}T{:01}:{:01}:{:01}",
+            self.full_year(),
+            self.month,
+            self.day,
+            self.hour,
+            self.minutes,
+            self.seconds,
+        )
+    }
 }
 
 fn is_leap_year(year: u32) -> bool {
@@ -52,27 +90,67 @@ mod test {
 
     #[test]
     fn mk_timestamp_zero() {
-        assert_eq!(mk_timestamp(0, 0, 0, 1, 1, 70), 0)
+        let dt = DateTime {
+            seconds: 0,
+            minutes: 0,
+            hour: 0,
+            day: 1,
+            month: 1,
+            year: 70,
+        };
+        assert_eq!(dt.timestamp(), 0)
     }
 
     #[test]
     fn mk_timestamp_for_leap_year_and_january() {
-        assert_eq!(mk_timestamp(0, 0, 0, 01, 01, 48), 2461449600)
+        let dt = DateTime {
+            seconds: 0,
+            minutes: 0,
+            hour: 0,
+            day: 1,
+            month: 1,
+            year: 48,
+        };
+        assert_eq!(dt.timestamp(), 2461449600)
     }
 
     #[test]
     fn mk_timestamp_for_leap_year_and_march() {
-        assert_eq!(mk_timestamp(0, 0, 0, 01, 03, 48), 2466633600)
+        let dt = DateTime {
+            seconds: 0,
+            minutes: 0,
+            hour: 0,
+            day: 1,
+            month: 3,
+            year: 48,
+        };
+        assert_eq!(dt.timestamp(), 2466633600)
     }
 
     #[test]
     fn mk_timestamp_after_2000() {
-        assert_eq!(mk_timestamp(17, 13, 13, 06, 11, 18), 1541509997)
+        let dt = DateTime {
+            seconds: 17,
+            minutes: 13,
+            hour: 13,
+            day: 06,
+            month: 11,
+            year: 18,
+        };
+        assert_eq!(dt.timestamp(), 1541509997)
     }
 
     #[test]
     fn mk_timestamp_my() {
-        assert_eq!(mk_timestamp(0, 0, 0, 25, 07, 90), 648864000)
+        let dt = DateTime {
+            seconds: 00,
+            minutes: 00,
+            hour: 00,
+            day: 25,
+            month: 07,
+            year: 90,
+        };
+        assert_eq!(dt.timestamp(), 648864000)
     }
 
     #[test]
