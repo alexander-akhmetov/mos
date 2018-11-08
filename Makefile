@@ -45,7 +45,7 @@ build-hello-asm:
 
 build-initrd:
 	mkdir -p $(BUILD_DIR)/isofiles/boot/
-	cd ./src/boot/initrd/ && tar --format ustar -c * > ../../../$(BUILD_DIR)/isofiles/boot/initrd.tar
+	cd ./initrd/ && tar --format ustar -c * > ../$(BUILD_DIR)/isofiles/boot/initrd.tar
 
 build:
 	mkdir -p $(BUILD_DIR)
