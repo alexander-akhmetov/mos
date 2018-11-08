@@ -105,7 +105,14 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
 
     // and not the OS is ready
     system_log_without_prefix!("----------------------------");
-    system_log!("kernel started");
+    let dt = cmos::get_datetime();
+    system_log!("kernel started at {}", dt);
+
+    // fn stack_overflow() {
+    //     stack_overflow(); // for each recursion, the return address is pushed
+    // }
+    // trigger a stack overflow
+    // stack_overflow();
 
     // ----------------------- test commands
     // run init "hello world" command

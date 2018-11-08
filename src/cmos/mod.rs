@@ -26,6 +26,11 @@ lazy_static! {
 }
 
 pub fn get_timestamp() -> u32 {
+    let datetime = get_datetime();
+    datetime.timestamp()
+}
+
+pub fn get_datetime() -> time::DateTime {
     // while CMOS in update process, wait
     while is_updating() {}
 
@@ -36,7 +41,14 @@ pub fn get_timestamp() -> u32 {
     let month = bcd_to_binary(cmos_read(CMOSRegister::Month));
     let year = bcd_to_binary(cmos_read(CMOSRegister::Year));
 
-    time::mk_timestamp(seconds, minutes, hour, day, month, year)
+    time::DateTime {
+        seconds: seconds,
+        minutes: minutes,
+        hour: hour,
+        day: day,
+        month: month,
+        year: year,
+    }
 }
 
 fn cmos_read(addr: CMOSRegister) -> u8 {
