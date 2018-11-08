@@ -1,7 +1,9 @@
+use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::slice;
 use core::str;
+use fs;
 use multiboot2::BootInformation;
 use tar;
 use x86;
@@ -25,17 +27,12 @@ pub fn init(boot_info: &BootInformation) {
     };
 
     let archive = tar::Archive::new(bytes);
-    let files_iter = archive.files();
-    for f in files_iter {
-        system_log!("--- initrd file ---");
-        system_log!("name: {}", f.name());
-        system_log!("size: {}", f.size());
-        system_log!("mtime: {}", f.mtime());
-        // let s = unsafe { String::from_utf8_unchecked(f.content.to_vec()) };
-        // system_log!("content string: '{}'", s);
-    }
-
-    system_log!("initrd loaded; size: {}", bytes.len());
+    let tfs = fs::tarfs::TarFS::new(archive);
+    fs::vfs::VFS.lock().mount("/initrd", Box::new(tfs));
+    system_log!(
+        "initrd loaded; files in '/initrd': {:?}",
+        fs::vfs::VFS.lock().list_dir("/initrd")
+    );
 }
 
 pub fn hello_asm(boot_info: &BootInformation) {

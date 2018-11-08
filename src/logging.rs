@@ -17,7 +17,7 @@ macro_rules! system_log {
         );
     );
     ($fmt:expr, $($arg:tt)*) => (
-        serial_kprint!(concat!("[kernel] ", $fmt), $($arg)*);
+        serial_kprintln!(concat!("[kernel] ", $fmt), $($arg)*);
         kprintln_color!(
             $crate::drivers::vga_buffer::ColorCode::new($crate::drivers::vga_buffer::Color::White, $crate::drivers::vga_buffer::Color::Black),
             concat!("[kernel] ", $fmt),
