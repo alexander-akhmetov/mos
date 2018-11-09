@@ -1,6 +1,6 @@
-#![no_std]
-#![no_main]
 #![feature(asm, start)]
+#![feature(lang_items)]
+#![no_std]
 
 use core::panic::PanicInfo;
 
@@ -13,3 +13,6 @@ fn panic(_info: &PanicInfo) -> ! {
 fn main(argc: isize, args: *const *const u8) -> isize {
     return 1;
 }
+
+#[lang = "eh_personality"]
+extern "C" fn eh_personality() {}
