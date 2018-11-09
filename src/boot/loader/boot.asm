@@ -6,7 +6,7 @@ extern check_long_mode
 section .text
 bits 32
 start:
-    mov esp, stack_top
+    ; mov esp, stack_top
     ; Move Multiboot info pointer to edi register
     mov edi, ebx
 

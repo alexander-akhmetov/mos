@@ -41,7 +41,7 @@ impl VirtualFS {
         // keys returns an iterator over the keys of the map, in sorted order
         // so we iterate in reversed order to find the most longest correspoinding
         // path first
-        let n_path = &utils::normalize(path);
+        let n_path = utils::add_trailing_slash(&utils::normalize(path));
         for key in self.mountpoints.keys().rev() {
             let n_key = utils::normalize(key);
             if n_path.starts_with(&n_key) {
@@ -58,7 +58,7 @@ impl VirtualFS {
         let (fs, mountpoint) = self.get_fs(path);
         if let Some(fs) = fs {
             let dirpath = utils::remove_prefix(path, &mountpoint);
-            let s_dirpath = utils::add_prefix_slash(&dirpath);
+            let s_dirpath = utils::add_trailing_slash(&utils::add_prefix_slash(&dirpath));
             fs.list_dir(&s_dirpath)
         } else {
             Vec::new()
@@ -92,4 +92,64 @@ impl fmt::Debug for FileDescriptor {
 
 lazy_static! {
     pub static ref VFS: Mutex<VirtualFS> = Mutex::new(VirtualFS::new());
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use fs::tarfs::TarFS;
+    use fs::test_data;
+
+    fn get_fs() -> TarFS {
+        let archive = tar::Archive::new(test_data::TEST_TAR_ARCHIVE);
+        TarFS::new(archive)
+    }
+
+    #[test]
+    fn test_read_tar_file() {
+        let tarfs = get_fs();
+        let mut vfs = VirtualFS::new();
+        vfs.mount("/mnt/tarfs/", Box::new(tarfs));
+
+        let exp_files_list: Vec<String> =
+            vec![String::from("file1.txt"), String::from("file2.txt")];
+
+        let files_list: Vec<String> = vfs
+            .list_dir("/mnt/tarfs/")
+            .iter()
+            .map(|x| x.name())
+            .collect();
+        assert_eq!(files_list, exp_files_list);
+
+        let files_list: Vec<String> = vfs
+            .list_dir("/mnt/tarfs")
+            .iter()
+            .map(|x| x.name())
+            .collect();
+        assert_eq!(files_list, exp_files_list);
+
+        let files_list: Vec<String> = vfs.list_dir("mnt/tarfs").iter().map(|x| x.name()).collect();
+        assert_eq!(files_list, exp_files_list);
+    }
+
+    #[test]
+    fn test_get_fs() {
+        let tarfs = get_fs();
+        let mut vfs = VirtualFS::new();
+        vfs.mount("/mnt/tarfs/", Box::new(tarfs));
+
+        assert_eq!(vfs.mountpoints.len(), 1);
+
+        let gtfs = vfs.get_fs("/mnt/tarfs/");
+        assert_eq!(gtfs.0.is_none(), false);
+        assert_eq!(gtfs.1, "/mnt/tarfs/");
+
+        let gtfs = vfs.get_fs("/mnt/tarfs");
+        assert_eq!(gtfs.0.is_none(), false);
+
+        let gtfs = vfs.get_fs("/mnt/");
+        assert_eq!(gtfs.0.is_none(), true);
+        let gtfs = vfs.get_fs("/mnt");
+        assert_eq!(gtfs.0.is_none(), true);
+    }
 }

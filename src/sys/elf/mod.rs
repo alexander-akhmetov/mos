@@ -2,7 +2,7 @@ use alloc::vec::Vec;
 use core::slice;
 use x86;
 
-#[repr(packed)]
+#[repr(C, packed)]
 pub struct ELFIdent {
     ei_mag: [u8; 4],
     ei_class: u8,
@@ -10,10 +10,10 @@ pub struct ELFIdent {
     ei_version: u8,
     ei_osabi: u8,
     ei_abiversion: u8,
-    ei_pad: [u8; 6],
+    ei_pad: [u8; 7],
 }
 
-#[repr(packed)]
+#[repr(C, packed)]
 pub struct ELFHeader {
     e_ident: ELFIdent,
     e_type: u16,
@@ -31,18 +31,19 @@ pub struct ELFHeader {
     e_shstrndx: u16,
 }
 
-pub fn read_header<'a>(file: &'a [u8]) -> &'a ELFHeader {
+pub fn read_header<'a>(addr: *const u8) -> &'a ELFHeader {
     unsafe {
-        let x: *mut ELFHeader = file.as_ptr() as *mut ELFHeader;
+        let x: *const ELFHeader = addr as *const ELFHeader;
         return &*x;
     }
 }
 
 pub unsafe fn exec(addr: *const u8) {
-    let bytes = slice::from_raw_parts(addr, 100);
-    let header = read_header(bytes);
-    system_log!("PARSED ELF: e_entry: {:x}", header.e_entry,);
-    x86::call(header.e_entry)
+    let header = read_header(addr);
+    let call_addr = addr as u64 + header.e_entry as u64;
+    system_log!("Executing ELF: e_entry: {:x}", call_addr);
+    // x86::jmp(call_addr);
+    // system_log!("Executed ELF: e_entry: {:x}", call_addr);
 }
 
 #[test]
@@ -51,11 +52,11 @@ fn test_read_elf_from_file() {
     use std::io::Read;
     use std::println;
 
-    let mut f = File::open("hello").expect("file not found");
+    let mut f = File::open("initrd/asm_hello.bin").expect("file not found");
     let mut buf: Vec<u8> = Vec::new();
     f.read_to_end(&mut buf).unwrap();
 
-    let header = read_header(&buf);
+    let header = read_header(buf.as_ptr());
 
     // Check the magic bytes
     println!(

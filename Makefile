@@ -40,12 +40,12 @@ build-kernel:
 	cargo xbuild --target x86_64-mos.json
 
 
-build-hello-asm:
-	$(NASM) -f bin src/boot/loader/hello.asm -o $(BUILD_DIR)/hello.bin
-
 build-os-binaries:
 	cd os_binaries/mos_hello && make build
 	cp os_binaries/mos_hello/target/x86_64-mos/debug/mos_hello ./initrd/mos_hello.bin
+
+	$(NASM) -f elf64 os_binaries/asm_hello/asm_hello.asm -o $(BUILD_DIR)/asm_hello.o
+	$(LD) --nmagic -o initrd/asm_hello.bin -T os_binaries/asm_hello/linker.ld $(BUILD_DIR)/asm_hello.o
 
 build-initrd:
 	mkdir -p $(BUILD_DIR)/isofiles/boot/
@@ -55,7 +55,7 @@ build:
 	mkdir -p $(BUILD_DIR)
 	make build-kernel
 	make build-bootloader
-	make build-hello-asm
+	make build-os-binaries
 	make build-initrd
 
 

@@ -1,8 +1,8 @@
 use alloc::string::String;
+use alloc::vec::Vec;
 
 pub fn normalize(path: &str) -> String {
-    let normalized_path = remove_trailing_slash(path);
-    add_prefix_slash(&normalized_path)
+    return add_prefix_slash(path);
 }
 
 pub fn add_prefix_slash(path: &str) -> String {
@@ -30,35 +30,75 @@ pub fn remove_trailing_slash(path: &str) -> String {
 }
 
 pub fn remove_prefix(filepath: &str, path: &str) -> String {
-    let n_filepath = normalize(filepath);
-    let n_path = normalize(path);
+    let n_filepath = remove_trailing_slash(&normalize(filepath));
+    let n_path = remove_trailing_slash(&normalize(path));
     let result = n_filepath.trim_left_matches(&n_path);
     String::from(add_prefix_slash(result))
 }
 
 pub fn is_file_in_root(filename: &str, path: &str) -> bool {
-    let n_filename = &normalize(filename);
-    let n_path = &normalize(path);
+    let (f, _) = get_filename_and_path(&normalize(filename));
+    return f == add_trailing_slash(&add_prefix_slash(path));
+}
 
-    if n_filename.starts_with(n_path) {
-        let t_filename = n_filename.trim_start_matches(n_path);
-        let t_filename = &t_filename.trim_end_matches("/");
-        if !t_filename.contains("/") {
-            return true;
-        }
+pub fn get_filename_and_path(filename: &str) -> (String, String) {
+    let n_filename = normalize(filename);
+    if n_filename.ends_with("/") {
+        return (String::from(filename), String::new());
     }
-    return false;
+
+    let mut splitted_filename: Vec<&str> = (&n_filename).rsplitn(2, "/").collect();
+    splitted_filename.reverse();
+
+    return (
+        add_trailing_slash(&normalize(&splitted_filename[0])),
+        String::from(splitted_filename[1]),
+    );
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::println;
+
+    #[test]
+    fn test_get_filename_and_path() {
+        assert_eq!(
+            get_filename_and_path("/files/file.txt"),
+            (String::from("/files/"), String::from("file.txt")),
+        );
+
+        assert_eq!(
+            get_filename_and_path("/file"),
+            (String::from("/"), String::from("file")),
+        );
+
+        assert_eq!(
+            get_filename_and_path("file"),
+            (String::from("/"), String::from("file")),
+        );
+
+        assert_eq!(
+            get_filename_and_path("/file/"),
+            (String::from("/file/"), String::from("")),
+        );
+    }
+
+    #[test]
+    fn test_normalize() {
+        assert_eq!(normalize("files/file.txt"), "/files/file.txt");
+        assert_eq!(normalize("files"), "/files");
+        assert_eq!(normalize(""), "/");
+        assert_eq!(normalize("/"), "/");
+    }
 
     #[test]
     fn test_is_file_in_root() {
         assert_eq!(is_file_in_root("/", "/"), true);
         assert_eq!(is_file_in_root("/file.txt", "/"), true);
-        assert_eq!(is_file_in_root("/file.txt/", "/"), true);
+
+        assert_eq!(is_file_in_root("/files/file1.txt", "files"), true);
+        assert_eq!(is_file_in_root("files/file1.txt", "files"), true);
     }
 
     #[test]
