@@ -12,7 +12,7 @@
     alloc_error_handler,
     int_to_from_bytes
 )]
-#![allow(dead_code, unused_imports, unused_doc_comments)]
+#![allow(dead_code, unused_imports, unused_doc_comments, unused_variables)]
 
 extern crate multiboot2;
 extern crate spin;

@@ -99,4 +99,5 @@ qemu-run: iso
 		-serial mon:stdio \
 		-m 512M \
 		-boot d \
+		# -d int \
 		# -monitor stdio
