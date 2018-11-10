@@ -132,10 +132,37 @@ macro_rules! default_handler {
     }};
 }
 
-extern "C" fn system_call(system_call_number: u64, first_arg: u64) -> u32 {
+extern "C" fn system_call(syscall_args: &sys::SyscallArgs) -> u64 {
     sys::SYSCALL_DISPATCHER
         .lock()
-        .process_system_call(system_call_number, first_arg)
+        .process_system_call(syscall_args)
+}
+
+macro_rules! save_registers {
+    () => {
+        asm!("  push rax
+                push rbx
+                push rcx
+                push rdx
+                push rsi
+                push rdi
+
+                mov rdi, rsp
+        " :::: "intel", "volatile");
+    }
+}
+
+macro_rules! restore_registers {
+    () => {
+        asm!("  add rsp, 4
+                pop rdi
+                pop rsi
+                pop rdx
+                pop rcx
+                pop rbx
+                add rsp, 4
+            " :::: "intel", "volatile");
+    }
 }
 
 macro_rules! system_call_handler {
@@ -143,10 +170,14 @@ macro_rules! system_call_handler {
         #[naked]
         extern "C" fn wrapper() {
             unsafe {
+                // https://en.wikibooks.org/wiki/X86_Assembly/Interfacing_with_Linux
+                // change to rax
+                save_registers!();
                 asm!("call $0"
-                      :: "i"($name as extern "C" fn(system_call_number: u64, first_arg: u64) -> u32)
-                      : "rax", "rdi" : "intel",
+                      :: "i"($name as extern "C" fn(syscall_args: &sys::SyscallArgs) -> u64)
+                      : "rax" : "intel",
                 );
+                restore_registers!();
                 asm!("iretq" :::: "intel", "volatile");
                 ::core::intrinsics::unreachable();
             }

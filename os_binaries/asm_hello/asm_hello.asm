@@ -1,10 +1,10 @@
 global _start
 
 _start:
-    mov rdi, 0xD  ; why rdi, not rax?
+    mov rax, 0xD
     int 0x80
 
-    mov rdi, 0x3C
+    mov rax, 0x3C
     int 0x80
 
     ret

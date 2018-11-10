@@ -13,12 +13,21 @@ pub mod syscall;
     Handlers know this structure format and can unwrap it to get data back.
 */
 
+pub struct SyscallArgs {
+    pub rdi: u64,
+    pub rsi: u64,
+    pub rdx: u64,
+    pub rcx: u64,
+    pub rbx: u64,
+    pub rax: u64,
+}
+
 struct SysCallArgument {
     length: u64,
     address: u64,
 }
 
-type SysCallHandler = fn(first_arg: u64) -> u32;
+type SysCallHandler = fn(first_arg: u64) -> u64;
 pub struct SysCallDispatcher {}
 
 /*
@@ -32,11 +41,13 @@ impl SysCallDispatcher {
         SysCallDispatcher {}
     }
 
-    pub fn process_system_call(&mut self, system_call_number: u64, first_arg: u64) -> u32 {
+    pub fn process_system_call(&mut self, syscall_args: &SyscallArgs) -> u64 {
         /// Executes a handler for syscall `№ system_call_number`
-        system_log!("system call received: '{}'", system_call_number);
-        let handler = self.get_handler(system_call_number);
-        return handler(first_arg);
+        system_log!("system call received: '{}'", syscall_args.rax);
+        let handler = self.get_handler(syscall_args.rax);
+        let result = handler(syscall_args.rbx);
+        unsafe { syscall::save_rax(result) };
+        return result;
     }
 
     pub fn get_handler(&self, system_call_number: u64) -> SysCallHandler {
