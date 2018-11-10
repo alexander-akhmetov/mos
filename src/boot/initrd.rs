@@ -29,8 +29,8 @@ fn init_filesystem(boot_info: &BootInformation) {
     fs::vfs::VFS.lock().mount("/initrd", Box::new(tfs));
 
     system_log!(
-        "initrd loaded; files in '/initrd': {:?}",
-        fs::vfs::VFS.lock().list_dir("/initrd")
+        "initrd loaded; files in '/initrd/': {:?}",
+        fs::vfs::VFS.lock().list_dir("/initrd/")
     );
 }
 
