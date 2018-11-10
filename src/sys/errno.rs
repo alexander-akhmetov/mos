@@ -1,2 +1,2 @@
-pub const SUCCESS: u32 = 0; // success
-pub const EINTR: u32 = 4; // Interrupted system call
+pub const SUCCESS: u64 = 0; // success
+pub const EINTR: u64 = 4; // Interrupted system call

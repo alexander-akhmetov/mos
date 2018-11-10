@@ -25,7 +25,7 @@ lazy_static! {
         Mutex::new(unsafe { cpuio::Port::new(CMOSAddr::Reader as u16) });
 }
 
-pub fn get_timestamp() -> u32 {
+pub fn get_timestamp() -> u64 {
     let datetime = get_datetime();
     datetime.timestamp()
 }

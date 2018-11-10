@@ -40,6 +40,7 @@ mod pic8259;
 mod sys;
 mod utils;
 mod x86;
+mod tasking;
 
 #[cfg(test)]
 extern crate array_init;

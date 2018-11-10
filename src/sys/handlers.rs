@@ -2,16 +2,16 @@ use cmos;
 use core;
 use sys;
 
-pub fn none(_: u64) -> u32 {
+pub fn none(_: u64) -> u64 {
     sys::errno::EINTR
 }
 
-pub fn sys_time(_: u64) -> u32 {
+pub fn sys_time(_: u64) -> u64 {
     system_log!("syscall received: 'time'");
     cmos::get_timestamp()
 }
 
-pub fn sys_debug(arg_pointer: u64) -> u32 {
+pub fn sys_debug(arg_pointer: u64) -> u64 {
     system_log!(
         "debug syscall received with message: '{}'",
         read_str(arg_pointer),
@@ -19,7 +19,7 @@ pub fn sys_debug(arg_pointer: u64) -> u32 {
     sys::errno::SUCCESS
 }
 
-pub fn sys_exit(_: u64) -> u32 {
+pub fn sys_exit(_: u64) -> u64 {
     system_log!("sys_exit syscall received");
     sys::errno::SUCCESS
 }
