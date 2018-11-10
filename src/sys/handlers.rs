@@ -19,6 +19,11 @@ pub fn sys_debug(arg_pointer: u64) -> u32 {
     sys::errno::SUCCESS
 }
 
+pub fn sys_exit(_: u64) -> u32 {
+    system_log!("sys_exit syscall received");
+    sys::errno::SUCCESS
+}
+
 fn read_str(arg_pointer: u64) -> &'static str {
     let arg_ptr: *const sys::SysCallArgument = arg_pointer as *const sys::SysCallArgument;
     let length: usize = unsafe { (*arg_ptr).length as usize };

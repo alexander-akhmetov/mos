@@ -9,7 +9,8 @@
     alloc,
     allocator_api,
     lang_items,
-    alloc_error_handler
+    alloc_error_handler,
+    int_to_from_bytes
 )]
 #![allow(dead_code, unused_imports, unused_doc_comments)]
 

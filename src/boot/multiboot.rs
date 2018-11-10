@@ -1,3 +1,5 @@
+use memory;
+use memory::FrameAllocator;
 use multiboot2::BootInformation;
 use x86;
 
@@ -46,18 +48,30 @@ pub fn print_multiboot_info(multiboot_information_address: usize) {
         // unsafe { x86::jmp(module.start_address() as u64) };
     }
 
-    // let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
-    // let mut frame_allocator = memory::SimpleFrameAllocator::new(
-    //     kernel_start as usize,
-    //     kernel_end as usize,
-    //     multiboot_start,
-    //     multiboot_end,
-    //     memory_map_tag.memory_areas(),
-    // );
-    // for i in 0.. {
+    let (initrd_start, initrd_end) = get_module(boot_info, "initrd");
+    let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
+    let mut frame_allocator = memory::SimpleFrameAllocator::new(
+        kernel_start as usize,
+        kernel_end as usize,
+        multiboot_start,
+        multiboot_end,
+        initrd_start as usize,
+        initrd_end as usize,
+        memory_map_tag.memory_areas(),
+    );
+    // for i in 0..2 {
     //     if let None = frame_allocator.allocate_frame() {
     //         system_log!("allocated {} frames", i);
     //         break;
     //     }
     // }
+}
+
+pub fn get_module(boot_info: &BootInformation, name: &str) -> (u64, u64) {
+    let module = boot_info
+        .module_tags()
+        .find(|m| m.name() == name)
+        .expect("Can't find module");
+
+    (module.start_address() as u64, module.end_address() as u64)
 }

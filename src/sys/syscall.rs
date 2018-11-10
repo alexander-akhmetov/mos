@@ -18,10 +18,10 @@ pub unsafe fn sys_debug(msg: &str) -> u32 {
 unsafe fn _system_call(number: u32) -> u32 {
     /// Executes system call with number: number,
     /// reads the response from eax register and returns it
-    asm!("mov eax, $0; int 0x80;"
+    asm!("int 0x80;"
          :                          // no output
-         : "r"(number)              // input
-         : "eax"                    // clobbers
+         : "{eax}"(number)          // input
+         : "memory"                 // clobbers
          : "volatile", "intel",     // options
     );
     // now we can read returned code
@@ -31,10 +31,10 @@ unsafe fn _system_call(number: u32) -> u32 {
 unsafe fn _system_call_with_args(number: u32, first_arg: u64) -> u32 {
     /// Executes system call with number: number, and first_arg (pointer as u64)
     /// reads the response from eax register and returns it
-    asm!("mov rsi, $0; mov eax, $1; int 0x80;"
+    asm!("int 0x80;"
          :                                          // no output
-         : "r"(first_arg), "r"(number)              // input
-         : "eax"                                    // clobbers
+         : "{rsi}"(first_arg), "{eax}"(number)      // input
+         : "memory"                                 // clobbers
          : "volatile", "intel",                     // options
     );
     // now we can read returned code
