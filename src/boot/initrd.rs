@@ -1,6 +1,7 @@
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
+use boot::multiboot::get_module;
 use core::slice;
 use core::str;
 use fs;
@@ -8,15 +9,6 @@ use multiboot2::BootInformation;
 use sys;
 use tar;
 use x86;
-
-fn get_module(boot_info: &BootInformation, name: &str) -> (u64, u64) {
-    let module = boot_info
-        .module_tags()
-        .find(|m| m.name() == name)
-        .expect("Can't find module");
-
-    (module.start_address() as u64, module.end_address() as u64)
-}
 
 pub fn init(boot_info: &BootInformation) {
     init_filesystem(boot_info);

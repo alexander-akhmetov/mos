@@ -1,33 +1,30 @@
 use alloc::vec::Vec;
+use core::ptr::read_volatile;
 use core::slice;
 use x86;
 
-#[repr(C, packed)]
-pub struct ELFIdent {
-    ei_mag: [u8; 4],
-    ei_class: u8,
-    ei_data: u8,
-    ei_version: u8,
-    ei_osabi: u8,
-    ei_abiversion: u8,
-    ei_pad: [u8; 7],
-}
-
-#[repr(C, packed)]
+#[derive(Default)]
+#[repr(packed)]
 pub struct ELFHeader {
-    e_ident: ELFIdent,
-    e_type: u16,
-    e_machine: u16,
-    e_version: u32,
-    e_entry: u64,
-    e_phoff: u64,
-    e_shoff: u64,
-    e_flags: u32,
-    e_ehsize: u16,
-    e_phentsize: u16,
-    e_phnum: u16,
-    e_shentsize: u16,
-    e_shnum: u16,
+    magic: [u8; 4],
+    class: u8,
+    endianness: u8,
+    version: u8,
+    os_abi: u8,
+    abi_version: u8,
+    unused: [u8; 7],
+    elf_type: u16,
+    machine: u16,
+    version2: u32,
+    pub entry_point: u64,
+    pub phoff: u64, // program Header offset
+    shoff: u64,     // pection Header offset
+    flags: u32,
+    header_size: u16,
+    pub phentsize: u16, // Program header entry size
+    pub phnum: u16,     // Program header entry count
+    shentsize: u16,     // Section header entry size
+    shnum: u16,         // Section header entry count
     e_shstrndx: u16,
 }
 
@@ -40,10 +37,15 @@ pub fn read_header<'a>(addr: *const u8) -> &'a ELFHeader {
 
 pub unsafe fn exec(addr: *const u8) {
     let header = read_header(addr);
-    let call_addr = addr as u64 + header.e_entry as u64;
-    system_log!("Executing ELF: e_entry: {:x}", call_addr);
-    // x86::jmp(call_addr);
-    // system_log!("Executed ELF: e_entry: {:x}", call_addr);
+    system_log!(
+        "Parsed ELF file, entry_point: 0x{:x}, addr: 0{:x}",
+        u64::swap_bytes(header.entry_point),
+        addr as u64,
+    );
+    let call_addr = addr as u64 + 0x80;
+    system_log!("Executing ELF: entry_point: 0x{:x}", call_addr);
+    x86::call(call_addr);
+    system_log!("Executed ELF: entry_point: 0x{:x}", call_addr);
 }
 
 #[test]
@@ -60,8 +62,11 @@ fn test_read_elf_from_file() {
 
     // Check the magic bytes
     println!(
-        "header.e_ident.ei_mag: {:?} header.e_entry: {:?}, version: {:?}, ei_osabi: {:?}, e_machine: {:?}",
-        header.e_ident.ei_mag, header.e_entry, header.e_version, header.e_ident.ei_osabi, header.e_machine,
+        "-----
+        endianness: {:?}
+        entry_point: 0x{:x}
+        ------",
+        header.endianness, header.entry_point,
     );
-    assert!(header.e_ident.ei_mag[1..4] == *"ELF".as_bytes());
+    assert_eq!(header.entry_point, 0x80000);
 }
