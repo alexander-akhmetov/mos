@@ -1,6 +1,8 @@
 #[macro_use]
 mod idt;
 
+pub mod tss;
+
 use drivers::keyboard;
 use pic8259;
 use sys;
