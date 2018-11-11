@@ -22,3 +22,9 @@ pub unsafe fn jmp(addr: u64) {
          :: "volatile", "intel",      // options
     );
 }
+
+pub unsafe fn cr3() -> u64 {
+    let result: u64;
+    asm!("mov %cr3, $0" : "=r" (result) :);
+    result
+}

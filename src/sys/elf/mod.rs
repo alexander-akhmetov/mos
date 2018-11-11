@@ -59,6 +59,7 @@ fn test_read_elf_from_file() {
     f.read_to_end(&mut buf).unwrap();
 
     let header = read_header(buf.as_ptr());
+    let entry_point = header.entry_point;
 
     // Check the magic bytes
     println!(
@@ -66,7 +67,7 @@ fn test_read_elf_from_file() {
         endianness: {:?}
         entry_point: 0x{:x}
         ------",
-        header.endianness, header.entry_point,
+        header.endianness, entry_point,
     );
-    assert_eq!(header.entry_point, 0x80000);
+    assert_eq!(entry_point, 0x80000);
 }

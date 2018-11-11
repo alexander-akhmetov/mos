@@ -12,7 +12,7 @@ pub struct Frame {
 }
 
 impl Frame {
-    fn get_for_address(address: usize) -> Frame {
+    fn get_for_address(address: paging::PhysicalAddress) -> Frame {
         // returns frame for a given physical memory address
         Frame {
             index: address / PAGE_SIZE,
