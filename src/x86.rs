@@ -3,8 +3,12 @@
 pub unsafe fn hlt_loop() -> ! {
     /// runs `hlt` instruction forever
     loop {
-        asm!("hlt" :::: "volatile");
+        hlt();
     }
+}
+
+pub unsafe fn hlt() {
+    asm!("hlt" :::: "volatile")
 }
 
 pub unsafe fn call(addr: u64) {

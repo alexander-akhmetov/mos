@@ -53,6 +53,7 @@ impl SysCallDispatcher {
     pub fn get_handler(&self, system_call_number: u64) -> SysCallHandler {
         match system_call_number {
             0 => handlers::sys_debug,
+            1 => handlers::sys_exit,
             13 => handlers::sys_time,
             60 => handlers::sys_exit,
             1000 => handlers::sys_switch,
