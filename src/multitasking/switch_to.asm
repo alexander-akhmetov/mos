@@ -18,7 +18,7 @@ switch_to:
     push r14
     push r15
 
-    mov [rdi], rsp	; update old ctx ptr with current stack ptr
+    ; mov [rdi], rsp	; update old ctx ptr with current stack ptr
     mov rsp, rsi	; switch to new stack
 
     pop r15

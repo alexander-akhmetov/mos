@@ -133,6 +133,7 @@ macro_rules! default_handler {
 }
 
 extern "C" fn system_call(syscall_args: &sys::SyscallArgs) -> u64 {
+    system_log!("system call handler: new syscall received");
     sys::SYSCALL_DISPATCHER
         .lock()
         .process_system_call(syscall_args)

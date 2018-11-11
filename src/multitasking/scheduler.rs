@@ -20,7 +20,9 @@ impl CurrentTask {
 }
 
 extern "C" fn init() -> u64 {
-    return 0;
+    loop {
+        unsafe { switch() };
+    }
 }
 
 impl Scheduler {
@@ -166,10 +168,9 @@ pub unsafe fn switch() {
         return;
     };
 
-    switch_to(&current_task.unwrap().registers, &next_task_context);
-
     CURRENT_TASK.write().id = next_task_id.unwrap();
-    system_log!("[scheduler] switch completed");
+
+    switch_to(&current_task.unwrap().registers, &next_task_context);
 }
 
 #[cfg(test)]
