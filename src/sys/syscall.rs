@@ -1,5 +1,9 @@
 use sys::SysCallArgument;
 
+pub unsafe fn sys_exit() -> u64 {
+    _system_call(1)
+}
+
 pub unsafe fn sys_time() -> u64 {
     // get timestamp
     _system_call(13)

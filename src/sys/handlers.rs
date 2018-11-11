@@ -12,6 +12,12 @@ pub fn sys_time(_: u64) -> u64 {
     cmos::get_timestamp()
 }
 
+pub fn sys_exit(_: u64) -> u64 {
+    system_log!("syscall received: 'exit'");
+    multitasking::scheduler::SCHEDULER.write().exit_current();
+    sys::errno::SUCCESS
+}
+
 pub fn sys_switch(_: u64) -> u64 {
     system_log!("syscall received: 'switch'");
     unsafe { multitasking::scheduler::switch() };
@@ -23,11 +29,6 @@ pub fn sys_debug(arg_pointer: u64) -> u64 {
         "debug syscall received with message: '{}'",
         read_str(arg_pointer),
     );
-    sys::errno::SUCCESS
-}
-
-pub fn sys_exit(_: u64) -> u64 {
-    system_log!("sys_exit syscall received");
     sys::errno::SUCCESS
 }
 

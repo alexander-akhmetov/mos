@@ -6,7 +6,7 @@ use core::slice;
 use core::str;
 use fs;
 use multiboot2::BootInformation;
-use multitasking;
+use multitasking::scheduler::{switch, SCHEDULER};
 use sys;
 use tar;
 use x86;
@@ -16,7 +16,9 @@ pub fn init(boot_info: &BootInformation) {
     // run_hello_bin();
     system_log!("[init] ###### testing scheduler ######");
     test_scheduler();
-    unsafe { multitasking::scheduler::switch() };
+    loop {
+        unsafe { switch() };
+    }
     system_log!("initrd end");
 }
 
@@ -52,26 +54,18 @@ fn run_hello_bin() {
 
 fn test_scheduler() {
     for _i in 0..3 {
-        multitasking::scheduler::SCHEDULER
-            .write()
-            .spawn(foo as *const () as u64);
+        SCHEDULER.write().spawn(foo as *const () as u64);
     }
 }
 
 extern "C" fn foo() {
-    for _i in 0..5 {
-        system_log!(
-            "hello from task {}",
-            multitasking::scheduler::SCHEDULER.read().current_task_id()
-        );
-        unsafe { multitasking::scheduler::switch() };
-        system_log!(
-            "hello again from task {}",
-            multitasking::scheduler::SCHEDULER.read().current_task_id()
-        );
+    for _i in 0..2 {
+        system_log!("hello from task {}", SCHEDULER.read().current_task_id());
+        // unsafe { switch() };
     }
-    system_log!(
-        "end task {}",
-        multitasking::scheduler::SCHEDULER.read().current_task_id()
-    );
+    system_log!("end task {}", SCHEDULER.read().current_task_id());
+    unsafe {
+        sys::syscall::sys_exit();
+        switch();
+    };
 }
