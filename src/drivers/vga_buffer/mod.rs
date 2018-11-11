@@ -131,6 +131,7 @@ impl fmt::Write for Writer {
 
 pub fn print(args: fmt::Arguments, color: ColorCode) {
     use core::fmt::Write;
+    unsafe { WRITER.force_unlock() };
     let mut writer = WRITER.lock();
     writer.set_color(color);
     writer.write_fmt(args).unwrap();

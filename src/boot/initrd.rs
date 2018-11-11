@@ -16,9 +16,9 @@ pub fn init(boot_info: &BootInformation) {
     // run_hello_bin();
     system_log!("[init] ###### testing scheduler ######");
     test_scheduler();
-    loop {
-        unsafe { switch() };
-    }
+    // loop {
+    //     unsafe { switch() };
+    // }
     system_log!("initrd end");
 }
 
@@ -60,12 +60,16 @@ fn test_scheduler() {
 
 extern "C" fn foo() {
     for _i in 0..2 {
-        system_log!("hello from task {}", SCHEDULER.read().current_task_id());
+        system_log!("task_{}: hello", SCHEDULER.read().current_task_id());
         // unsafe { switch() };
     }
-    system_log!("end task {}", SCHEDULER.read().current_task_id());
+    system_log!(
+        "task_{}: completed, stopping...",
+        SCHEDULER.read().current_task_id()
+    );
     unsafe {
         sys::syscall::sys_exit();
         switch();
+        // sys::syscall::sys_switch();
     };
 }

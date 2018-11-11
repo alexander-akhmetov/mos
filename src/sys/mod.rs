@@ -5,6 +5,7 @@ mod errno;
 mod handlers;
 pub mod interrupts;
 pub mod syscall;
+pub mod time;
 
 /*
     This structure is used by sys::syscall library

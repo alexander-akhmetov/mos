@@ -105,11 +105,12 @@ impl Pic8259 {
     }
 
     pub unsafe fn notify_end_of_interrupt(&mut self, interrupt_id: u8) {
-        if self.pics[0].handles_interrupt(interrupt_id) {
+        if self.handles_interrupt(interrupt_id) {
+            // chain
+            if self.pics[1].handles_interrupt(interrupt_id) {
+                self.pics[1].end_of_interrupt();
+            }
             self.pics[0].end_of_interrupt();
-        }
-        if self.pics[1].handles_interrupt(interrupt_id) {
-            self.pics[1].end_of_interrupt();
         }
     }
 }
