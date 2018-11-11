@@ -26,6 +26,7 @@ build-bootloader:
 	$(NASM) -f elf64 src/boot/loader/boot.asm -o $(BUILD_DIR)/boot.o
 	$(NASM) -f elf64 src/boot/loader/long_mode_init.asm -o $(BUILD_DIR)/long_mode_init.o
 	$(NASM) -f elf64 src/boot/loader/checks.asm -o $(BUILD_DIR)/checks.o
+	$(NASM) -f elf64 src/multitasking/switch_to.asm -o $(BUILD_DIR)/switch_to.o
 	$(LD) --nmagic \
 			-o $(BUILD_DIR)/kernel.bin \
 			-T src/boot/loader/linker.ld \
@@ -33,6 +34,7 @@ build-bootloader:
 			$(BUILD_DIR)/boot.o \
 			$(BUILD_DIR)/long_mode_init.o \
 			$(BUILD_DIR)/checks.o \
+			$(BUILD_DIR)/switch_to.o \
 			$(RUST_BUILD_DIR)/x86_64-mos/debug/libmos.a
 
 
