@@ -10,7 +10,8 @@
     allocator_api,
     lang_items,
     alloc_error_handler,
-    int_to_from_bytes
+    int_to_from_bytes,
+    const_vec_new
 )]
 #![allow(dead_code, unused_imports, unused_doc_comments, unused_variables)]
 
@@ -21,6 +22,8 @@ extern crate volatile;
 extern crate lazy_static;
 extern crate uart_16550;
 extern crate x86_64;
+#[macro_use]
+extern crate bitflags;
 
 #[macro_use]
 extern crate alloc;
@@ -36,11 +39,11 @@ mod cpuio;
 mod fs;
 mod init;
 mod memory;
+mod multitasking;
 mod pic8259;
 mod sys;
 mod utils;
 mod x86;
-mod tasking;
 
 #[cfg(test)]
 extern crate array_init;

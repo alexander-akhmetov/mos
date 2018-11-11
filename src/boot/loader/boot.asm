@@ -63,7 +63,11 @@ enable_paging:
 
     ; move page table address to cr3
     mov eax, p4_table
-    mov cr3, eax  ; we can't mov directly into cr3, we must move data from another register, so let's do it via eax
+    mov cr3, eax  ; we can't move directly into cr3, we must move data from another register, so let's do it via eax
+
+    mov eax, p4_table
+    or eax, 0b11 ; present + writable
+    mov [p4_table + 511 * 8], eax
 
     ; enable PAE
     mov eax, cr4
