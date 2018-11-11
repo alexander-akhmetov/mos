@@ -2,6 +2,7 @@ use alloc::collections::BTreeMap;
 use multitasking::context::{switch_to, ContextRegisters};
 use multitasking::process::{Process, ProcessID};
 use spin::RwLock;
+use sys;
 use x86;
 
 pub struct Scheduler {
@@ -21,10 +22,7 @@ impl CurrentTask {
 
 extern "C" fn init() -> u64 {
     loop {
-        unsafe {
-            // x86::hlt();
-            switch()
-        };
+        unsafe { switch() };
     }
 }
 
@@ -97,34 +95,43 @@ lazy_static! {
 pub unsafe fn switch() {
     system_log!("[scheduler] switch signal received");
 
+    let read_scheduler_opt = SCHEDULER.try_read();
+    if read_scheduler_opt.is_none() {
+        system_log!("[scheduler] busy...");
+        return;
+    }
+    let read_scheduler = read_scheduler_opt.unwrap();
+
+    if read_scheduler.tasks.len() == 0 {
+        system_log!("[scheduler] no tasks");
+        return;
+    }
+
     let current_id = CURRENT_TASK.read().id;
     let next_task: &Process;
 
-    let next_task_id = SCHEDULER.read().next_id();
+    let next_task_id = read_scheduler.next_id();
     if next_task_id.is_none() {
         system_log!("[scheduler] no next task id");
         return;
     }
 
-    let next_task_context = SCHEDULER
-        .read()
+    let next_task_context = read_scheduler
         .get_task(next_task_id.unwrap())
         .unwrap()
         .registers;
 
     system_log!(
-        "[scheduler] switching tasks from {} to {} (0x{:x})",
+        "[scheduler] switching tasks from {} to {}",
         current_id,
         next_task_id.unwrap(),
-        next_task_context.rip,
     );
 
     if current_id == next_task_id.unwrap() {
         return;
     }
 
-    let current_task_context = SCHEDULER
-        .read()
+    let current_task_context = read_scheduler
         .get_task(current_id)
         .unwrap_or(&Process::new(0, 0)) // if there is no current process, just give mock to switch func
         .registers;

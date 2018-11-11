@@ -14,13 +14,7 @@ pub fn sys_time(_: u64) -> u64 {
 
 pub fn sys_exit(_: u64) -> u64 {
     system_log!("syscall received: 'exit'");
-    multitasking::scheduler::SCHEDULER.write().exit_current();
-    sys::errno::SUCCESS
-}
-
-pub fn sys_switch(_: u64) -> u64 {
-    system_log!("syscall received: 'switch'");
-    unsafe { multitasking::scheduler::switch() };
+    // multitasking::scheduler::SCHEDULER.write().exit_current();
     sys::errno::SUCCESS
 }
 

@@ -57,7 +57,6 @@ impl SysCallDispatcher {
             1 => handlers::sys_exit,
             13 => handlers::sys_time,
             60 => handlers::sys_exit,
-            1000 => handlers::sys_switch,
             _ => {
                 system_log!("unhandled system call: {}", system_call_number);
                 handlers::none

@@ -11,7 +11,8 @@
     lang_items,
     alloc_error_handler,
     int_to_from_bytes,
-    const_vec_new
+    const_vec_new,
+    compiler_builtins_lib
 )]
 #![allow(dead_code, unused_imports, unused_doc_comments, unused_variables)]
 
@@ -100,6 +101,8 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // finish enabling interrupts
     sys::interrupts::enable();
 
+    sys::time::init();
+
     // print multiboot info
     boot::multiboot::print_multiboot_info(multiboot_information_address);
 
@@ -110,7 +113,6 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // and not the OS is ready
     system_log_without_prefix!("----------------------------");
     let dt = cmos::get_datetime();
-    sys::time::init();
     system_log!("kernel started at {}", dt);
 
     // fn stack_overflow() {
