@@ -40,7 +40,6 @@ mod fs;
 mod init;
 mod memory;
 mod multitasking;
-mod pic8259;
 mod sys;
 mod utils;
 mod x86;
@@ -96,7 +95,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     sys::interrupts::init();
     // init PIC to start getting interrupts from timer, keyboard, etc.
     unsafe {
-        pic8259::PICS.lock().initialize();
+        drivers::pic8259::PICS.lock().initialize();
     }
     // finish enabling interrupts
     sys::interrupts::enable();
@@ -111,6 +110,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // and not the OS is ready
     system_log_without_prefix!("----------------------------");
     let dt = cmos::get_datetime();
+    sys::time::init();
     system_log!("kernel started at {}", dt);
 
     // fn stack_overflow() {

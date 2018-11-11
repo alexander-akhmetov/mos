@@ -3,8 +3,7 @@ mod idt;
 
 pub mod tss;
 
-use drivers::keyboard;
-use pic8259;
+use drivers::{keyboard, pic8259};
 use sys;
 
 #[derive(Debug)]
@@ -57,7 +56,8 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame) {
-    // kprint!(".");
+    unsafe { sys::time::SYSCLOCK.force_unlock() };
+    sys::time::SYSCLOCK.lock().tick();
     unsafe {
         pic8259::PICS
             .lock()
