@@ -1,3 +1,4 @@
+#[derive(Debug, Copy, Clone)]
 pub struct ContextRegisters {
     pub rax: u64,
     pub rbx: u64,

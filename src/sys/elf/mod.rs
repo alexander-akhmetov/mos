@@ -36,6 +36,13 @@ pub fn read_header<'a>(addr: *const u8) -> &'a ELFHeader {
 }
 
 pub unsafe fn exec(addr: *const u8) {
+    let call_addr = get_elf_entrypoint(addr);
+    system_log!("Executing ELF: entry_point: 0x{:x}", call_addr);
+    x86::call(call_addr);
+    system_log!("Executed ELF: entry_point: 0x{:x}", call_addr);
+}
+
+pub unsafe fn get_elf_entrypoint(addr: *const u8) -> u64 {
     let header = read_header(addr);
     system_log!(
         "Parsed ELF file, entry_point: 0x{:x}, addr: 0{:x}",
@@ -43,9 +50,7 @@ pub unsafe fn exec(addr: *const u8) {
         addr as u64,
     );
     let call_addr = addr as u64 + 0x80;
-    system_log!("Executing ELF: entry_point: 0x{:x}", call_addr);
-    x86::call(call_addr);
-    system_log!("Executed ELF: entry_point: 0x{:x}", call_addr);
+    return call_addr;
 }
 
 #[test]

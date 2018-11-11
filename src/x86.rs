@@ -24,7 +24,8 @@ pub unsafe fn jmp(addr: u64) {
 }
 
 pub unsafe fn cr3() -> u64 {
-    let result: u64;
+    let mut result: u64 = 0;
+    #[cfg(not(test))]
     asm!("mov %cr3, $0" : "=r" (result) :);
     result
 }
