@@ -1,19 +1,18 @@
 use sys::SysCallArgument;
+use x86;
 
 pub unsafe fn sys_exit() -> u64 {
+    /// sends system call "exit"
     _system_call(1)
 }
 
 pub unsafe fn sys_time() -> u64 {
-    // get timestamp
+    /// sends system call "time" and returns current timestamp
     _system_call(13)
 }
 
-pub unsafe fn sys_switch() -> u64 {
-    _system_call(1000)
-}
-
 pub unsafe fn sys_debug(msg: &str) -> u64 {
+    /// sends system call "debug" with msg string
     // for now msg MUST be null-terminated, for example: b"hello\0"
     let ptr = msg.as_ptr();
     let arg = SysCallArgument {
@@ -33,7 +32,7 @@ unsafe fn _system_call(number: u32) -> u64 {
          : "volatile", "intel",     // options
     );
     // now we can read returned code
-    read_rax()
+    x86::read_rax()
 }
 
 unsafe fn _system_call_with_args(number: u32, first_arg: u64) -> u64 {
@@ -46,19 +45,5 @@ unsafe fn _system_call_with_args(number: u32, first_arg: u64) -> u64 {
          : "volatile", "intel",                     // options
     );
     // now we can read returned code
-    read_rax()
-}
-
-unsafe fn read_rax() -> u64 {
-    let result: u64;
-    asm!("mov $0, rax"
-         : "=r"(result)           // output
-         :                        // no input
-         :: "volatile", "intel",  // options
-    );
-    result
-}
-
-pub unsafe fn save_rax(value: u64) {
-    asm!("mov rax, $0" :: "m"(value) :: "intel")
+    x86::read_rax()
 }

@@ -3,24 +3,47 @@
 * QEMU: `qemu-system-x86_64`
 * Always use `/usr/local/bin/nasm`
 
-## Bootsector
+## Development
 
-When the computer boots, the BIOS doesn't know how to load the OS, so it delegates that task to the boot sector. Thus, the boot sector must be placed in a known, standard location. That location is the first sector of the disk (cylinder 0, head 0, sector 0) and it takes 512 bytes.
+Start QEMU with mOS inside:
 
-To make sure that the "disk is bootable", the BIOS checks that bytes 511 and 512 of the alleged boot sector are bytes 0xAA55.
+```shell
+make run
+```
 
-To make sure that the "disk is bootable", the BIOS checks that bytes 511 and 512 of the alleged boot sector are bytes 0xAA55.
+### Folders structure
 
-## GCC cross-compiler
+* `./initrd`: all files in this directory will be placed into a single archive and mounted as a TarFS to `/initrd`
+* `./src`: kernel source code
 
-* [binutils installation](https://os.phil-opp.com/cross-compile-binutils/)
-* [grub on macos](https://github.com/phil-opp/blog_os/issues/55)
-* [more about grub](https://gist.github.com/alexander-akhmetov/f0a07f2264047a746907c3cfa182ae81)
+## Requirements
 
-## Todo
+* Cross compiled binutils (actually only `ld`).
+* NASM
+* Rust nightly
+* Docker to build iso with GRUB bootloader
+* QEMU
 
-* VGA Buffer scrolling
-* -Simple filesystem- DONE
-* Program execution
-* Processes
-* Start init after kernel loading and call OS if needed with syscalls
+### Requirements installation
+
+nasm:
+
+```shell
+brew install nasm
+```
+
+[Binutils installation](https://os.phil-opp.com/cross-compile-binutils/)
+
+# What it can?
+
+* [x] Load! :-)
+* [x] Print to VGA buffer
+* [x] Mount ramdisk
+* [x] Built-in support for TarFS
+* [x] Interrupts
+* [x] System clock
+* [x] Syscalls ABI
+* [ ] Processes
+* [ ] Start init process
+* [ ] Shell for user's commands
+* [ ] `cat`, `ps`

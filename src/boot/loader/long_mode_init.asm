@@ -12,7 +12,7 @@ long_mode_start:
 
 clear_data_segment_registers:
     ; load 0 into all data segment registers
-    mov ax, 0
+    xor rax, rax
     mov ss, ax
     mov ds, ax
     mov es, ax

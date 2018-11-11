@@ -4,6 +4,7 @@ mod idt;
 pub mod tss;
 
 use drivers::{keyboard, pic8259};
+use multitasking;
 use sys;
 
 #[derive(Debug)]
@@ -20,7 +21,7 @@ pub struct ExceptionStackFrame {
 
 fn kprintln_exception(name: &str, stack_frame: &ExceptionStackFrame) {
     system_log!(
-        "EXCEPTION: {}: {:#x}\n{:#?}",
+        "EXCEPTION: {}: 0x{:x}\n{:#?}",
         name,
         stack_frame.instruction_pointer,
         &*stack_frame,
@@ -44,7 +45,7 @@ extern "x86-interrupt" fn invalid_opcode_irq(stack_frame: &ExceptionStackFrame) 
 
 extern "x86-interrupt" fn page_fault_irq(stack_frame: &ExceptionStackFrame, error_code: u64) {
     kprintln!(
-        "\nEXCEPTION: PAGE FAULT with error code 0b{:b}\n{:#?}",
+        "\nEXCEPTION: PAGE FAULT with error code 0x{:x}\n{:#?}",
         error_code,
         &*stack_frame,
     );
@@ -56,13 +57,22 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame) {
-    unsafe { sys::time::SYSCLOCK.force_unlock() };
-    sys::time::SYSCLOCK.lock().tick();
     unsafe {
         pic8259::PICS
             .lock()
             .notify_end_of_interrupt(TIMER_INTERRUPT_ID);
-    }
+    };
+
+    match sys::time::SYSCLOCK.try_write() {
+        Some(mut clock) => clock.tick(),
+        None => {}
+    };
+    let switch_counter = sys::time::SYSCLOCK.read().switch_counter;
+    if switch_counter == 0 {
+        unsafe {
+            multitasking::scheduler::switch();
+        }
+    };
 }
 
 extern "x86-interrupt" fn keyboard_irq(_stack_frame: &ExceptionStackFrame) {

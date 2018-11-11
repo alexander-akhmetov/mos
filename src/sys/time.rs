@@ -1,14 +1,15 @@
 use cmos::get_timestamp;
 use drivers;
-use spin::Mutex;
-
-const TIMER_HERTZ: u32 = 1000;
-const TIME_BETWEEN_TICKS: f32 = 1.0 / (TIMER_HERTZ as f32);
+use multitasking::scheduler::switch;
+use spin::RwLock;
+use sys::constants;
+use x86;
 
 pub struct SystemClock {
     base_timestamp: u64,
     counter: u64,
     fraction: f32,
+    pub switch_counter: u32,
 }
 
 impl SystemClock {
@@ -17,30 +18,92 @@ impl SystemClock {
             base_timestamp: 0,
             counter: 0,
             fraction: 0.0,
+            switch_counter: 0,
         }
     }
 
     pub fn tick(&mut self) {
-        self.fraction += TIME_BETWEEN_TICKS;
+        // Does a system clock "tick"
+        // increases switch_counter which can be used by system scheduler
+        // to switch tasks.
+        //
+        // Also it increases base_timestamp if a second has passed
+        self.fraction += constants::TIME_BETWEEN_TICKS;
+        self.switch_counter += 1;
+
         if self.fraction > 1.0 {
             self.fraction -= 1.0;
             self.counter += 1;
             system_log!("{} system clock: +1 sec", self.timestamp());
         }
+        if self.switch_counter == constants::SCHEDULER_TICKS_TO_SWITCH {
+            self.switch_counter = 0;
+            // seems like can't do this here, because clocks will be blocked forever
+            //     unsafe { switch() };
+        }
     }
 
     pub fn timestamp(&self) -> u64 {
+        /// timestamp returns current timestamp in seconds
         return self.base_timestamp + self.counter;
+    }
+
+    pub fn milliseconds(&self) -> u64 {
+        /// returns current timestamp in milliseconds
+        return ((self.base_timestamp * 1000) + (self.fraction * 1000.0) as u64) as u64;
     }
 }
 
-pub static SYSCLOCK: Mutex<SystemClock> = Mutex::new(SystemClock::new());
+pub static SYSCLOCK: RwLock<SystemClock> = RwLock::new(SystemClock::new());
 
 pub fn init() {
-    drivers::pit::init(TIMER_HERTZ);
-    match SYSCLOCK.try_lock() {
+    /// initializes system clock
+    // at first it inits PIT and sets proper frequency
+    drivers::pit::init(constants::TIMER_HERTZ);
+
+    // sets current timestamp from CMOS
+    match SYSCLOCK.try_write() {
         Some(mut clock) => clock.base_timestamp = get_timestamp(),
         None => panic!("can't lock clock"),
     }
+
     system_log!("System clock initialized");
+}
+
+pub fn sleep(milliseconds: u64) {
+    /// sleeps at least N milliseconds
+    // first let's calculate when it needs to wake up
+    let mut wake_up_at = 0;
+
+    while wake_up_at == 0 {
+        let msecs = read_milliseconds_or_none();
+        // system clock can be locked by another thread
+        if msecs.is_some() {
+            wake_up_at = msecs.unwrap() + milliseconds;
+        };
+    }
+
+    loop {
+        // wait...
+        // trying to read current milliseconds
+        // if system clock is not locked by some else thread,
+        // if locked - just does nothing
+        let msecs = read_milliseconds_or_none();
+        if msecs.is_some() && msecs.unwrap() > wake_up_at {
+            // time to wake up!
+            break;
+        }
+        unsafe { x86::hlt() };
+    }
+}
+
+fn read_milliseconds_or_none() -> Option<u64> {
+    /// returns current timestamp in milliseconds
+    /// if system clock is not blocked by another thread
+    /// if it is, returns none
+    let read_sysclock = SYSCLOCK.try_read();
+    if read_sysclock.is_some() {
+        return Some(read_sysclock.unwrap().milliseconds());
+    };
+    return None;
 }

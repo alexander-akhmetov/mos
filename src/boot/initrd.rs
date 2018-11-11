@@ -15,10 +15,11 @@ pub fn init(boot_info: &BootInformation) {
     init_filesystem(boot_info);
     // run_hello_bin();
     system_log!("[init] ###### testing scheduler ######");
+    unsafe {
+        let rflags = x86::read_rflags();
+        system_log!("[init] !!! RFLAGS: 0b{:b}", rflags);
+    };
     test_scheduler();
-    // loop {
-    //     unsafe { switch() };
-    // }
     system_log!("initrd end");
 }
 
@@ -59,17 +60,27 @@ fn test_scheduler() {
 }
 
 extern "C" fn foo() {
-    for _i in 0..2 {
-        system_log!("task_{}: hello", SCHEDULER.read().current_task_id());
-        // unsafe { switch() };
+    let mut counter = 0;
+    system_log!(">> task_{}: started", SCHEDULER.read().current_task_id());
+
+    for _i in 0..5 {
+        counter += 1;
+        system_log!(
+            ">> task_{}: hello! counter={}",
+            SCHEDULER.read().current_task_id(),
+            counter,
+        );
+
+        sys::time::sleep(1000);
+
+        // unsafe {
+        //     let rflags = x86::read_rflags();
+        //     system_log!(">> task_{} RFLAGS: 0b{:b}", SCHEDULER.read().current_task_id(), rflags);
+        // };
     }
+
     system_log!(
-        "task_{}: completed, stopping...",
+        ">> task_{}: completed, stopping...",
         SCHEDULER.read().current_task_id()
     );
-    unsafe {
-        sys::syscall::sys_exit();
-        switch();
-        // sys::syscall::sys_switch();
-    };
 }

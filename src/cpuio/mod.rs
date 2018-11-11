@@ -2,6 +2,17 @@ use core::marker::PhantomData;
 
 mod x86;
 
+/*
+    Contains helper structures to make calls to CPU i/o ports.
+    Basic usage:
+
+        let port = cpuio::Port::new(some_addr);
+        let unsafe_port = cpuio::UnsafePort::new(some_addr);
+
+    UnsafePort implements unsafe read/write methods
+    and Port just hides whis unsafe calls for you.
+*/
+
 pub struct Port<T: InOut> {
     // address
     port: u16,
