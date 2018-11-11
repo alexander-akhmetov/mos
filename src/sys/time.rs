@@ -34,7 +34,7 @@ impl SystemClock {
         }
         if self.switch_counter == 10 {
             self.switch_counter = 0;
-            unsafe { switch() };
+            // unsafe { switch() };
         }
     }
 

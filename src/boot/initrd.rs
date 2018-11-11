@@ -15,8 +15,15 @@ pub fn init(boot_info: &BootInformation) {
     init_filesystem(boot_info);
     // run_hello_bin();
     system_log!("[init] ###### testing scheduler ######");
+    unsafe {
+        let rflags = x86::read_rflags();
+        system_log!("[init] !!! RFLAGS: 0b{:b}", rflags);
+    };
     test_scheduler();
     system_log!("initrd end");
+    unsafe {
+        switch();
+    };
 }
 
 fn init_filesystem(boot_info: &BootInformation) {
@@ -66,7 +73,15 @@ extern "C" fn foo() {
             counter,
         );
         for _j in 0..1000000 {}
-        unsafe { switch() };
+        unsafe {
+            let rflags = x86::read_rflags();
+            system_log!(
+                ">> task_{} RFLAGS: 0b{:b}",
+                rflags,
+                SCHEDULER.read().current_task_id()
+            );
+            switch();
+        };
     }
     system_log!(
         ">> task_{}: completed, stopping...",

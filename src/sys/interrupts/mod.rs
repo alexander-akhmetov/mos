@@ -56,7 +56,7 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame) {
-    system_log!("... timer ...");
+    // system_log!("... timer ...");
     match sys::time::SYSCLOCK.try_write() {
         Some(mut clock) => clock.tick(),
         None => panic!("Can't lock system clock"),

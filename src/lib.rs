@@ -69,7 +69,11 @@ fn panic(info: &PanicInfo) -> ! {
         drivers::vga_buffer::Color::Black,
     );
 
-    kprintln_color!(color, "\n-----------\n[KERNEL PANIC] {}\n-----------", info);
+    kprintln_color!(
+        color,
+        "\n-----------\n[KERNEL PANIC] Ooops... {}\n-----------",
+        info
+    );
 
     unsafe {
         x86::hlt_loop();

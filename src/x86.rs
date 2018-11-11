@@ -33,3 +33,14 @@ pub unsafe fn cr3() -> u64 {
     asm!("mov %cr3, $0" : "=r" (result) :);
     result
 }
+
+pub unsafe fn read_rflags() -> u64 {
+    let result: u64;
+    asm!("pushfq
+          pop rax"
+         : "=r"(result)           // output
+         :                        // no input
+         :: "volatile", "intel",  // options
+    );
+    result
+}

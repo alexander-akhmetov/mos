@@ -12,5 +12,5 @@ pub struct ContextRegisters {
 }
 
 extern "C" {
-    pub fn switch_to(old_ctx: *const ContextRegisters, new_ctx: *const ContextRegisters);
+    pub fn switch_to(old_ctx: *mut ContextRegisters, new_ctx: *const ContextRegisters);
 }

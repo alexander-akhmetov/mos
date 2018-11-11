@@ -67,7 +67,7 @@ impl Process {
             (*context).rbp = base_stack_pointer;
 
             (*context).rip = func_ptr;
-            (*context).rflags = 0x1002u64;
+            (*context).rflags = 0b1000000010;
 
             Process {
                 id: id,

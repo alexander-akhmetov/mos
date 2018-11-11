@@ -22,7 +22,9 @@ impl CurrentTask {
 
 extern "C" fn init() -> u64 {
     loop {
-        unsafe { switch() };
+        unsafe {
+            switch();
+        };
     }
 }
 
@@ -102,7 +104,7 @@ pub unsafe fn switch() {
     }
     let read_scheduler = read_scheduler_opt.unwrap();
 
-    if read_scheduler.tasks.len() == 0 {
+    if read_scheduler.tasks.len() < 2 {
         system_log!("[scheduler] no tasks");
         return;
     }
@@ -132,14 +134,17 @@ pub unsafe fn switch() {
         return;
     }
 
-    let current_task_context = read_scheduler
+    let mut current_task_context = read_scheduler
         .get_task(current_id)
         .unwrap_or(&Process::new(0, 0)) // if there is no current process, just give mock to switch func
         .registers;
 
     CURRENT_TASK.write().id = next_task_id.unwrap();
 
-    switch_to(&current_task_context, &next_task_context);
+    switch_to(
+        (&mut current_task_context) as *mut ContextRegisters,
+        &next_task_context,
+    );
 }
 
 #[cfg(test)]
