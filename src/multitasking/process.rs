@@ -50,7 +50,7 @@ impl Process {
 
         unsafe {
             // debugging...
-            *stack_ptr = 0xDEADBEEFu64;
+            *stack_ptr = 0xDEADBEEF;
             // going 1 u64 down
             stack_ptr = (stack_ptr as usize - size_of::<u64>()) as *mut u64;
 
@@ -64,11 +64,7 @@ impl Process {
             let context: *mut ContextRegisters = stack_ptr as *mut ContextRegisters;
             memset(context as *mut u8, 0x00, context_size);
 
-            (*context).rsp = (stack_ptr as usize + size_of::<ContextRegisters>()) as u64;
             (*context).rbp = base_stack_pointer;
-
-            stack_ptr = (stack_ptr as usize - size_of::<u64>()) as *mut u64;
-            *stack_ptr = func_ptr;
 
             (*context).rip = func_ptr;
             (*context).rflags = 0x1002u64;
@@ -83,6 +79,8 @@ impl Process {
     }
 }
 
+#[naked]
+#[no_mangle]
 extern "C" fn task_finished() -> ! {
     system_log!("finished task {}", CURRENT_TASK.read().id);
     loop {}

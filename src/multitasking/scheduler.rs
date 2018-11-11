@@ -122,9 +122,10 @@ pub unsafe fn switch() {
         .registers;
 
     system_log!(
-        "[scheduler] switching tasks from {} to {}",
+        "[scheduler] switching tasks from {} to {} (rip: 0x{:x})",
         current_id,
         next_task_id.unwrap(),
+        next_task_context.rip,
     );
 
     if current_id == next_task_id.unwrap() {

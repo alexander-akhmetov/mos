@@ -7,10 +7,10 @@ bits 64
 ; old = RDI
 ; new = RSI
 switch_to:
+    mov rax, [rsp]
+    push rax
+
     push rbp
-
-    sub  rsp, 8  ; ignore rsp
-
     push r15
     push r14
     push r13
@@ -27,7 +27,6 @@ switch_to:
     pop r13
     pop r14
     pop r15
-    add rsp, 8
     pop rbp
 
     ret

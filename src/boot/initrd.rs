@@ -65,15 +65,11 @@ extern "C" fn foo() {
             SCHEDULER.read().current_task_id(),
             counter,
         );
-        for _j in 0..5000000 {}
+        for _j in 0..1000000 {}
         unsafe { switch() };
     }
     system_log!(
         ">> task_{}: completed, stopping...",
         SCHEDULER.read().current_task_id()
     );
-    unsafe {
-        sys::syscall::sys_exit();
-    };
-    loop {}
 }
