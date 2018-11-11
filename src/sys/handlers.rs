@@ -1,5 +1,6 @@
 use cmos;
 use core;
+use multitasking;
 use sys;
 
 pub fn none(_: u64) -> u64 {
@@ -9,6 +10,12 @@ pub fn none(_: u64) -> u64 {
 pub fn sys_time(_: u64) -> u64 {
     system_log!("syscall received: 'time'");
     cmos::get_timestamp()
+}
+
+pub fn sys_switch(_: u64) -> u64 {
+    system_log!("syscall received: 'switch'");
+    unsafe { multitasking::scheduler::switch() };
+    sys::errno::SUCCESS
 }
 
 pub fn sys_debug(arg_pointer: u64) -> u64 {

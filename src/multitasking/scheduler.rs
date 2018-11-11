@@ -1,5 +1,5 @@
 use alloc::collections::BTreeMap;
-use multitasking::context::ContextRegisters;
+use multitasking::context::{switch_to, ContextRegisters};
 use multitasking::process::{Process, ProcessID};
 use spin::RwLock;
 use x86;
@@ -82,72 +82,73 @@ lazy_static! {
     pub static ref CURRENT_TASK: RwLock<CurrentTask> = RwLock::new(CurrentTask::new());
 }
 
-#[naked]
-pub unsafe fn switch_registers(current: &mut Process, next: ContextRegisters) {
-    // asm!("mov $0, cr3" : "=r"(current.registers.cr3) : : "memory" : "intel", "volatile");
-    // if next.cr3 == 0 {
-    //     panic!("Attempted to switch to a task with an invalid page table!");
-    // } else if next.cr3 != current.registers.cr3 {
-    //     asm!("mov cr3, $0" : : "r"(next.cr3) : "memory" : "intel", "volatile");
-    // }
+// #[naked]
+// pub unsafe fn switch_registers(current: &mut Process, next: ContextRegisters) {
+//     // asm!("mov $0, cr3" : "=r"(current.registers.cr3) : : "memory" : "intel", "volatile");
+//     // if next.cr3 == 0 {
+//     //     panic!("Attempted to switch to a task with an invalid page table!");
+//     // } else if next.cr3 != current.registers.cr3 {
+//     //     asm!("mov cr3, $0" : : "r"(next.cr3) : "memory" : "intel", "volatile");
+//     // }
 
-    // asm!("pushfq ; pop $0" : "=r"(current.registers.rflags) : : "memory" : "intel", "volatile");
-    // asm!("push $0 ; popfq" : : "r"(next.rflags) : "memory" : "intel", "volatile");
+//     asm!("pushfq ; pop $0" : "=r"(current.registers.rflags) : : "memory" : "intel", "volatile");
+//     asm!("push $0 ; popfq" : : "r"(next.rflags) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, rax" : "=r"(current.registers.rax) : : "memory" : "intel", "volatile");
-    // asm!("mov rax, $0" : : "r"(next.rax) : "memory" : "intel", "volatile");
+//     asm!("mov $0, rax" : "=r"(current.registers.rax) : : "memory" : "intel", "volatile");
+//     asm!("mov rax, $0" : : "r"(next.rax) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, rbx" : "=r"(current.registers.rbx) : : "memory" : "intel", "volatile");
-    // asm!("mov rbx, $0" : : "r"(next.rbx) : "memory" : "intel", "volatile");
+//     asm!("mov $0, rbx" : "=r"(current.registers.rbx) : : "memory" : "intel", "volatile");
+//     asm!("mov rbx, $0" : : "r"(next.rbx) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, rcx" : "=r"(current.registers.rcx) : : "memory" : "intel", "volatile");
-    // asm!("mov rcx, $0" : : "r"(next.rcx) : "memory" : "intel", "volatile");
+//     asm!("mov $0, rcx" : "=r"(current.registers.rcx) : : "memory" : "intel", "volatile");
+//     asm!("mov rcx, $0" : : "r"(next.rcx) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, rdx" : "=r"(current.registers.rdx) : : "memory" : "intel", "volatile");
-    // asm!("mov rdx, $0" : : "r"(next.rdx) : "memory" : "intel", "volatile");
+//     asm!("mov $0, rdx" : "=r"(current.registers.rdx) : : "memory" : "intel", "volatile");
+//     asm!("mov rdx, $0" : : "r"(next.rdx) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, rsi" : "=r"(current.registers.rsi) : : "memory" : "intel", "volatile");
-    // asm!("mov rsi, $0" : : "r"(next.rsi) : "memory" : "intel", "volatile");
+//     // asm!("mov $0, rsi" : "=r"(current.registers.rsi) : : "memory" : "intel", "volatile");
+//     // asm!("mov rsi, $0" : : "r"(next.rsi) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, rdi" : "=r"(current.registers.rdi) : : "memory" : "intel", "volatile");
-    // asm!("mov rdi, $0" : : "r"(next.rdi) : "memory" : "intel", "volatile");
+//     asm!("mov $0, rdi" : "=r"(current.registers.rdi) : : "memory" : "intel", "volatile");
+//     asm!("mov rdi, $0" : : "r"(next.rdi) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, r12" : "=r"(current.registers.r12) : : "memory" : "intel", "volatile");
-    // asm!("mov r12, $0" : : "r"(next.r12) : "memory" : "intel", "volatile");
+//     asm!("mov $0, r12" : "=r"(current.registers.r12) : : "memory" : "intel", "volatile");
+//     asm!("mov r12, $0" : : "r"(next.r12) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, r13" : "=r"(current.registers.r13) : : "memory" : "intel", "volatile");
-    // asm!("mov r13, $0" : : "r"(next.r13) : "memory" : "intel", "volatile");
+//     asm!("mov $0, r13" : "=r"(current.registers.r13) : : "memory" : "intel", "volatile");
+//     asm!("mov r13, $0" : : "r"(next.r13) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, r14" : "=r"(current.registers.r14) : : "memory" : "intel", "volatile");
-    // asm!("mov r14, $0" : : "r"(next.r14) : "memory" : "intel", "volatile");
+//     asm!("mov $0, r14" : "=r"(current.registers.r14) : : "memory" : "intel", "volatile");
+//     asm!("mov r14, $0" : : "r"(next.r14) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, r15" : "=r"(current.registers.r15) : : "memory" : "intel", "volatile");
-    // asm!("mov r15, $0" : : "r"(next.r15) : "memory" : "intel", "volatile");
+//     asm!("mov $0, r15" : "=r"(current.registers.r15) : : "memory" : "intel", "volatile");
+//     asm!("mov r15, $0" : : "r"(next.r15) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, rbp" : "=r"(current.registers.rbp) : : "memory" : "intel", "volatile");
-    // asm!("mov rbp, $0" : : "r"(next.rbp) : "memory" : "intel", "volatile");
+//     asm!("mov $0, rbp" : "=r"(current.registers.rbp) : : "memory" : "intel", "volatile");
+//     asm!("mov rbp, $0" : : "r"(next.rbp) : "memory" : "intel", "volatile");
 
-    // asm!("mov $0, rsp" : "=r"(current.registers.rsp) : : "memory" : "intel", "volatile");
-    // asm!("mov rsp, $0" : : "r"(next.rsp) : "memory" : "intel", "volatile");
+//     asm!("mov $0, rsp" : "=r"(current.registers.rsp) : : "memory" : "intel", "volatile");
+//     asm!("mov rsp, $0" : : "r"(next.rsp) : "memory" : "intel", "volatile");
 
-    // current.registers.rip = x86::read_rip();
-    x86::jmp(next.rsp);
-}
+//     // current.registers.rip = x86::read_rip();
+//     x86::jmp(next.rsp);
+// }
 
 pub unsafe fn switch() {
     system_log!("[scheduler] switch signal received");
 
+    let scheduler_lock = SCHEDULER.read();
+
     let current_id = CURRENT_TASK.read().id;
     let next_task: &Process;
 
-    let next_task_id = SCHEDULER.read().next_id();
+    let next_task_id = scheduler_lock.next_id();
     if next_task_id.is_none() {
         system_log!("[scheduler] no next task id");
         return;
     }
 
-    let next_task_registers = SCHEDULER
-        .read()
+    let next_task_context = scheduler_lock
         .get_task(next_task_id.unwrap())
         .unwrap()
         .registers;
@@ -156,25 +157,19 @@ pub unsafe fn switch() {
         "[scheduler] switching tasks from {} to {} (0x{:x})",
         current_id,
         next_task_id.unwrap(),
-        next_task_registers.rsp,
+        next_task_context.rip,
     );
 
-    let mut scheduler_lock = SCHEDULER.write();
-    let current_task = scheduler_lock.get_task_mut(current_id);
+    let current_task = scheduler_lock.get_task(current_id);
     if current_task.is_none() {
         system_log!("[scheduler] no current task id");
         return;
     };
-    switch_registers(current_task.unwrap(), next_task_registers);
+
+    switch_to(&current_task.unwrap().registers, &next_task_context);
 
     CURRENT_TASK.write().id = next_task_id.unwrap();
     system_log!("[scheduler] switch completed");
-}
-
-pub fn spawn_internal(func: extern "C" fn()) {
-    let func_ptr = (func as *const ()) as u64;
-    SCHEDULER.write().spawn(func_ptr);
-    unsafe { switch() };
 }
 
 #[cfg(test)]

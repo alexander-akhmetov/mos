@@ -5,6 +5,10 @@ pub unsafe fn sys_time() -> u64 {
     _system_call(13)
 }
 
+pub unsafe fn sys_switch() -> u64 {
+    _system_call(1000)
+}
+
 pub unsafe fn sys_debug(msg: &str) -> u64 {
     // for now msg MUST be null-terminated, for example: b"hello\0"
     let ptr = msg.as_ptr();
