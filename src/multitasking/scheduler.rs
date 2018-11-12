@@ -24,7 +24,7 @@ impl CurrentTask {
     }
 }
 
-extern "C" fn init() -> u64 {
+fn init_task() -> u64 {
     /// simple function which does nothing and
     /// is being always executing by the kernel
     loop {
@@ -42,7 +42,7 @@ impl Scheduler {
             process_id_counter: 0,
         };
 
-        let pid = sc.spawn(init as *const () as u64);
+        let pid = sc.spawn(init_task as *const () as u64);
         CURRENT_TASK.write().id = pid;
         sc
     }
@@ -107,9 +107,16 @@ impl Scheduler {
     }
 }
 
+pub static mut SCHEDULER: Option<Scheduler> = None;
+
 lazy_static! {
-    pub static ref SCHEDULER: RwLock<Scheduler> = RwLock::new(Scheduler::new());
     pub static ref CURRENT_TASK: RwLock<CurrentTask> = RwLock::new(CurrentTask::new());
+}
+
+pub fn init() {
+    unsafe {
+        SCHEDULER = Some(Scheduler::new());
+    }
 }
 
 pub unsafe fn switch() {
@@ -117,30 +124,24 @@ pub unsafe fn switch() {
     /// Do not call this fulction while you have holding locks.
     system_log!("[scheduler] switch signal received");
 
-    // check that scheduler is not locked
-    let read_scheduler_opt = SCHEDULER.try_read();
-    if read_scheduler_opt.is_none() {
-        system_log!("[scheduler] busy...");
-        return;
-    }
-    let read_scheduler = read_scheduler_opt.unwrap();
-
     // if there is no tasks to switch to, just return nothing
-    if read_scheduler.tasks.len() < 2 {
+    if SCHEDULER.as_ref().unwrap().tasks.len() < 2 {
         system_log!("[scheduler] no tasks");
         return;
     }
 
     let next_task: &Process;
     // if there is no next task - do nothing
-    let next_task_id = read_scheduler.next_id();
+    let next_task_id = SCHEDULER.as_ref().unwrap().next_id();
     if next_task_id.is_none() {
         system_log!("[scheduler] no next task id");
         return;
     }
 
     // get next tasks's context information (registers)
-    let next_task_context = read_scheduler
+    let next_task_context = SCHEDULER
+        .as_ref()
+        .unwrap()
         .get_task(next_task_id.unwrap())
         .unwrap()
         .registers;
@@ -159,14 +160,19 @@ pub unsafe fn switch() {
     }
 
     // if current
-    let current_task_exists = read_scheduler.get_task(current_id).is_some();
+    let current_task_exists = SCHEDULER.as_ref().unwrap().get_task(current_id).is_some();
 
     // update current task information with next task's id
     CURRENT_TASK.write().id = next_task_id.unwrap();
 
     if current_task_exists {
         // get current tasks's context information (registers)
-        let mut current_task_context = read_scheduler.get_task(current_id).unwrap().registers;
+        let mut current_task_context = SCHEDULER
+            .as_ref()
+            .unwrap()
+            .get_task(current_id)
+            .unwrap()
+            .registers;
         // context switch!
         switch_to(
             (&mut current_task_context) as *mut ContextRegisters,
@@ -180,6 +186,10 @@ pub unsafe fn switch() {
 extern "C" {
     fn switch_to(old_ctx: *mut ContextRegisters, new_ctx: *const ContextRegisters);
     fn start_task(ctx: *const ContextRegisters);
+}
+
+pub fn current_task_id() -> u32 {
+    return CURRENT_TASK.read().id;
 }
 
 #[cfg(test)]

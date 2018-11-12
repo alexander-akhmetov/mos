@@ -16,7 +16,6 @@ pub fn sys_time(_: u64) -> u64 {
 pub fn sys_exit(_: u64) -> u64 {
     /// handles "exit" syscall
     system_log!("syscall received: 'exit'");
-    // multitasking::scheduler::SCHEDULER.write().exit_current();
     sys::errno::SUCCESS
 }
 

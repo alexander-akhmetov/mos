@@ -6,7 +6,7 @@ use core::slice;
 use core::str;
 use fs;
 use multiboot2::BootInformation;
-use multitasking::scheduler::{switch, SCHEDULER};
+use multitasking::scheduler::{current_task_id, SCHEDULER};
 use sys;
 use tar;
 use x86;
@@ -55,32 +55,22 @@ fn run_hello_bin() {
 
 fn test_scheduler() {
     for _i in 0..3 {
-        SCHEDULER.write().spawn(foo as *const () as u64);
+        unsafe {
+            SCHEDULER.as_mut().unwrap().spawn(foo as *const () as u64);
+        }
     }
 }
 
-extern "C" fn foo() {
+fn foo() {
     let mut counter = 0;
-    system_log!(">> task_{}: started", SCHEDULER.read().current_task_id());
+    system_log!(">> task_{}: started", current_task_id());
 
     for _i in 0..5 {
         counter += 1;
-        system_log!(
-            ">> task_{}: hello! counter={}",
-            SCHEDULER.read().current_task_id(),
-            counter,
-        );
+        system_log!(">> task_{}: hello! counter={}", current_task_id(), counter,);
 
         sys::time::sleep(1000);
-
-        // unsafe {
-        //     let rflags = x86::read_rflags();
-        //     system_log!(">> task_{} RFLAGS: 0b{:b}", SCHEDULER.read().current_task_id(), rflags);
-        // };
     }
 
-    system_log!(
-        ">> task_{}: completed, stopping...",
-        SCHEDULER.read().current_task_id()
-    );
+    system_log!(">> task_{}: completed, stopping...", current_task_id());
 }
