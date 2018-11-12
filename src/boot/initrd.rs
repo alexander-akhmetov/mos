@@ -76,11 +76,6 @@ extern "C" fn foo() {
         // unsafe {
         //     let rflags = x86::read_rflags();
         //     system_log!(">> task_{} RFLAGS: 0b{:b}", SCHEDULER.read().current_task_id(), rflags);
-        //     switch();
-        //     system_log!(
-        //         ">> task_{}: back from switch",
-        //         SCHEDULER.read().current_task_id(),
-        //     );
         // };
     }
 

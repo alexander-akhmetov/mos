@@ -1,4 +1,3 @@
-use spin::Mutex;
 pub mod collections;
 pub mod constants;
 pub mod elf;
@@ -7,6 +6,8 @@ mod handlers;
 pub mod interrupts;
 pub mod syscall;
 pub mod time;
+use spin::Mutex;
+use x86;
 
 /*
     This structure is used by sys::syscall library
@@ -29,7 +30,10 @@ struct SysCallArgument {
     address: u64,
 }
 
+/// SysCallHandler is a function template which handles system calls from apps
 type SysCallHandler = fn(first_arg: u64) -> u64;
+
+// SysCallDispatcher implements a dispatcher to all system calls
 pub struct SysCallDispatcher {}
 
 /*
@@ -48,11 +52,12 @@ impl SysCallDispatcher {
         system_log!("system call received: '{}'", syscall_args.rax);
         let handler = self.get_handler(syscall_args.rax);
         let result = handler(syscall_args.rbx);
-        unsafe { syscall::save_rax(result) };
+        unsafe { x86::save_rax(result) };
         return result;
     }
 
     pub fn get_handler(&self, system_call_number: u64) -> SysCallHandler {
+        /// returns a handler for system call `№ system_call_number`
         match system_call_number {
             0 => handlers::sys_debug,
             1 => handlers::sys_exit,

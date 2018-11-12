@@ -1,16 +1,20 @@
 use alloc::collections::BTreeMap;
-use multitasking::context::{switch_to, ContextRegisters};
+use multitasking::context::ContextRegisters;
 use multitasking::process::{Process, ProcessID};
 use spin::RwLock;
 use sys;
 use x86;
 
 pub struct Scheduler {
+    /// Implements context switching for preemptive multitasking
+    // tasks: list of currently active tasks
     tasks: BTreeMap<ProcessID, Process>,
+    // counter to generate ids for new tasks
     process_id_counter: u32,
 }
 
 pub struct CurrentTask {
+    /// holds information about current task (thread or process)
     pub id: ProcessID,
 }
 
@@ -21,6 +25,8 @@ impl CurrentTask {
 }
 
 extern "C" fn init() -> u64 {
+    /// simple function which does nothing and
+    /// is being always executing by the kernel
     loop {
         unsafe {
             x86::hlt();
@@ -30,6 +36,7 @@ extern "C" fn init() -> u64 {
 
 impl Scheduler {
     pub fn new() -> Scheduler {
+        /// initializes the Scheduler
         let mut sc = Scheduler {
             tasks: BTreeMap::new(),
             process_id_counter: 0,
@@ -41,6 +48,7 @@ impl Scheduler {
     }
 
     pub fn current_task_id(&self) -> u32 {
+        /// returns id of the task which is active now
         CURRENT_TASK.read().id
     }
 
@@ -52,12 +60,13 @@ impl Scheduler {
     }
 
     pub fn spawn(&mut self, func_ptr: u64) -> ProcessID {
+        // creates a new task from a function pointer
         self.process_id_counter += 1;
         let process = Process::new(self.process_id_counter, func_ptr);
         let pid = process.id;
         self.tasks.insert(pid, process);
         system_log!(
-            "[scheduler] new task created: {}, rsp 0x{:x}",
+            "[scheduler] new task created with pid={} func_ptr=0x{:x}",
             pid,
             func_ptr
         );
@@ -65,14 +74,22 @@ impl Scheduler {
     }
 
     pub fn get_task_mut(&mut self, id: ProcessID) -> Option<&mut Process> {
+        /// returns mutable task from task list by it's id
         return self.tasks.get_mut(&id);
     }
 
     pub fn get_task(&self, id: ProcessID) -> Option<&Process> {
+        /// returns task from task list by it's id
         return self.tasks.get(&id);
     }
 
     pub fn next_id(&self) -> Option<ProcessID> {
+        /// returns id of the task which has to be executed next
+        //
+        // round-robin scheduling
+        // first it finds id of the current task,
+        // then iterates over all tasks (inc ordering)
+        // and returns the first task which id is bigger than the current's
         let current_id = CURRENT_TASK.read().id;
         for (id, task) in self.tasks.iter() {
             if *id > current_id {
@@ -80,7 +97,8 @@ impl Scheduler {
             }
         }
 
-        // if it was the latest task - return the first one
+        // if current task was the latest task in the list, (no tasks with bigger ids)
+        // we will be here, let's return the first task from the list
         for (id, task) in self.tasks.iter() {
             return Some(*id);
         }
@@ -95,8 +113,11 @@ lazy_static! {
 }
 
 pub unsafe fn switch() {
+    /// Context switch happens in this function.
+    /// Do not call this fulction while you have holding locks.
     system_log!("[scheduler] switch signal received");
 
+    // check that scheduler is not locked
     let read_scheduler_opt = SCHEDULER.try_read();
     if read_scheduler_opt.is_none() {
         system_log!("[scheduler] busy...");
@@ -104,47 +125,61 @@ pub unsafe fn switch() {
     }
     let read_scheduler = read_scheduler_opt.unwrap();
 
+    // if there is no tasks to switch to, just return nothing
     if read_scheduler.tasks.len() < 2 {
         system_log!("[scheduler] no tasks");
         return;
     }
 
-    let current_id = CURRENT_TASK.read().id;
     let next_task: &Process;
-
+    // if there is no next task - do nothing
     let next_task_id = read_scheduler.next_id();
     if next_task_id.is_none() {
         system_log!("[scheduler] no next task id");
         return;
     }
 
+    // get next tasks's context information (registers)
     let next_task_context = read_scheduler
         .get_task(next_task_id.unwrap())
         .unwrap()
         .registers;
 
+    let current_id = CURRENT_TASK.read().id;
     system_log!(
-        "[scheduler] switching tasks from {} to {} (rip: 0x{:x})",
+        "[scheduler] switching tasks from {} to {} (context: 0x{:x})",
         current_id,
         next_task_id.unwrap(),
-        next_task_context.rip,
+        &next_task_context as *const _ as u64,
     );
 
+    // if next's task id and current's are the same - do nothing
     if current_id == next_task_id.unwrap() {
         return;
     }
 
-    let mut current_task_context = read_scheduler
-        .get_task(current_id)
-        .unwrap_or(&Process::new(0, 0)) // if there is no current process, just give mock to switch func
-        .registers;
+    // if current
+    let current_task_exists = read_scheduler.get_task(current_id).is_some();
 
+    // update current task information with next task's id
     CURRENT_TASK.write().id = next_task_id.unwrap();
 
-    switch_to(
-        (&mut current_task_context) as *mut ContextRegisters,
-        &next_task_context,
-    );
+    if current_task_exists {
+        // get current tasks's context information (registers)
+        let mut current_task_context = read_scheduler.get_task(current_id).unwrap().registers;
+        // context switch!
+        switch_to(
+            (&mut current_task_context) as *mut ContextRegisters,
+            &next_task_context,
+        );
+    } else {
+        start_task(&next_task_context);
+    }
+}
+
+extern "C" {
+    fn switch_to(old_ctx: *mut ContextRegisters, new_ctx: *const ContextRegisters);
+    fn start_task(ctx: *const ContextRegisters);
 }
 
 #[cfg(test)]

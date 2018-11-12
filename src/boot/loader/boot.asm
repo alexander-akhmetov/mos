@@ -49,6 +49,7 @@ enable_paging:
     ; point each p2_table entry to a page
     ; and the loop begins
     mov ecx, 0 ; counter
+
 .map_p2_table:
     mov eax, 0x200000 ; 2MB
     mul ecx  ; mul multiplies ecx by eax (always by eax), store result in eax

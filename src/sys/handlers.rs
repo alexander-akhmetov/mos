@@ -8,17 +8,20 @@ pub fn none(_: u64) -> u64 {
 }
 
 pub fn sys_time(_: u64) -> u64 {
+    /// handles "time" syscall and returns current timestamp
     system_log!("syscall received: 'time'");
     cmos::get_timestamp()
 }
 
 pub fn sys_exit(_: u64) -> u64 {
+    /// handles "exit" syscall
     system_log!("syscall received: 'exit'");
     // multitasking::scheduler::SCHEDULER.write().exit_current();
     sys::errno::SUCCESS
 }
 
 pub fn sys_debug(arg_pointer: u64) -> u64 {
+    /// handles "debug" syscall and prints passed debug message
     system_log!(
         "debug syscall received with message: '{}'",
         read_str(arg_pointer),
@@ -27,6 +30,7 @@ pub fn sys_debug(arg_pointer: u64) -> u64 {
 }
 
 fn read_str(arg_pointer: u64) -> &'static str {
+    /// reads string from arg_pointer which has to be a pointer to sys::SysCallArgument structure
     let arg_ptr: *const sys::SysCallArgument = arg_pointer as *const sys::SysCallArgument;
     let length: usize = unsafe { (*arg_ptr).length as usize };
     let arg_beginning_ptr = unsafe { (*arg_ptr).address as *const u8 };

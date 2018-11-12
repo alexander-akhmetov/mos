@@ -1,5 +1,5 @@
 global switch_to
-global switch_first_time
+global start_task
 
 section .text
 bits 64
@@ -7,9 +7,6 @@ bits 64
 ; old = RDI
 ; new = RSI
 switch_to:
-    mov rax, [rsp]
-    push rax
-
     push rbp
     push r15
     push r14
@@ -20,6 +17,22 @@ switch_to:
 
     mov [rdi], rsp	; update old ctx ptr with current stack ptr
     mov rsp, rsi	; switch to new stack
+
+    popfq
+    pop rbx
+    pop r12
+    pop r13
+    pop r14
+    pop r15
+    pop rbp
+
+    ret
+
+
+start_task:
+    ; fn start_task(ctx: *mut Context)
+    ; task = RDI
+    mov rsp, rdi	; switch to new stack
 
     popfq
     pop rbx

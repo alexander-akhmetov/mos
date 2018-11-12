@@ -34,9 +34,17 @@ impl Stack {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
+#[repr(C, packed)]
+pub struct NewProcessStack {
+    registers: ContextRegisters,
+    entry_point_func: u64,
+    finished_func: u64,
+    debugging: u64,
+}
+
 pub struct Process {
     pub registers: ContextRegisters,
-    pub func_ptr: u64,
     pub id: ProcessID,
     pub state: ProcessState,
 }
@@ -53,31 +61,53 @@ impl Process {
         let base_stack_pointer = stack_ptr as u64;
 
         unsafe {
+            let process_stack_size = size_of::<NewProcessStack>();
+            stack_ptr = (stack_ptr as usize - process_stack_size) as *mut u64;
+            // clean structure
+            let process_stack: *mut NewProcessStack = stack_ptr as *mut NewProcessStack;
+            memset(process_stack as *mut u8, 0x00, process_stack_size);
+
+            (*process_stack).debugging = 0xDEADBEEF;
+            (*process_stack).finished_func = (task_finished as *const ()) as u64;
+            (*process_stack).entry_point_func = func_ptr;
+            (*process_stack).registers.rflags = 0b1000000010;
+            (*process_stack).registers.rip = func_ptr;
+
+            let context_size = size_of::<ContextRegisters>() as u64;
+            (*process_stack).registers.rbp = process_stack as u64 + context_size;
+
             // debugging...
-            *stack_ptr = 0xDEADBEEF;
-            // going 1 u64 down
-            stack_ptr = (stack_ptr as usize - size_of::<u64>()) as *mut u64;
+            // *stack_ptr = 0xDEADBEEF;
+            // // going 1 u64 down
+            // stack_ptr = (stack_ptr as usize - size_of::<u64>()) as *mut u64;
 
-            // set "task_finished" function addr to the top of the stack
-            *stack_ptr = (task_finished as *const ()) as u64;
+            // // set "task_finished" function addr to the top of the stack
+            // *stack_ptr = (task_finished as *const ()) as u64;
 
-            // new addr in the stack for registers
-            let context_size = size_of::<ContextRegisters>();
-            stack_ptr = (stack_ptr as usize - context_size) as *mut u64;
-            //
-            let context: *mut ContextRegisters = stack_ptr as *mut ContextRegisters;
-            memset(context as *mut u8, 0x00, context_size);
+            // stack_ptr = (stack_ptr as usize - size_of::<u64>()) as *mut u64;
+            // *stack_ptr = func_ptr;
 
-            (*context).rbp = stack_ptr as u64;
+            // // new addr in the stack for registers
+            // let context_size = size_of::<ContextRegisters>();
+            // stack_ptr = (stack_ptr as usize - context_size) as *mut u64;
+            // //
+            // let context: *mut ContextRegisters = stack_ptr as *mut ContextRegisters;
+            // memset(context as *mut u8, 0x00, context_size);
 
-            (*context).rip = func_ptr;
-            (*context).rflags = 0b1000000010;
+            // (*context).rbp = stack_ptr as u64;
+            // (*context).rflags = 0b1000000010;
+
+            system_log!(
+                "Created new process with entry_point_func={}, id={}, context={}",
+                func_ptr,
+                id,
+                &((*process_stack).registers) as *const _ as u64,
+            );
 
             Process {
                 id: id,
-                registers: *context,
+                registers: (*process_stack).registers,
                 state: ProcessState::NEW,
-                func_ptr: func_ptr,
             }
         }
     }

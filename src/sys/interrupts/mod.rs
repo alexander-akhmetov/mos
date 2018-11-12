@@ -21,7 +21,7 @@ pub struct ExceptionStackFrame {
 
 fn kprintln_exception(name: &str, stack_frame: &ExceptionStackFrame) {
     system_log!(
-        "EXCEPTION: {}: {:#x}\n{:#?}",
+        "EXCEPTION: {}: 0x{:x}\n{:#?}",
         name,
         stack_frame.instruction_pointer,
         &*stack_frame,
@@ -45,7 +45,7 @@ extern "x86-interrupt" fn invalid_opcode_irq(stack_frame: &ExceptionStackFrame) 
 
 extern "x86-interrupt" fn page_fault_irq(stack_frame: &ExceptionStackFrame, error_code: u64) {
     kprintln!(
-        "\nEXCEPTION: PAGE FAULT with error code 0b{:b}\n{:#?}",
+        "\nEXCEPTION: PAGE FAULT with error code 0x{:x}\n{:#?}",
         error_code,
         &*stack_frame,
     );
