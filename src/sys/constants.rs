@@ -1,0 +1,1 @@
+pub static SCHEDULER_TICKS_TO_SWITCH: u32 = 100;

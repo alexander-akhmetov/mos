@@ -4,6 +4,7 @@ mod idt;
 pub mod tss;
 
 use drivers::{keyboard, pic8259};
+use multitasking;
 use sys;
 
 #[derive(Debug)]
@@ -56,16 +57,22 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame) {
-    // system_log!("... timer ...");
-    match sys::time::SYSCLOCK.try_write() {
-        Some(mut clock) => clock.tick(),
-        None => panic!("Can't lock system clock"),
-    }
     unsafe {
         pic8259::PICS
             .lock()
             .notify_end_of_interrupt(TIMER_INTERRUPT_ID);
-    }
+    };
+
+    match sys::time::SYSCLOCK.try_write() {
+        Some(mut clock) => clock.tick(),
+        None => {}
+    };
+    let switch_counter = sys::time::SYSCLOCK.read().switch_counter;
+    if switch_counter == 0 {
+        unsafe {
+            multitasking::scheduler::switch();
+        }
+    };
 }
 
 extern "x86-interrupt" fn keyboard_irq(_stack_frame: &ExceptionStackFrame) {

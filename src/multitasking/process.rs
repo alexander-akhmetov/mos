@@ -17,7 +17,7 @@ pub enum ProcessState {
 #[repr(align(64))]
 #[repr(C)]
 pub struct Stack {
-    buffer: [u64; 4096],
+    buffer: [u8; 4096],
 }
 
 impl Stack {
@@ -26,7 +26,7 @@ impl Stack {
     }
 
     pub fn top(&self) -> u64 {
-        (&(self.buffer[4095]) as *const _) as u64
+        (&(self.buffer[4096 - 16]) as *const _) as u64
     }
 
     pub fn bottom(&self) -> u64 {
@@ -44,6 +44,10 @@ pub struct Process {
 impl Process {
     pub fn new(id: ProcessID, func_ptr: u64) -> Process {
         let stack = &Stack::new();
+        unsafe {
+            // 0xCD: clean memory
+            memset((*stack).bottom() as *mut u8, 0xCD, stack.buffer.len());
+        };
         let stack_top: *mut u64 = ((*stack).top()) as *mut u64;
         let mut stack_ptr = (stack_top as u64 - (size_of::<u64>() as u64)) as *mut u64;
         let base_stack_pointer = stack_ptr as u64;
@@ -64,7 +68,7 @@ impl Process {
             let context: *mut ContextRegisters = stack_ptr as *mut ContextRegisters;
             memset(context as *mut u8, 0x00, context_size);
 
-            (*context).rbp = base_stack_pointer;
+            (*context).rbp = stack_ptr as u64;
 
             (*context).rip = func_ptr;
             (*context).rflags = 0b1000000010;

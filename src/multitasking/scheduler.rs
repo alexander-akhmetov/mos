@@ -23,7 +23,7 @@ impl CurrentTask {
 extern "C" fn init() -> u64 {
     loop {
         unsafe {
-            switch();
+            x86::hlt();
         };
     }
 }

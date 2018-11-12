@@ -21,9 +21,6 @@ pub fn init(boot_info: &BootInformation) {
     };
     test_scheduler();
     system_log!("initrd end");
-    unsafe {
-        switch();
-    };
 }
 
 fn init_filesystem(boot_info: &BootInformation) {
@@ -64,25 +61,29 @@ fn test_scheduler() {
 
 extern "C" fn foo() {
     let mut counter = 0;
-    system_log!(">> task_{} started", SCHEDULER.read().current_task_id());
+    system_log!(">> task_{}: started", SCHEDULER.read().current_task_id());
+
     for _i in 0..5 {
         counter += 1;
         system_log!(
-            ">> task_{}: hello {}",
+            ">> task_{}: hello! counter={}",
             SCHEDULER.read().current_task_id(),
             counter,
         );
-        for _j in 0..1000000 {}
-        unsafe {
-            let rflags = x86::read_rflags();
-            system_log!(
-                ">> task_{} RFLAGS: 0b{:b}",
-                rflags,
-                SCHEDULER.read().current_task_id()
-            );
-            switch();
-        };
+
+        sys::time::sleep(1000);
+
+        // unsafe {
+        //     let rflags = x86::read_rflags();
+        //     system_log!(">> task_{} RFLAGS: 0b{:b}", SCHEDULER.read().current_task_id(), rflags);
+        //     switch();
+        //     system_log!(
+        //         ">> task_{}: back from switch",
+        //         SCHEDULER.read().current_task_id(),
+        //     );
+        // };
     }
+
     system_log!(
         ">> task_{}: completed, stopping...",
         SCHEDULER.read().current_task_id()

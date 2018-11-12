@@ -2,6 +2,8 @@ use cmos::get_timestamp;
 use drivers;
 use multitasking::scheduler::switch;
 use spin::RwLock;
+use sys::constants;
+use x86;
 
 const TIMER_HERTZ: u32 = 100;
 const TIME_BETWEEN_TICKS: f32 = 1.0 / (TIMER_HERTZ as f32);
@@ -10,7 +12,7 @@ pub struct SystemClock {
     base_timestamp: u64,
     counter: u64,
     fraction: f32,
-    switch_counter: u32,
+    pub switch_counter: u32,
 }
 
 impl SystemClock {
@@ -32,9 +34,10 @@ impl SystemClock {
             self.counter += 1;
             system_log!("{} system clock: +1 sec", self.timestamp());
         }
-        if self.switch_counter == 10 {
+        if self.switch_counter == constants::SCHEDULER_TICKS_TO_SWITCH {
             self.switch_counter = 0;
-            // unsafe { switch() };
+            // seems like can't do this here, because clocks will be blocked forever
+            //     unsafe { switch() };
         }
     }
 
@@ -78,5 +81,6 @@ pub fn sleep(milliseconds: u64) {
                 }
             }
         }
+        unsafe { x86::hlt() };
     }
 }
