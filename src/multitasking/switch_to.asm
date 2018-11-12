@@ -43,3 +43,8 @@ start_task:
     pop rbp
 
     ret
+
+
+get_eip:
+    mov rax, [rsp]
+    ret

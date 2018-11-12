@@ -6,7 +6,7 @@ use core::slice;
 use core::str;
 use fs;
 use multiboot2::BootInformation;
-use multitasking::scheduler::{current_task_id, SCHEDULER};
+use multitasking::scheduler;
 use sys;
 use tar;
 use x86;
@@ -54,23 +54,28 @@ fn run_hello_bin() {
 }
 
 fn test_scheduler() {
-    for _i in 0..3 {
-        unsafe {
-            SCHEDULER.as_mut().unwrap().spawn(foo as *const () as u64);
-        }
+    for _i in 0..2 {
+        scheduler::spawn(foo);
     }
 }
 
 fn foo() {
     let mut counter = 0;
-    system_log!(">> task_{}: started", current_task_id());
+    system_log!(">> task_{}: started", scheduler::current_task_id());
 
     for _i in 0..5 {
         counter += 1;
-        system_log!(">> task_{}: hello! counter={}", current_task_id(), counter,);
+        system_log!(
+            ">> task_{}: hello! counter={}",
+            scheduler::current_task_id(),
+            counter,
+        );
 
         sys::time::sleep(1000);
     }
 
-    system_log!(">> task_{}: completed, stopping...", current_task_id());
+    system_log!(
+        ">> task_{}: completed, stopping...",
+        scheduler::current_task_id()
+    );
 }

@@ -42,7 +42,7 @@ impl Scheduler {
             process_id_counter: 0,
         };
 
-        let pid = sc.spawn(init_task as *const () as u64);
+        let pid = sc.spawn(init_task as *const fn() as u64);
         CURRENT_TASK.write().id = pid;
         sc
     }
@@ -119,7 +119,10 @@ pub fn init() {
     }
 }
 
-pub unsafe fn switch() {
+#[naked]
+#[no_mangle]
+#[inline(always)]
+pub unsafe extern "C" fn switch() {
     /// Context switch happens in this function.
     /// Do not call this fulction while you have holding locks.
     system_log!("[scheduler] switch signal received");
@@ -148,10 +151,11 @@ pub unsafe fn switch() {
 
     let current_id = CURRENT_TASK.read().id;
     system_log!(
-        "[scheduler] switching tasks from {} to {} (context: 0x{:x})",
+        "[scheduler] switching tasks from {} to {} (context: 0x{:x}; rip: 0x{:x})",
         current_id,
         next_task_id.unwrap(),
         &next_task_context as *const _ as u64,
+        next_task_context.rip,
     );
 
     // if next's task id and current's are the same - do nothing
@@ -179,17 +183,44 @@ pub unsafe fn switch() {
             &next_task_context,
         );
     } else {
+        system_log!("!!!!!!!");
         start_task(&next_task_context);
     }
 }
 
+#[naked]
 extern "C" {
+    #[inline(always)]
     fn switch_to(old_ctx: *mut ContextRegisters, new_ctx: *const ContextRegisters);
+    #[inline(always)]
     fn start_task(ctx: *const ContextRegisters);
 }
 
 pub fn current_task_id() -> u32 {
     return CURRENT_TASK.read().id;
+}
+
+pub fn spawn(func: fn()) {
+    unsafe {
+        SCHEDULER.as_mut().unwrap().spawn(func as *const () as u64);
+    }
+}
+
+pub fn exit_current_process() {
+    unsafe {
+        SCHEDULER.as_mut().unwrap().exit_current();
+    }
+}
+
+#[naked]
+#[inline(always)]
+pub fn switch_if_needed() {
+    let switch_counter = sys::time::SYSCLOCK.read().switch_counter;
+    if switch_counter == 0 {
+        unsafe {
+            switch();
+        }
+    };
 }
 
 #[cfg(test)]
