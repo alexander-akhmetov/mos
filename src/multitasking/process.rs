@@ -1,7 +1,7 @@
 use compiler_builtins::mem::memset;
 use core::mem::size_of;
 use multitasking::context::ContextRegisters;
-use multitasking::scheduler::{current_task_id, SCHEDULER};
+use multitasking::scheduler;
 use x86;
 
 pub type ProcessID = u32;
@@ -26,21 +26,12 @@ impl Stack {
     }
 
     pub fn top(&self) -> u64 {
-        (&(self.buffer[4096 - 16]) as *const _) as u64
+        (&(self.buffer[4096 - 8]) as *const _) as u64
     }
 
     pub fn bottom(&self) -> u64 {
         (&(self.buffer[0]) as *const _) as u64
     }
-}
-
-#[derive(Copy, Clone, Debug)]
-#[repr(C, packed)]
-pub struct NewProcessStack {
-    registers: ContextRegisters,
-    entry_point_func: u64,
-    finished_func: u64,
-    debugging: u64,
 }
 
 pub struct Process {
@@ -61,32 +52,28 @@ impl Process {
         let base_stack_pointer = stack_ptr as u64;
 
         unsafe {
-            let process_stack_size = size_of::<NewProcessStack>();
-            stack_ptr = (stack_ptr as usize - process_stack_size) as *mut u64;
+            let context_registers_size = size_of::<ContextRegisters>();
+            stack_ptr = (stack_ptr as usize - context_registers_size) as *mut u64;
             // clean structure
-            let process_stack: *mut NewProcessStack = stack_ptr as *mut NewProcessStack;
-            memset(process_stack as *mut u8, 0x00, process_stack_size);
+            let context_registers: *mut ContextRegisters = stack_ptr as *mut ContextRegisters;
+            memset(context_registers as *mut u8, 0x00, context_registers_size);
 
-            (*process_stack).debugging = 0xDEADBEEF;
-            (*process_stack).finished_func = (task_finished as *const ()) as u64;
-            (*process_stack).entry_point_func = func_ptr;
-            (*process_stack).registers.rflags = 0b1000000010;
-            (*process_stack).registers.rip = func_ptr;
-            (*process_stack).registers.complete = (task_finished as *const ()) as u64;
+            (*context_registers).rflags = 0b1000000010;
+            (*context_registers).rip = func_ptr;
+            (*context_registers).complete = (task_finished as *const ()) as u64;
 
-            let context_size = size_of::<ContextRegisters>() as u64;
-            (*process_stack).registers.rbp = process_stack as u64 + context_size;
+            (*context_registers).rbp = context_registers as u64 + context_registers_size as u64;
 
             system_log!(
                 "Created new process with entry_point_func={}, id={}, context={}",
                 func_ptr,
                 id,
-                &((*process_stack).registers) as *const _ as u64,
+                &(*context_registers) as *const _ as u64,
             );
 
             Process {
                 id: id,
-                registers: (*process_stack).registers,
+                registers: (*context_registers),
                 state: ProcessState::NEW,
             }
         }
@@ -94,11 +81,8 @@ impl Process {
 }
 
 #[naked]
-#[no_mangle]
-extern "C" fn task_finished() {
-    let current_task = current_task_id();
-    unsafe {
-        SCHEDULER.as_mut().unwrap().exit_current();
-    }
+fn task_finished() {
+    let current_task = scheduler::current_task_id();
+    scheduler::exit_current_process();
     system_log!("finished task {}", current_task);
 }

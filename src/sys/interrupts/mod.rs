@@ -67,12 +67,7 @@ extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame
         Some(mut clock) => clock.tick(),
         None => {}
     };
-    let switch_counter = sys::time::SYSCLOCK.read().switch_counter;
-    if switch_counter == 0 {
-        unsafe {
-            multitasking::scheduler::switch();
-        }
-    };
+    multitasking::scheduler::switch_if_needed();
 }
 
 extern "x86-interrupt" fn keyboard_irq(_stack_frame: &ExceptionStackFrame) {
