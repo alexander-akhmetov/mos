@@ -93,6 +93,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     //      > passed in registers RDI, RSI, RDX, RCX, R8, and R9
     //      >
     // So in the boot asm code I set it: "mov edi, ebx;".
+    multitasking::scheduler::init();
     drivers::vga_buffer::clear_screen();
     system_log!("kernel loading...");
 

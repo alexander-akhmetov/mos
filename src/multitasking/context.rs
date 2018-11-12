@@ -12,4 +12,5 @@ pub struct ContextRegisters {
     pub r15: u64,
     pub rbp: u64,
     pub rip: u64,
+    pub complete: u64,
 }
