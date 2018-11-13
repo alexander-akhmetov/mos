@@ -7,24 +7,26 @@ bits 64
 ; old = RDI
 ; new = RSI
 switch_to:
-    push rbp
     push r15
     push r14
     push r13
     push r12
     push rbx
     pushfq
+    push rbp
 
     mov [rdi], rsp	; update old ctx ptr with current stack ptr
     mov rsp, rsi	; switch to new stack
 
+    pop rbp
     popfq
     pop rbx
     pop r12
     pop r13
     pop r14
     pop r15
-    pop rbp
+
+    sti
 
     ret
 
@@ -41,6 +43,8 @@ start_task:
     pop r14
     pop r15
     pop rbp
+
+    sti
 
     ret
 
