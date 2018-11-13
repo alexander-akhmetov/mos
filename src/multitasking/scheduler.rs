@@ -119,10 +119,7 @@ pub fn init() {
     }
 }
 
-#[naked]
-#[no_mangle]
-#[inline(always)]
-pub unsafe extern "C" fn switch() {
+pub unsafe fn switch() {
     /// Context switch happens in this function.
     /// Do not call this fulction while you have holding locks.
     system_log!("[scheduler] switch signal received");
@@ -166,6 +163,15 @@ pub unsafe extern "C" fn switch() {
     // if current
     let current_task_exists = SCHEDULER.as_ref().unwrap().get_task(current_id).is_some();
 
+    // debugging. print current and the next's processes stacks
+    print_current_process_stack();
+    SCHEDULER
+        .as_ref()
+        .unwrap()
+        .get_task(next_task_id.unwrap())
+        .unwrap()
+        .print_stack();
+
     // update current task information with next task's id
     CURRENT_TASK.write().id = next_task_id.unwrap();
 
@@ -178,12 +184,13 @@ pub unsafe extern "C" fn switch() {
             .unwrap()
             .registers;
         // context switch!
+        system_log!("switch");
         switch_to(
             (&mut current_task_context) as *mut ContextRegisters,
             &next_task_context,
         );
     } else {
-        system_log!("!!!!!!!");
+        system_log!("switch (start)");
         start_task(&next_task_context);
     }
 }
@@ -212,9 +219,20 @@ pub fn exit_current_process() {
     }
 }
 
+pub fn print_current_process_stack() {
+    unsafe {
+        let pid = CURRENT_TASK.read().id;
+        let process = SCHEDULER
+            .as_ref()
+            .unwrap()
+            .get_task(pid)
+            .unwrap()
+            .print_stack();
+    }
+}
+
 #[naked]
-#[inline(always)]
-pub fn switch_if_needed() {
+pub extern "C" fn switch_if_needed() {
     let switch_counter = sys::time::SYSCLOCK.read().switch_counter;
     if switch_counter == 0 {
         unsafe {

@@ -61,12 +61,12 @@ fn test_scheduler() {
 
 fn foo() {
     let mut counter = 0;
-    system_log!(">> task_{}: started", scheduler::current_task_id());
+    system_log!(">>>    task_{}: started", scheduler::current_task_id());
 
     for _i in 0..5 {
         counter += 1;
         system_log!(
-            ">> task_{}: hello! counter={}",
+            ">>>    task_{}: hello! counter={}",
             scheduler::current_task_id(),
             counter,
         );
@@ -75,7 +75,7 @@ fn foo() {
     }
 
     system_log!(
-        ">> task_{}: completed, stopping...",
+        ">>>    task_{}: completed, stopping...",
         scheduler::current_task_id()
     );
 }
