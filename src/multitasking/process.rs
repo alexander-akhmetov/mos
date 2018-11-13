@@ -3,10 +3,11 @@ use compiler_builtins::mem::memset;
 use core::mem::size_of;
 use multitasking::context::ContextRegisters;
 use multitasking::scheduler;
+use sys;
 use x86;
 
 pub type ProcessID = u32;
-const PROCESS_STACK_SIZE: usize = 16; // number of u64 elements
+const PROCESS_STACK_SIZE: usize = 32; // number of u64 elements (512 * 8)
 const RFLAGS: u64 = 0b1000000010;
 
 #[derive(PartialEq)]
@@ -87,11 +88,13 @@ impl Process {
     }
 
     pub fn print_stack(&self) {
-        system_log!("Process {} stack:", self.id);
-        for element in self.stack.buffer.iter() {
-            system_log!("   0x{:x}    0x{:x}", element as *const u64 as u64, element);
+        if sys::constants::DEBUG {
+            system_log!("Process {} stack:", self.id);
+            for element in self.stack.buffer.iter() {
+                system_log!("   0x{:x}    0x{:x}", element as *const u64 as u64, element);
+            }
+            system_log!("---");
         }
-        system_log!("---");
     }
 }
 

@@ -120,6 +120,7 @@ pub fn init() {
 pub unsafe fn switch() {
     /// Context switch happens in this function.
     /// Do not call this fulction while you have holding locks.
+    sys::interrupts::disable();
     system_log!("[scheduler] switch signal received");
     let read_scheduler = SCHEDULER.as_ref().unwrap();
 
@@ -163,6 +164,7 @@ pub unsafe fn switch() {
     let current_task_exists = read_scheduler.get_task(current_id).is_some();
 
     // debugging. print current and the next's processes stacks
+    // only if sys::constants::DEBUG is true!
     if current_task_exists {
         print_current_process_stack();
     };

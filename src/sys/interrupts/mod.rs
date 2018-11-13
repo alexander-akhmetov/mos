@@ -78,7 +78,6 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame) {
-    system_log!("TICK");
     unsafe {
         pic8259::PICS
             .lock()
@@ -253,9 +252,19 @@ lazy_static! {
     };
 }
 
+#[naked]
+#[inline]
 pub fn enable() {
     unsafe {
         asm!("sti");
+    }
+}
+
+#[naked]
+#[inline]
+pub fn disable() {
+    unsafe {
+        asm!("cli");
     }
 }
 
