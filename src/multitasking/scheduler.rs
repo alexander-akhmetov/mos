@@ -177,18 +177,15 @@ pub unsafe fn switch() {
 
     if current_task_exists {
         // get current tasks's context information (registers)
-        let mut current_task_context = SCHEDULER
-            .as_ref()
+        let current_task_context = &mut SCHEDULER
+            .as_mut()
             .unwrap()
-            .get_task(current_id)
+            .get_task_mut(current_id)
             .unwrap()
             .registers;
         // context switch!
         system_log!("switch");
-        switch_to(
-            (&mut current_task_context) as *mut ContextRegisters,
-            &next_task_context,
-        );
+        switch_to(current_task_context, &next_task_context);
     } else {
         system_log!("switch (start)");
         start_task(&next_task_context);
