@@ -38,8 +38,6 @@ impl SystemClock {
         }
         if self.switch_counter == constants::SCHEDULER_TICKS_TO_SWITCH {
             self.switch_counter = 0;
-            // seems like can't do this here, because clocks will be blocked forever
-            //     unsafe { switch() };
         }
     }
 

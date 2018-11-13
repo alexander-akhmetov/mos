@@ -27,10 +27,10 @@ impl CurrentTask {
 fn init_task() -> u64 {
     /// simple function which does nothing and
     /// is being always executing by the kernel
+    system_log!(">>> init task started");
     loop {
-        unsafe {
-            x86::hlt();
-        };
+        system_log!(">>> init task");
+        sys::time::sleep(1000);
     }
 }
 
@@ -41,9 +41,7 @@ impl Scheduler {
             tasks: BTreeMap::new(),
             process_id_counter: 0,
         };
-
-        let pid = sc.spawn(init_task as *const fn() as u64);
-        CURRENT_TASK.write().id = pid;
+        sc.spawn(init_task as *const fn() as u64);
         sc
     }
 
@@ -123,16 +121,17 @@ pub unsafe fn switch() {
     /// Context switch happens in this function.
     /// Do not call this fulction while you have holding locks.
     system_log!("[scheduler] switch signal received");
+    let read_scheduler = SCHEDULER.as_ref().unwrap();
 
     // if there is no tasks to switch to, just return nothing
-    if SCHEDULER.as_ref().unwrap().tasks.len() < 2 {
+    if read_scheduler.tasks.len() < 2 {
         system_log!("[scheduler] no tasks");
         return;
     }
 
     let next_task: &Process;
     // if there is no next task - do nothing
-    let next_task_id = SCHEDULER.as_ref().unwrap().next_id();
+    let next_task_id = read_scheduler.next_id();
     if next_task_id.is_none() {
         system_log!("[scheduler] no next task id");
         return;
@@ -161,13 +160,13 @@ pub unsafe fn switch() {
     }
 
     // if current
-    let current_task_exists = SCHEDULER.as_ref().unwrap().get_task(current_id).is_some();
+    let current_task_exists = read_scheduler.get_task(current_id).is_some();
 
     // debugging. print current and the next's processes stacks
-    print_current_process_stack();
-    SCHEDULER
-        .as_ref()
-        .unwrap()
+    if current_task_exists {
+        print_current_process_stack();
+    };
+    read_scheduler
         .get_task(next_task_id.unwrap())
         .unwrap()
         .print_stack();
@@ -184,10 +183,10 @@ pub unsafe fn switch() {
             .unwrap()
             .registers;
         // context switch!
-        system_log!("switch");
+        system_log!("[scheduler] switch");
         switch_to(current_task_context, &next_task_context);
     } else {
-        system_log!("switch (start)");
+        system_log!("[scheduler] switch (start)");
         start_task(&next_task_context);
     }
 }

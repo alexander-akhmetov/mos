@@ -78,12 +78,12 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame) {
+    system_log!("TICK");
     unsafe {
         pic8259::PICS
             .lock()
             .notify_end_of_interrupt(TIMER_INTERRUPT_ID);
     };
-
     match sys::time::SYSCLOCK.try_write() {
         Some(mut clock) => clock.tick(),
         None => {}
