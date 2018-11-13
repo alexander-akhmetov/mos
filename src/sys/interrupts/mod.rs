@@ -1,3 +1,5 @@
+use core::fmt;
+
 #[macro_use]
 mod idt;
 
@@ -7,7 +9,6 @@ use drivers::{keyboard, pic8259};
 use multitasking;
 use sys;
 
-#[derive(Debug)]
 #[repr(C)]
 pub struct ExceptionStackFrame {
     instruction_pointer: u64,
@@ -15,6 +16,26 @@ pub struct ExceptionStackFrame {
     cpu_flags: u64,
     stack_pointer: u64,
     stack_segment: u64,
+}
+
+impl fmt::Debug for ExceptionStackFrame {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "ExceptionStackFrame {{
+                instruction_pointer: 0x{:x}
+                code_segment: 0x{:x}
+                cpu_flags: 0b{:b}
+                stack_pointer: 0x{:x}
+                stack_segment: 0x{:x}
+            }}",
+            self.instruction_pointer,
+            self.code_segment,
+            self.cpu_flags,
+            self.stack_pointer,
+            self.stack_segment,
+        )
+    }
 }
 
 // https://wiki.osdev.org/Exceptions
