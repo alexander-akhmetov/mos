@@ -1,4 +1,5 @@
 use alloc::string::String;
+use alloc::vec::Vec;
 use compiler_builtins::mem::memset;
 use core::mem::size_of;
 use multitasking::context::ContextRegisters;
@@ -17,44 +18,24 @@ pub enum ProcessState {
     RUNNING,
 }
 
-#[derive(Copy, Clone)]
-#[repr(align(64))]
-#[repr(C)]
-pub struct Stack {
-    buffer: [u64; PROCESS_STACK_SIZE],
-}
-
-impl Stack {
-    pub const fn new() -> Stack {
-        Stack {
-            buffer: [0; PROCESS_STACK_SIZE],
-        }
-    }
-
-    pub fn top(&self) -> u64 {
-        (&(self.buffer[PROCESS_STACK_SIZE - 1]) as *const _) as u64
-    }
-
-    pub fn bottom(&self) -> u64 {
-        (&(self.buffer[0]) as *const _) as u64
-    }
-}
-
 pub struct Process {
     pub registers: ContextRegisters,
     pub id: ProcessID,
     pub state: ProcessState,
-    stack: Stack,
+    stack: Vec<u64>,
 }
 
 impl Process {
     pub fn new(id: ProcessID, func_ptr: u64) -> Process {
-        let stack = &Stack::new();
+        let mut stack: Vec<u64> = vec![0; PROCESS_STACK_SIZE];
+        let stack_bottom = stack.as_mut_ptr();
+        let stack_top = unsafe { stack_bottom.add(PROCESS_STACK_SIZE - 1) };
+
         unsafe {
             // 0xCD: clean memory
-            memset((*stack).bottom() as *mut u8, 0xCD, stack.buffer.len());
+            memset(stack_bottom as *mut u8, 0xCD, stack.len());
         };
-        let mut stack_ptr: *mut u64 = ((*stack).top()) as *mut u64;
+        let mut stack_ptr: *mut u64 = stack_top as *mut u64;
         let context_registers_size = size_of::<ContextRegisters>();
 
         unsafe {
@@ -66,7 +47,7 @@ impl Process {
             (*context_registers).rflags = RFLAGS;
             (*context_registers).rip = func_ptr;
             (*context_registers).complete = (task_finished as *const ()) as u64;
-            (*context_registers).rbp = (*stack).top();
+            (*context_registers).rbp = stack_top as u64;
 
             system_log!(
                 "Created new process with entry_point_func=0x{:x} id={} context=0x{:x} finish_func=0x{:x}",
@@ -80,7 +61,7 @@ impl Process {
                 id: id,
                 registers: (*context_registers),
                 state: ProcessState::NEW,
-                stack: *stack,
+                stack: stack,
             };
             pt.print_stack();
             pt
@@ -89,9 +70,14 @@ impl Process {
 
     pub fn print_stack(&self) {
         if sys::constants::DEBUG {
-            system_log!("Process {} stack:", self.id);
-            for element in self.stack.buffer.iter() {
-                system_log!("   0x{:x}    0x{:x}", element as *const u64 as u64, element);
+            system_log!(
+                "Process (ctx: 0x{:x}) {} stack:",
+                &self.registers as *const _ as u64,
+                self.id
+            );
+            for index in 0..self.stack.len() {
+                let ptr = unsafe { self.stack.as_ptr().add(index) };
+                system_log!("   0x{:x}    0x{:x}", ptr as u64, unsafe { *ptr });
             }
             system_log!("---");
         }
