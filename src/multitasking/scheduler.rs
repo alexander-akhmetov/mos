@@ -178,7 +178,7 @@ pub unsafe fn switch() {
 
     if current_task_exists {
         // get current tasks's context information (registers)
-        let current_task_context = &mut SCHEDULER
+        let current_task_context = &SCHEDULER
             .as_mut()
             .unwrap()
             .get_task_mut(current_id)
@@ -196,7 +196,7 @@ pub unsafe fn switch() {
 #[naked]
 extern "C" {
     #[inline(always)]
-    fn switch_to(old_ctx: *mut ContextRegisters, new_ctx: *const ContextRegisters);
+    fn switch_to(old_ctx: *const ContextRegisters, new_ctx: *const ContextRegisters);
     #[inline(always)]
     fn start_task(ctx: *const ContextRegisters);
 }
