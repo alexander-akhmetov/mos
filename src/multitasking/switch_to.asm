@@ -3,7 +3,7 @@ global start_task
 
 section .text
 bits 64
-; fn switch_to(old: *mut *mut Context, new: *mut Context)
+; fn switch_to(old_rsp: u64, new_rsp: u64)
 ; old = RDI
 ; new = RSI
 switch_to:
@@ -15,7 +15,7 @@ switch_to:
     pushfq
     push rbp
 
-    mov [rdi], rsp	; update old ctx ptr with current stack ptr
+    mov [rdi], rsp	; update old rsp to the current rsp
     mov rsp, rsi	; switch to new stack
 
     pop rbp
@@ -32,20 +32,10 @@ switch_to:
 
 
 start_task:
-    ; fn start_task(ctx: *mut Context)
+    ; fn start_task(rsp: u64)
     ; task = RDI
     mov rsp, rdi	; switch to new stack
-
-    popfq
-    pop rbx
-    pop r12
-    pop r13
-    pop r14
-    pop r15
-    pop rbp
-
     sti
-
     ret
 
 

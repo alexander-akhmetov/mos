@@ -41,7 +41,8 @@ impl Scheduler {
             tasks: BTreeMap::new(),
             process_id_counter: 0,
         };
-        sc.spawn(init_task as *const fn() as u64);
+        let pid = sc.spawn(init_task as *const fn() as u64);
+        CURRENT_TASK.write().id = pid;
         sc
     }
 
@@ -144,15 +145,14 @@ pub unsafe fn switch() {
         .unwrap()
         .get_task(next_task_id.unwrap())
         .unwrap()
-        .registers;
+        .rsp;
 
     let current_id = CURRENT_TASK.read().id;
     system_log!(
-        "[scheduler] switching tasks from {} to {} (context: 0x{:x}; rip: 0x{:x})",
+        "[scheduler] switching tasks from {} to {} (rsp: 0x{:x})",
         current_id,
         next_task_id.unwrap(),
-        &next_task_context as *const _ as u64,
-        next_task_context.rip,
+        next_task_context,
     );
 
     // if next's task id and current's are the same - do nothing
@@ -178,27 +178,27 @@ pub unsafe fn switch() {
 
     if current_task_exists {
         // get current tasks's context information (registers)
-        let current_task_context = &SCHEDULER
-            .as_mut()
+        let current_task_context = SCHEDULER
+            .as_ref()
             .unwrap()
-            .get_task_mut(current_id)
+            .get_task(current_id)
             .unwrap()
-            .registers;
+            .rsp;
         // context switch!
         system_log!("[scheduler] switch");
-        switch_to(current_task_context, &next_task_context);
+        switch_to(current_task_context, next_task_context);
     } else {
         system_log!("[scheduler] switch (start)");
-        start_task(&next_task_context);
+        start_task(next_task_context);
     }
 }
 
 #[naked]
 extern "C" {
     #[inline(always)]
-    fn switch_to(old_ctx: *const ContextRegisters, new_ctx: *const ContextRegisters);
+    fn switch_to(old_rsp: u64, new_rsp: u64);
     #[inline(always)]
-    fn start_task(ctx: *const ContextRegisters);
+    fn start_task(rsp: u64);
 }
 
 pub fn current_task_id() -> u32 {

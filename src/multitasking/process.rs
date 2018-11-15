@@ -19,10 +19,11 @@ pub enum ProcessState {
 }
 
 pub struct Process {
-    pub registers: ContextRegisters,
+    // pub registers: ContextRegisters,
     pub id: ProcessID,
     pub state: ProcessState,
-    stack: Vec<u64>,
+    pub stack: Vec<u64>,
+    pub rsp: u64,
 }
 
 impl Process {
@@ -48,20 +49,24 @@ impl Process {
             (*context_registers).rip = func_ptr;
             (*context_registers).complete = (task_finished as *const ()) as u64;
             (*context_registers).rbp = stack_top as u64;
+            // let rsp = stack_top.sub(2) as u64;
+            let rsp = stack_ptr as u64;
 
             system_log!(
-                "Created new process with entry_point_func=0x{:x} id={} context=0x{:x} finish_func=0x{:x}",
+                "Created new process with entry_point_func=0x{:x} id={} context=0x{:x} finish_func=0x{:x} rsp=0x{:x}",
                 func_ptr,
                 id,
                 context_registers as u64,
                 (*context_registers).complete,
+                rsp,
             );
 
             let pt = Process {
                 id: id,
-                registers: (*context_registers),
+                // registers: (*context_registers),
                 state: ProcessState::NEW,
                 stack: stack,
+                rsp: rsp,
             };
             pt.print_stack();
             pt
@@ -71,8 +76,9 @@ impl Process {
     pub fn print_stack(&self) {
         if sys::constants::DEBUG {
             system_log!(
-                "Process (ctx: 0x{:x}) {} stack:",
-                &self.registers as *const _ as u64,
+                "Process (ctx: 0x{:x} rsp: 0x{:x}) {} stack:",
+                self.stack.as_ptr() as u64,
+                self.rsp,
                 self.id
             );
             for index in 0..self.stack.len() {
