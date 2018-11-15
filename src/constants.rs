@@ -1,7 +1,3 @@
-#[derive(PartialEq)]
-pub enum LogLevels {
-    DEBUG,
-    INFO,
-}
+use logging;
 
-pub const LOGLEVEL: LogLevels = LogLevels::INFO;
+pub const LOGLEVEL: logging::LogLevels = logging::LogLevels::INFO;

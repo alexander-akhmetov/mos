@@ -34,6 +34,7 @@ extern crate tar;
 mod drivers;
 #[macro_use]
 mod logging;
+mod bin_helpers;
 mod boot;
 mod cmos;
 mod constants;
@@ -65,13 +66,8 @@ static GLOBAL_ALLOCATOR: &'static memory::allocator::MGlobalAlloc =
 fn panic(info: &PanicInfo) -> ! {
     /// this function is called when kernel panic occurs
     // it will print red message with panic information
-    let color = drivers::vga_buffer::ColorCode::new(
-        drivers::vga_buffer::Color::Red,
-        drivers::vga_buffer::Color::Black,
-    );
-
     kprintln_color!(
-        color,
+        drivers::vga_buffer::colors::RED,
         "\n-----------\n[KERNEL PANIC] Ooops... {}\n-----------",
         info
     );
@@ -117,9 +113,9 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     boot::initrd::init(&boot_info);
 
     // and not the OS is ready
-    system_log_without_prefix!("----------------------------");
+    system_log!("----------------------------");
     let dt = cmos::get_datetime();
-    system_log!("kernel started at {}", dt);
+    system_log_ok!("kernel started at {}", dt,);
 
     // fn stack_overflow() {
     //     stack_overflow(); // for each recursion, the return address is pushed
@@ -130,6 +126,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // ----------------------- test commands
     // run init "hello world" command
     init::hello_world();
+    bin_helpers::hello::init();
     // allocator_test creates dynamic data structures to check that it works
     // utils::allocator_test();
     // -------------------------------------

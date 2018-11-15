@@ -1,7 +1,7 @@
 // #[derive(Copy, Clone, Debug)]
 #[repr(C, packed)]
-pub struct ContextRegisters {
-    /// ContextRegisters stores all information about paused thread
+pub struct Context {
+    /// Context stores all information about paused thread
     /// in the memory
     /// To restore the thread it must be putted to the thread's stack before switching
     pub rbp: u64,
@@ -11,6 +11,6 @@ pub struct ContextRegisters {
     r13: u64,
     r14: u64,
     r15: u64,
-    pub rip: u64,
-    pub complete: u64,
+    pub entrypoint_func: u64,
+    pub finish_func: u64,
 }

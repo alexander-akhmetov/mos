@@ -1,11 +1,12 @@
 #[macro_export]
 macro_rules! kprint {
     ($($arg:tt)*) => (
+        #[cfg(not(test))]
         $crate::drivers::vga_buffer::print(
             format_args!($($arg)*),
-            $crate::drivers::vga_buffer::ColorCode::new(
-                $crate::drivers::vga_buffer::Color::LightGray,
-                $crate::drivers::vga_buffer::Color::Black,
+            $crate::drivers::vga_buffer::colors::ColorCode::new(
+                $crate::drivers::vga_buffer::colors::Color::LightGray,
+                $crate::drivers::vga_buffer::colors::Color::Black,
             ),
         )
     );

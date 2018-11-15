@@ -65,7 +65,7 @@ pub fn init() {
         None => panic!("can't lock clock"),
     }
 
-    system_log!("System clock initialized");
+    system_log_ok!("[system clock] started");
 }
 
 pub fn sleep(milliseconds: u64) {
@@ -104,4 +104,10 @@ fn read_milliseconds_or_none() -> Option<u64> {
         return Some(read_sysclock.unwrap().milliseconds());
     };
     return None;
+}
+
+pub fn stupid_sleep() {
+    for _in in 0..15 {
+        unsafe { x86::hlt() };
+    }
 }
