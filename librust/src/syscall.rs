@@ -19,6 +19,11 @@ pub unsafe fn time() -> u64 {
     _system_call(13)
 }
 
+pub unsafe fn getpid() -> u64 {
+    /// sends system call "getpid" and returns pid of the current process
+    _system_call(20)
+}
+
 pub unsafe fn debug(msg: &str) -> u64 {
     /// sends system call "debug" with msg string
     // for now msg MUST be null-terminated, for example: b"hello\0"

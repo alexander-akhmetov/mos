@@ -43,8 +43,8 @@ build-kernel:
 
 
 build-os-binaries:
-	cd os_binaries/moshell && make build
-	cp os_binaries/moshell/target/x86_64-moshell/debug/moshell ./initrd/moshell.bin
+	cd os_binaries/msh && make build
+	cp os_binaries/msh/target/x86_64-msh/debug/msh ./initrd/msh.bin
 
 	cd os_binaries/hello_world && make build
 	cp os_binaries/hello_world/target/x86_64-hello_world/debug/hello_world ./initrd/hello_world.bin

@@ -49,6 +49,7 @@ impl SysCallDispatcher {
             0 => handlers::sys_debug,
             1 => handlers::sys_exit,
             13 => handlers::sys_time,
+            20 => handlers::sys_getpid,
             60 => handlers::sys_exit,
             _ => {
                 system_log!("unhandled system call: {}", system_call_number);

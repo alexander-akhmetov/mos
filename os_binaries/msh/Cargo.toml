@@ -1,5 +1,5 @@
 [package]
-name = "moshell"
+name = "msh"
 version = "0.0.1"
 authors = ["Alexander Akhmetov <me@aleks.sh>"]
 
@@ -7,7 +7,7 @@ authors = ["Alexander Akhmetov <me@aleks.sh>"]
 librust = { path = "../../librust" }
 
 [package.metadata.bootimage]
-default-target = "x86_64-moshell.json"
+default-target = "x86_64-msh.json"
 
 [profile.dev]
 panic = "abort"

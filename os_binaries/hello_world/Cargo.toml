@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 librust = { path = "../../librust" }
+alloc_dummy = { path = "../../malloc/alloc_dummy" }
 
 [package.metadata.bootimage]
 default-target = "x86_64-hello_world.json"

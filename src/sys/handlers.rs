@@ -14,6 +14,12 @@ pub fn sys_time(_: u64) -> u64 {
     cmos::get_timestamp()
 }
 
+pub fn sys_getpid(_: u64) -> u64 {
+    let pid = multitasking::scheduler::current_task_id();
+    system_log!("syscall received: 'getpid', pid: {}", pid);
+    return pid as u64;
+}
+
 pub fn sys_exit(_: u64) -> u64 {
     /// handles "exit" syscall
     system_log!("syscall received: 'exit'");
