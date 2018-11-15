@@ -1,4 +1,6 @@
-# OS
+# mos
+
+Small operating system.
 
 * QEMU: `qemu-system-x86_64`
 * Always use `/usr/local/bin/nasm`
@@ -34,6 +36,11 @@ brew install nasm
 
 [Binutils installation](https://os.phil-opp.com/cross-compile-binutils/)
 
+## librust
+
+You can build userspace programs for mOS. To communicate with OS from Rust code you need to use `librust`.
+It is a library which provides interface to use all implemented system calls.
+
 # What can it do?
 
 * [x] Load! :-)
@@ -45,5 +52,5 @@ brew install nasm
 * [x] Syscalls ABI
 * [x] Processes
 * [ ] Start init process
-* [ ] Shell for user's commands
+* [ ] Shell for user's commands: `msh`
 * [ ] `cat`, `ps`
