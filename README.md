@@ -34,7 +34,7 @@ brew install nasm
 
 [Binutils installation](https://os.phil-opp.com/cross-compile-binutils/)
 
-# What it can?
+# What can it do?
 
 * [x] Load! :-)
 * [x] Print to VGA buffer
@@ -43,7 +43,7 @@ brew install nasm
 * [x] Interrupts
 * [x] System clock
 * [x] Syscalls ABI
-* [ ] Processes
+* [x] Processes
 * [ ] Start init process
 * [ ] Shell for user's commands
 * [ ] `cat`, `ps`

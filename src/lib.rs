@@ -25,6 +25,7 @@ extern crate uart_16550;
 extern crate x86_64;
 #[macro_use]
 extern crate bitflags;
+extern crate librust;
 
 #[macro_use]
 extern crate alloc;
@@ -34,13 +35,12 @@ extern crate tar;
 mod drivers;
 #[macro_use]
 mod logging;
-mod bin_helpers;
+mod binaries;
 mod boot;
 mod cmos;
 mod constants;
 mod cpuio;
 mod fs;
-mod init;
 mod memory;
 mod multitasking;
 mod sys;
@@ -90,15 +90,15 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     //      > passed in registers RDI, RSI, RDX, RCX, R8, and R9
     //      >
     // So in the boot asm code I set it: "mov edi, ebx;".
-    multitasking::scheduler::init();
     drivers::vga_buffer::clear_screen();
+    multitasking::scheduler::init();
     system_log!("kernel loading...");
 
     // init IDT table, so the CPU will know about our interrupt handlers
     sys::interrupts::init();
     // init PIC to start getting interrupts from timer, keyboard, etc.
     unsafe {
-        drivers::pic8259::PICS.lock().initialize();
+        drivers::pic8259::PICS.lock().init();
     }
     // finish enabling interrupts
     sys::interrupts::enable();
@@ -114,8 +114,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
 
     // and not the OS is ready
     system_log!("----------------------------");
-    let dt = cmos::get_datetime();
-    system_log_ok!("kernel started at {}", dt,);
+    system_log_ok!("kernel started at {}", cmos::get_datetime());
 
     // fn stack_overflow() {
     //     stack_overflow(); // for each recursion, the return address is pushed
@@ -125,8 +124,8 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
 
     // ----------------------- test commands
     // run init "hello world" command
-    init::hello_world();
-    bin_helpers::hello::init();
+    binaries::init::hello_world();
+    binaries::tasks::init();
     // allocator_test creates dynamic data structures to check that it works
     // utils::allocator_test();
     // -------------------------------------

@@ -1,0 +1,16 @@
+[package]
+name = "moshell"
+version = "0.0.1"
+authors = ["Alexander Akhmetov <me@aleks.sh>"]
+
+[dependencies]
+librust = { path = "../../librust" }
+
+[package.metadata.bootimage]
+default-target = "x86_64-moshell.json"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

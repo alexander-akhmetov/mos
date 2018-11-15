@@ -53,7 +53,7 @@ impl Pic8259 {
         }
     }
 
-    pub unsafe fn initialize(&mut self) {
+    pub unsafe fn init(&mut self) {
         // initialization: https://wiki.osdev.org/8259_PIC#Initialisation
         //
         // write some data to port 0x80 and this makes our computer to wait for a while

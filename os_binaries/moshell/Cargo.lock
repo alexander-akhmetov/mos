@@ -1,0 +1,11 @@
+[[package]]
+name = "librust"
+version = "0.1.0"
+
+[[package]]
+name = "moshell"
+version = "0.0.1"
+dependencies = [
+ "librust 0.1.0",
+]
+

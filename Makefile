@@ -43,11 +43,12 @@ build-kernel:
 
 
 build-os-binaries:
-	cd os_binaries/mos_hello && make build
-	cp os_binaries/mos_hello/target/x86_64-mos/debug/mos_hello ./initrd/mos_hello.bin
+	cd os_binaries/moshell && make build
+	cp os_binaries/moshell/target/x86_64-moshell/debug/moshell ./initrd/moshell.bin
 
-	$(NASM) -f elf64 os_binaries/asm_hello/asm_hello.asm -o $(BUILD_DIR)/asm_hello.o
-	$(LD) --nmagic -o initrd/asm_hello.bin -T os_binaries/asm_hello/linker.ld $(BUILD_DIR)/asm_hello.o
+	cd os_binaries/hello_world && make build
+	cp os_binaries/hello_world/target/x86_64-hello_world/debug/hello_world ./initrd/hello_world.bin
+
 
 build-initrd:
 	mkdir -p $(BUILD_DIR)/isofiles/boot/

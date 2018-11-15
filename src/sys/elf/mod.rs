@@ -1,6 +1,7 @@
 use alloc::vec::Vec;
 use core::ptr::read_volatile;
 use core::slice;
+use multitasking::scheduler;
 use x86;
 
 #[derive(Default)]
@@ -38,7 +39,7 @@ pub fn read_header<'a>(addr: *const u8) -> &'a ELFHeader {
 pub unsafe fn exec(addr: *const u8) {
     let call_addr = get_elf_entrypoint(addr);
     system_log!("Executing ELF: entry_point: 0x{:x}", call_addr);
-    x86::call(call_addr);
+    scheduler::spawn_addr(call_addr);
     system_log!("Executed ELF: entry_point: 0x{:x}", call_addr);
 }
 
@@ -49,7 +50,7 @@ pub unsafe fn get_elf_entrypoint(addr: *const u8) -> u64 {
         u64::swap_bytes(header.entry_point),
         addr as u64,
     );
-    let call_addr = addr as u64 + 0x80;
+    let call_addr = addr as u64 + 0x00001000;
     return call_addr;
 }
 

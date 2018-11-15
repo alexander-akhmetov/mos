@@ -13,7 +13,7 @@ use x86;
 
 pub fn init(boot_info: &BootInformation) {
     init_filesystem(boot_info);
-    // run_hello_bin();
+    run_hello_bin();
     system_log_ok!("[initrd] loaded");
 }
 
@@ -37,7 +37,7 @@ fn init_filesystem(boot_info: &BootInformation) {
 }
 
 fn run_hello_bin() {
-    let f = fs::vfs::VFS.lock().get_file("/initrd/asm_hello.bin");
+    let f = fs::vfs::VFS.lock().get_file("/initrd/hello_world.bin");
     if let Some(f) = f {
         system_log!("asm_hello.bin: {:?}", f);
         let b = f.read();

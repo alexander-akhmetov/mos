@@ -1,0 +1,7 @@
+[package]
+name = "librust"
+version = "0.1.0"
+authors = ["Alexander Akhmetov <me@aleks.sh>"]
+edition = "2018"
+
+[dependencies]

@@ -31,6 +31,7 @@ unsafe impl<'a> GlobalAlloc for &'a MGlobalAlloc {
 
         let ptr = &mut PREALLOCATED_MEM.heap[PREALLOCATED_MEM.index] as *mut u8;
         PREALLOCATED_MEM.index = new_index;
+        // system_log!("[allocator]: current index: {}", new_index);
 
         // system_log!(
         //     "allocator: alloc called, allocated {} bytes at {:#X}",
