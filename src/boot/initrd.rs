@@ -15,10 +15,6 @@ pub fn init(boot_info: &BootInformation) {
     init_filesystem(boot_info);
     // run_hello_bin();
     system_log!("[init] ###### testing scheduler ######");
-    unsafe {
-        let rflags = x86::read_rflags();
-        system_log!("[init] !!! RFLAGS: 0b{:b}", rflags);
-    };
     test_scheduler();
     system_log!("initrd end");
 }
@@ -54,7 +50,7 @@ fn run_hello_bin() {
 }
 
 fn test_scheduler() {
-    for _i in 0..2 {
+    for _i in 0..3 {
         scheduler::spawn(foo);
     }
 }
@@ -71,7 +67,7 @@ fn foo() {
             counter,
         );
 
-        for _in in 0..5000000 {}
+        for _in in 0..500000 {}
     }
 
     system_log!(

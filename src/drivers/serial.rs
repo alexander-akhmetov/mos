@@ -16,6 +16,7 @@ lazy_static! {
 
 pub fn print(args: ::core::fmt::Arguments) {
     use core::fmt::Write;
+    unsafe { SERIAL1.force_unlock() };
     let s = SERIAL1.try_lock();
     if s.is_none() {
         // sometimes it was locked forever

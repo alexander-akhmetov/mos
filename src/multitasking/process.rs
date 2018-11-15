@@ -1,6 +1,7 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 use compiler_builtins::mem::memset;
+use constants;
 use core::mem::size_of;
 use multitasking::context::ContextRegisters;
 use multitasking::scheduler;
@@ -8,11 +9,10 @@ use sys;
 use x86;
 
 pub type ProcessID = u32;
-const PROCESS_STACK_SIZE: usize = 1024; // number of u64 elements (512 * 8)
+const PROCESS_STACK_SIZE: usize = 1024; // number of u64 elements (1024 * 8)
 const RFLAGS: u64 = 0b1000000010;
 
 #[derive(PartialEq)]
-#[repr(C)]
 pub enum ProcessState {
     NEW,
     RUNNING,
@@ -74,7 +74,7 @@ impl Process {
     }
 
     pub fn print_stack(&self) {
-        if sys::constants::DEBUG {
+        if constants::LOGLEVEL == constants::LogLevels::DEBUG {
             system_log!(
                 "Process (ctx: 0x{:x} rsp: 0x{:x}) {} stack:",
                 self.stack.as_ptr() as u64,

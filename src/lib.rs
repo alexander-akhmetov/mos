@@ -36,6 +36,7 @@ mod drivers;
 mod logging;
 mod boot;
 mod cmos;
+mod constants;
 mod cpuio;
 mod fs;
 mod init;
@@ -132,6 +133,8 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // allocator_test creates dynamic data structures to check that it works
     // utils::allocator_test();
     // -------------------------------------
+
+    multitasking::scheduler::start();
 
     // loop with hlt forever
     unsafe {
