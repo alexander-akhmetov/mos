@@ -8,7 +8,7 @@ use sys;
 use x86;
 
 pub type ProcessID = u32;
-const PROCESS_STACK_SIZE: usize = 32; // number of u64 elements (512 * 8)
+const PROCESS_STACK_SIZE: usize = 1024; // number of u64 elements (512 * 8)
 const RFLAGS: u64 = 0b1000000010;
 
 #[derive(PartialEq)]
@@ -49,7 +49,7 @@ impl Process {
             (*context_registers).rip = func_ptr;
             (*context_registers).complete = (task_finished as *const ()) as u64;
             (*context_registers).rbp = stack_top as u64;
-            // let rsp = stack_top.sub(2) as u64;
+            // let rsp = stack_top.sub(3) as u64;
             let rsp = stack_ptr as u64;
 
             system_log!(

@@ -24,13 +24,19 @@ impl CurrentTask {
     }
 }
 
-fn init_task() -> u64 {
+fn init_task() {
     /// simple function which does nothing and
     /// is being always executing by the kernel
-    system_log!(">>> init task started");
+    system_log!(">>>    init task started");
+    let mut counter: usize = 0;
     loop {
-        system_log!(">>> init task");
-        sys::time::sleep(1000);
+        system_log!(">>>    init task: counter={}", counter);
+        // sys::time::sleep(1000);
+        for _in in 0..5000000 {}
+        counter += 1;
+        if counter > 100000 {
+            counter = 0;
+        }
     }
 }
 
@@ -41,8 +47,7 @@ impl Scheduler {
             tasks: BTreeMap::new(),
             process_id_counter: 0,
         };
-        let pid = sc.spawn(init_task as *const fn() as u64);
-        CURRENT_TASK.write().id = pid;
+        sc.spawn(init_task as *const () as u64);
         sc
     }
 
@@ -126,7 +131,7 @@ pub unsafe fn switch() {
     let read_scheduler = SCHEDULER.as_ref().unwrap();
 
     // if there is no tasks to switch to, just return nothing
-    if read_scheduler.tasks.len() < 2 {
+    if read_scheduler.tasks.len() < 1 {
         system_log!("[scheduler] no tasks");
         return;
     }
@@ -149,7 +154,7 @@ pub unsafe fn switch() {
 
     let current_id = CURRENT_TASK.read().id;
     system_log!(
-        "[scheduler] switching tasks from {} to {} (rsp: 0x{:x})",
+        "[scheduler] switching tasks from {} to {} (next task rsp addr: 0x{:x})",
         current_id,
         next_task_id.unwrap(),
         next_task_context,
@@ -178,13 +183,13 @@ pub unsafe fn switch() {
 
     if current_task_exists {
         // get current tasks's context information (registers)
-        let current_task_context = SCHEDULER
-            .as_ref()
-            .unwrap()
-            .get_task(current_id)
-            .unwrap()
-            .rsp;
         // context switch!
+        let current_task_context = &mut SCHEDULER
+            .as_mut()
+            .unwrap()
+            .get_task_mut(current_id)
+            .unwrap()
+            .rsp as *mut u64;
         system_log!("[scheduler] switch");
         switch_to(current_task_context, next_task_context);
     } else {
@@ -196,7 +201,7 @@ pub unsafe fn switch() {
 #[naked]
 extern "C" {
     #[inline(always)]
-    fn switch_to(old_rsp: u64, new_rsp: u64);
+    fn switch_to(old_rsp: *mut u64, new_rsp: u64);
     #[inline(always)]
     fn start_task(rsp: u64);
 }

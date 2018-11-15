@@ -71,7 +71,7 @@ fn foo() {
             counter,
         );
 
-        sys::time::sleep(1000);
+        for _in in 0..5000000 {}
     }
 
     system_log!(
