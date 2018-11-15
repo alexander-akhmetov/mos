@@ -1,6 +1,6 @@
 [package]
 name = "librust"
-version = "0.1.0"
+version = "0.0.2"
 authors = ["Alexander Akhmetov <me@aleks.sh>"]
 edition = "2018"
 

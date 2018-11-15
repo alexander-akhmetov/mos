@@ -43,11 +43,11 @@ build-kernel:
 
 
 build-os-binaries:
-	cd os_binaries/msh && make build
-	cp os_binaries/msh/target/x86_64-msh/debug/msh ./initrd/msh.bin
+	cd ./lib/userspace/msh && make build
+	cp ./lib/userspace/msh/target/x86_64-msh/debug/msh ./initrd/msh.bin
 
-	cd os_binaries/hello_world && make build
-	cp os_binaries/hello_world/target/x86_64-hello_world/debug/hello_world ./initrd/hello_world.bin
+	cd ./lib/userspace/hello_world && make build
+	cp ./lib/userspace/hello_world/target/x86_64-hello_world/debug/hello_world ./initrd/hello_world.bin
 
 
 build-initrd:
@@ -70,9 +70,6 @@ iso: build
 	mkdir -p $(BUILD_DIR)/isofiles/boot/grub
 	cp src/boot/loader/grub.cfg $(BUILD_DIR)/isofiles/boot/grub
 	cp $(BUILD_DIR)/kernel.bin $(BUILD_DIR)/isofiles/boot
-
-	# copy modules
-	cp $(BUILD_DIR)/hello.bin $(BUILD_DIR)/isofiles/boot/hello
 
 	docker-compose run build_os grub-mkrescue -o /src/$(BUILD_DIR)/os.iso /src/$(BUILD_DIR)/isofiles
 

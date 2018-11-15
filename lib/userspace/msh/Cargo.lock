@@ -1,11 +1,11 @@
 [[package]]
 name = "librust"
-version = "0.1.0"
+version = "0.0.2"
 
 [[package]]
 name = "msh"
 version = "0.0.1"
 dependencies = [
- "librust 0.1.0",
+ "librust 0.0.2",
 ]
 

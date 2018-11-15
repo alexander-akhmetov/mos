@@ -2,18 +2,18 @@
 name = "alloc_dummy"
 version = "0.1.0"
 dependencies = [
- "librust 0.1.0",
+ "librust 0.0.2",
 ]
 
 [[package]]
 name = "hello_world"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "alloc_dummy 0.1.0",
- "librust 0.1.0",
+ "librust 0.0.2",
 ]
 
 [[package]]
 name = "librust"
-version = "0.1.0"
+version = "0.0.2"
 
