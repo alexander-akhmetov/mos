@@ -1,8 +1,8 @@
 #![no_std]
-#![feature(lang_items, start)]
+#![feature(start)]
 
-use core::panic::PanicInfo;
 extern crate librust;
+use core::panic::PanicInfo;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -11,7 +11,10 @@ fn panic(_info: &PanicInfo) -> ! {
 
 #[start]
 #[no_mangle]
-fn _start(argc: isize, args: *const *const u8) -> isize {
-    unsafe { librust::syscall::debug("hello_world > Hello mOS!") };
+fn _start(_argc: isize, _args: *const *const u8) -> isize {
+    unsafe {
+        librust::syscall::debug(">$     hello_world > Hello mOS!");
+        librust::syscall::getpid();
+    };
     return 0;
 }

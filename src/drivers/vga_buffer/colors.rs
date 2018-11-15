@@ -29,6 +29,7 @@ impl ColorCode {
     }
 }
 
+pub const LIGHT_BLUE: ColorCode = ColorCode::new(Color::LightBlue, Color::Black);
 pub const LIGHT_GRAY: ColorCode = ColorCode::new(Color::LightGray, Color::Black);
 pub const WHITE: ColorCode = ColorCode::new(Color::White, Color::Black);
 pub const RED: ColorCode = ColorCode::new(Color::Red, Color::Black);

@@ -39,10 +39,11 @@ fn init_filesystem(boot_info: &BootInformation) {
 fn run_hello_bin() {
     let f = fs::vfs::VFS.lock().get_file("/initrd/hello_world.bin");
     if let Some(f) = f {
-        system_log!("asm_hello.bin: {:?}", f);
-        let b = f.read();
         unsafe {
-            sys::elf::exec(b.as_ptr());
+            // todo: change me
+            // memory are allocated forever, but when deallocate is implemented
+            // this will stop work
+            sys::elf::exec(f.read().as_ptr());
         };
     }
 }

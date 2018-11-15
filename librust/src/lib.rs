@@ -1,5 +1,5 @@
 #![no_std]
-#![feature(asm)]
-#![allow(unused_doc_comments, dead_code)]
+#![feature(asm, custom_inner_attributes, custom_attribute)]
+#![allow(unused_doc_comments, dead_code, unused_variables)]
 
 pub mod syscall;

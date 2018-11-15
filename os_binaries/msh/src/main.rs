@@ -12,6 +12,6 @@ fn panic(_info: &PanicInfo) -> ! {
 #[start]
 #[no_mangle]
 fn _start(argc: isize, args: *const *const u8) -> isize {
-    unsafe { librust::syscall::debug("moshell > Hello mOS!") };
+    unsafe { librust::syscall::debug("msh > Hello mOS!") };
     return 0;
 }
