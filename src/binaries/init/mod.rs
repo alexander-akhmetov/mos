@@ -1,12 +1,12 @@
-use sys;
+use librust;
 
 pub fn hello_world() {
     kprintln!("[init] --- before system call ---");
 
     // let's ask the mOS current time
-    let timestamp = unsafe { sys::syscall::sys_time() };
+    let timestamp = unsafe { librust::syscall::time() };
     // and then send a debug message
-    let syslog_call_result = unsafe { sys::syscall::sys_debug("Hello, mOS!") };
+    let syslog_call_result = unsafe { librust::syscall::debug("Hello, mOS!") };
     kprintln!("[init] --- after system call ---");
 
     // now let's print current time

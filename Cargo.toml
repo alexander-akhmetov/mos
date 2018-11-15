@@ -14,6 +14,7 @@ x86_64 = "0.2.8"
 bitflags = "1.0"
 multiboot2 = "0.3.2"
 tar = { git = "ssh://git@gitlab.com/akhmetov/tar.git", tag = "0.3.0" }
+librust = { path = "./librust" }
 
 [package.metadata.bootimage]
 default-target = "x86_64-mos.json"

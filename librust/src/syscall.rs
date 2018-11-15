@@ -1,17 +1,25 @@
-use sys::SysCallArgument;
-use x86;
+pub struct SysCallArgument {
+    /*
+        This structure is used by librust::syscall library
+        to send arguments with syscalls. Basically, it wraps
+        bytes array into this structure and sends a pointer to it.
+        Handlers know this structure format and can unwrap it to get data back.
+    */
+    pub length: u64,
+    pub address: u64,
+}
 
-pub unsafe fn sys_exit() -> u64 {
+pub unsafe fn exit() -> u64 {
     /// sends system call "exit"
     _system_call(1)
 }
 
-pub unsafe fn sys_time() -> u64 {
+pub unsafe fn time() -> u64 {
     /// sends system call "time" and returns current timestamp
     _system_call(13)
 }
 
-pub unsafe fn sys_debug(msg: &str) -> u64 {
+pub unsafe fn debug(msg: &str) -> u64 {
     /// sends system call "debug" with msg string
     // for now msg MUST be null-terminated, for example: b"hello\0"
     let ptr = msg.as_ptr();
@@ -32,7 +40,7 @@ unsafe fn _system_call(number: u32) -> u64 {
          : "volatile", "intel",     // options
     );
     // now we can read returned code
-    x86::read_rax()
+    read_rax()
 }
 
 unsafe fn _system_call_with_args(number: u32, first_arg: u64) -> u64 {
@@ -45,5 +53,16 @@ unsafe fn _system_call_with_args(number: u32, first_arg: u64) -> u64 {
          : "volatile", "intel",                     // options
     );
     // now we can read returned code
-    x86::read_rax()
+    read_rax()
+}
+
+unsafe fn read_rax() -> u64 {
+    /// returns RAX register's value
+    let result: u64;
+    asm!("mov $0, rax"
+         : "=r"(result)           // output
+         :                        // no input
+         :: "volatile", "intel",  // options
+    );
+    result
 }

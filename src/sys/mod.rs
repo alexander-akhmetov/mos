@@ -4,17 +4,9 @@ pub mod elf;
 mod errno;
 mod handlers;
 pub mod interrupts;
-pub mod syscall;
 pub mod time;
 use spin::Mutex;
 use x86;
-
-/*
-    This structure is used by sys::syscall library
-    to send arguments with syscalls. Basically, it wraps
-    bytes array into this structure and sends a pointer to it.
-    Handlers know this structure format and can unwrap it to get data back.
-*/
 
 pub struct SyscallArgs {
     pub rdi: u64,
@@ -23,11 +15,6 @@ pub struct SyscallArgs {
     pub rcx: u64,
     pub rbx: u64,
     pub rax: u64,
-}
-
-struct SysCallArgument {
-    length: u64,
-    address: u64,
 }
 
 /// SysCallHandler is a function template which handles system calls from apps

@@ -1,0 +1,17 @@
+[package]
+name = "hello_world"
+version = "0.1.0"
+authors = ["Alexander Akhmetov <me@aleks.sh>"]
+edition = "2018"
+
+[dependencies]
+librust = { path = "../../librust" }
+
+[package.metadata.bootimage]
+default-target = "x86_64-hello_world.json"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

@@ -80,7 +80,7 @@ impl Scheduler {
     pub fn exit(&mut self, pid: u32) {
         /// removes process with `pid` from the tasks list
         self.tasks.remove(&pid);
-        system_log_debug!("[scheduler] task {} exited", pid);
+        system_log!("[scheduler] task {} exited", pid);
     }
 
     pub fn spawn(&mut self, func_ptr: u64) -> ProcessID {
@@ -258,6 +258,13 @@ pub fn spawn(func: fn()) {
     /// spawns a new process
     unsafe {
         SCHEDULER.as_mut().unwrap().spawn(func as *const () as u64);
+    }
+}
+
+pub fn spawn_addr(func_ptr: u64) {
+    /// spawns a new process
+    unsafe {
+        SCHEDULER.as_mut().unwrap().spawn(func_ptr);
     }
 }
 

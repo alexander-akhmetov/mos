@@ -1,5 +1,6 @@
 use cmos;
 use core;
+use librust::syscall::SysCallArgument;
 use multitasking;
 use sys;
 
@@ -29,8 +30,8 @@ pub fn sys_debug(arg_pointer: u64) -> u64 {
 }
 
 fn read_str(arg_pointer: u64) -> &'static str {
-    /// reads string from arg_pointer which has to be a pointer to sys::SysCallArgument structure
-    let arg_ptr: *const sys::SysCallArgument = arg_pointer as *const sys::SysCallArgument;
+    /// reads string from arg_pointer which has to be a pointer to librust::syscall::SysCallArgument structure
+    let arg_ptr: *const SysCallArgument = arg_pointer as *const SysCallArgument;
     let length: usize = unsafe { (*arg_ptr).length as usize };
     let arg_beginning_ptr = unsafe { (*arg_ptr).address as *const u8 };
 

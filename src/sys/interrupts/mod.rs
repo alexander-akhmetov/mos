@@ -6,6 +6,7 @@ mod idt;
 pub mod tss;
 
 use drivers::{keyboard, pic8259};
+use librust::syscall::SysCallArgument;
 use multitasking;
 use sys;
 
