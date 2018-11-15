@@ -3,6 +3,7 @@ use drivers::serial;
 /// prints output to the screen and serial port 1
 /// so output will be available in the qemu running
 /// with `-serial mon:stdio` parameter
+
 #[macro_export]
 macro_rules! system_log {
     () => (

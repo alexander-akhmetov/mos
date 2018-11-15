@@ -1,7 +1,7 @@
 use core::alloc::GlobalAlloc;
 use core::alloc::Layout;
 
-const PREALLOCATED_HEAP_SIZE: usize = 32 * 1024 * 1024; // 16Mb
+const PREALLOCATED_HEAP_SIZE: usize = 32 * 1024 * 1024; // 32Mb
 
 #[repr(C)]
 struct PreAllocatedMemory {

@@ -1,9 +1,16 @@
 use alloc::collections::BTreeMap;
+use constants;
 use multitasking::context::ContextRegisters;
 use multitasking::process::{Process, ProcessID};
 use spin::RwLock;
 use sys;
 use x86;
+
+#[derive(PartialEq)]
+enum SchedulerStatus {
+    INIT,
+    STARTED,
+}
 
 pub struct Scheduler {
     /// Implements context switching for preemptive multitasking
@@ -11,6 +18,7 @@ pub struct Scheduler {
     tasks: BTreeMap<ProcessID, Process>,
     // counter to generate ids for new tasks
     process_id_counter: u32,
+    status: SchedulerStatus,
 }
 
 pub struct CurrentTask {
@@ -24,13 +32,19 @@ impl CurrentTask {
     }
 }
 
-fn init_task() -> u64 {
+fn init_task() {
     /// simple function which does nothing and
     /// is being always executing by the kernel
-    system_log!(">>> init task started");
+    system_log!(">>>    init task started");
+    let mut counter: usize = 0;
     loop {
-        system_log!(">>> init task");
-        sys::time::sleep(1000);
+        system_log!(">>>    init task: counter={}", counter);
+        // sys::time::sleep(1000);
+        for _in in 0..5000000 {}
+        counter += 1;
+        if counter > 100000 {
+            counter = 0;
+        }
     }
 }
 
@@ -40,10 +54,14 @@ impl Scheduler {
         let mut sc = Scheduler {
             tasks: BTreeMap::new(),
             process_id_counter: 0,
+            status: SchedulerStatus::INIT,
         };
-        let pid = sc.spawn(init_task as *const fn() as u64);
-        CURRENT_TASK.write().id = pid;
+        sc.spawn(init_task as *const () as u64);
         sc
+    }
+
+    fn start(&mut self) {
+        self.status = SchedulerStatus::STARTED;
     }
 
     pub fn current_task_id(&self) -> u32 {
@@ -118,16 +136,32 @@ pub fn init() {
     }
 }
 
+pub fn start() {
+    unsafe {
+        SCHEDULER.as_mut().unwrap().start();
+    }
+}
+
 pub unsafe fn switch() {
-    /// Context switch happens in this function.
-    /// Do not call this fulction while you have holding locks.
+    // Context switch happens in this function.
+    // Do not call this fulction while you have holding locks.
+
+    if SCHEDULER.as_ref().unwrap().status != SchedulerStatus::STARTED {
+        // if scheduler is not started yet, do nothing
+        return;
+    }
+
     sys::interrupts::disable();
-    system_log!("[scheduler] switch signal received");
+    if constants::LOGLEVEL == constants::LogLevels::DEBUG {
+        system_log!("[scheduler] switch signal received");
+    }
     let read_scheduler = SCHEDULER.as_ref().unwrap();
 
     // if there is no tasks to switch to, just return nothing
-    if read_scheduler.tasks.len() < 2 {
-        system_log!("[scheduler] no tasks");
+    if read_scheduler.tasks.len() < 1 {
+        if constants::LOGLEVEL == constants::LogLevels::DEBUG {
+            system_log!("[scheduler] no tasks");
+        }
         return;
     }
 
@@ -135,7 +169,9 @@ pub unsafe fn switch() {
     // if there is no next task - do nothing
     let next_task_id = read_scheduler.next_id();
     if next_task_id.is_none() {
-        system_log!("[scheduler] no next task id");
+        if constants::LOGLEVEL == constants::LogLevels::DEBUG {
+            system_log!("[scheduler] no next task id");
+        }
         return;
     }
 
@@ -148,12 +184,14 @@ pub unsafe fn switch() {
         .rsp;
 
     let current_id = CURRENT_TASK.read().id;
-    system_log!(
-        "[scheduler] switching tasks from {} to {} (rsp: 0x{:x})",
-        current_id,
-        next_task_id.unwrap(),
-        next_task_context,
-    );
+    if constants::LOGLEVEL == constants::LogLevels::DEBUG {
+        system_log!(
+            "[scheduler] switching tasks from {} to {} (next task rsp addr: 0x{:x})",
+            current_id,
+            next_task_id.unwrap(),
+            next_task_context,
+        );
+    }
 
     // if next's task id and current's are the same - do nothing
     if current_id == next_task_id.unwrap() {
@@ -178,17 +216,21 @@ pub unsafe fn switch() {
 
     if current_task_exists {
         // get current tasks's context information (registers)
-        let current_task_context = SCHEDULER
-            .as_ref()
-            .unwrap()
-            .get_task(current_id)
-            .unwrap()
-            .rsp;
         // context switch!
-        system_log!("[scheduler] switch");
+        let current_task_context = &mut SCHEDULER
+            .as_mut()
+            .unwrap()
+            .get_task_mut(current_id)
+            .unwrap()
+            .rsp as *mut u64;
+        if constants::LOGLEVEL == constants::LogLevels::DEBUG {
+            system_log!("[scheduler] switch");
+        }
         switch_to(current_task_context, next_task_context);
     } else {
-        system_log!("[scheduler] switch (start)");
+        if constants::LOGLEVEL == constants::LogLevels::DEBUG {
+            system_log!("[scheduler] switch (start)");
+        }
         start_task(next_task_context);
     }
 }
@@ -196,7 +238,7 @@ pub unsafe fn switch() {
 #[naked]
 extern "C" {
     #[inline(always)]
-    fn switch_to(old_rsp: u64, new_rsp: u64);
+    fn switch_to(old_rsp: *mut u64, new_rsp: u64);
     #[inline(always)]
     fn start_task(rsp: u64);
 }

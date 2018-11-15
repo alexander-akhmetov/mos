@@ -35,7 +35,17 @@ start_task:
     ; fn start_task(rsp: u64)
     ; task = RDI
     mov rsp, rdi	; switch to new stack
+
+    pop rbp
+    popfq
+    pop rbx
+    pop r12
+    pop r13
+    pop r14
+    pop r15
+
     sti
+
     ret
 
 
