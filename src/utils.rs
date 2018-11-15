@@ -24,5 +24,5 @@ pub fn allocator_test() {
     for i in 0..count {
         ll.push_front(i);
     }
-    kprintln!(">>> created linked list with {} elements: {:?}", count, ll);
+    system_log!(">>> created linked list with {} elements: {:?}", count, ll);
 }

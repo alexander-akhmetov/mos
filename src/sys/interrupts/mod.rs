@@ -65,7 +65,7 @@ extern "x86-interrupt" fn invalid_opcode_irq(stack_frame: &ExceptionStackFrame) 
 }
 
 extern "x86-interrupt" fn page_fault_irq(stack_frame: &ExceptionStackFrame, error_code: u64) {
-    kprintln!(
+    system_log!(
         "\nEXCEPTION: PAGE FAULT with error code 0x{:x}\n{:#?}",
         error_code,
         &*stack_frame,
@@ -277,4 +277,5 @@ pub fn int3() {
 
 pub fn init() {
     GLOBAL_IDT.load();
+    system_log_ok!("[interrupts] started");
 }

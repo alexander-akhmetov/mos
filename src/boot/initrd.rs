@@ -14,9 +14,7 @@ use x86;
 pub fn init(boot_info: &BootInformation) {
     init_filesystem(boot_info);
     // run_hello_bin();
-    system_log!("[init] ###### testing scheduler ######");
-    test_scheduler();
-    system_log!("initrd end");
+    system_log_ok!("[initrd] loaded");
 }
 
 fn init_filesystem(boot_info: &BootInformation) {
@@ -47,31 +45,4 @@ fn run_hello_bin() {
             sys::elf::exec(b.as_ptr());
         };
     }
-}
-
-fn test_scheduler() {
-    for _i in 0..3 {
-        scheduler::spawn(foo);
-    }
-}
-
-fn foo() {
-    let mut counter = 0;
-    system_log!(">>>    task_{}: started", scheduler::current_task_id());
-
-    for _i in 0..5 {
-        counter += 1;
-        system_log!(
-            ">>>    task_{}: hello! counter={}",
-            scheduler::current_task_id(),
-            counter,
-        );
-
-        for _in in 0..500000 {}
-    }
-
-    system_log!(
-        ">>>    task_{}: completed, stopping...",
-        scheduler::current_task_id()
-    );
 }
