@@ -1,4 +1,4 @@
-#[derive(Copy, Clone, Debug)]
+// #[derive(Copy, Clone, Debug)]
 #[repr(C, packed)]
 pub struct ContextRegisters {
     /// ContextRegisters stores all information about paused thread
