@@ -1,4 +1,3 @@
-pub mod collections;
 pub mod constants;
 pub mod elf;
 mod errno;
@@ -54,6 +53,8 @@ impl SysCallDispatcher {
         match system_call_number {
             0 => handlers::sys_debug,
             1 => handlers::sys_exit,
+            3 => handlers::sys_read,
+            4 => handlers::sys_write,
             13 => handlers::sys_time,
             20 => handlers::sys_getpid,
             60 => handlers::sys_exit,

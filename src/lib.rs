@@ -35,7 +35,6 @@ extern crate tar;
 mod drivers;
 #[macro_use]
 mod logging;
-mod binaries;
 mod boot;
 mod cmos;
 mod constants;
@@ -44,6 +43,7 @@ mod fs;
 mod memory;
 mod multitasking;
 mod sys;
+mod user;
 mod utils;
 mod x86;
 
@@ -124,12 +124,13 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
 
     // ----------------------- test commands
     // run init "hello world" command
-    binaries::init::hello_world();
-    binaries::tasks::init();
+    user::init::hello_world();
+    user::tasks::init();
     // allocator_test creates dynamic data structures to check that it works
     // utils::allocator_test();
     // -------------------------------------
 
+    user::msh::start();
     multitasking::scheduler::start();
 
     // loop with hlt forever

@@ -1,10 +1,15 @@
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use compiler_builtins::mem::memset;
 use core::mem::size_of;
+use fs;
 use multitasking::context::Context;
 use multitasking::{constants, scheduler};
 use sys;
 use x86;
+
+use super::stdio;
 
 pub type ProcessID = u32;
 
@@ -20,6 +25,7 @@ pub struct Process {
     pub state: ProcessState,
     pub stack: Vec<u64>,
     pub rsp: u64,
+    pub file_descriptors: BTreeMap<u64, Box<fs::FileDescriptor>>,
 }
 
 impl Process {
@@ -83,12 +89,16 @@ impl Process {
                 rsp,
             );
 
-            let pt = Process {
+            let mut pt = Process {
                 id: id,
                 state: ProcessState::NEW,
                 stack: stack,
                 rsp: rsp,
+                file_descriptors: BTreeMap::new(),
             };
+
+            let stdout = stdio::StdOut::new(id);
+            pt.file_descriptors.insert(1, Box::new(stdout));
             pt.print_stack(); // if debug, prints new process' stack
             pt
         }

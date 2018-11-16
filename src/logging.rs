@@ -2,6 +2,7 @@ use constants;
 use core::fmt;
 use drivers::serial;
 use drivers::vga_buffer::colors;
+use multitasking::focus::get_focused_pid;
 
 /// prints output to the screen and serial port 1
 /// so output will be available in the qemu running
@@ -86,7 +87,7 @@ macro_rules! system_log_warn {
     ($fmt:expr, $($arg:tt)*) => (
         if $crate::constants::LOGLEVEL <= $crate::logging::LogLevels::WARNING {
             let level = $crate::logging::LogLevels::WARNING;
-            _system_log!(level, $fmt, $($arg)*)
+            _system_log!(level, $fmt, $($arg)*);
         }
     );
 }
@@ -115,33 +116,41 @@ macro_rules! _system_log {
         let color = $crate::drivers::vga_buffer::colors::WHITE;
         $crate::logging::print_prefix($level);
         serial_kprintln!("\n");
-        kprintln!();
+        if $crate::multitasking::focus::get_focused_pid() == 0 {
+            kprintln!();
+        }
     );
 
     ($level:expr, $fmt:expr) => (
         $crate::logging::print_prefix($level);
         serial_kprintln!($fmt);
-        kprintln!($fmt);
+        if $crate::multitasking::focus::get_focused_pid() == 0 {
+            kprintln!($fmt);
+        }
     );
 
     ($level:expr, $fmt:expr, $($arg:tt)*) => (
         $crate::logging::print_prefix($level);
         serial_kprintln!($fmt, $($arg)*);
-        kprintln!($fmt, $($arg)*);
+        if $crate::multitasking::focus::get_focused_pid() == 0 {
+            kprintln!($fmt, $($arg)*);
+        }
     );
 }
 
 pub fn print_prefix(level: LogLevels) {
-    let color: colors::ColorCode;
-    match level {
-        LogLevels::DEBUG => color = colors::LIGHT_GRAY,
-        LogLevels::INFO => color = colors::WHITE,
-        LogLevels::OK => color = colors::GREEN,
-        LogLevels::WARNING => color = colors::YELLOW,
-        LogLevels::ERROR => color = colors::RED,
-    }
+    let color: colors::ColorCode = match level {
+        LogLevels::DEBUG => colors::LIGHT_GRAY,
+        LogLevels::INFO => colors::WHITE,
+        LogLevels::OK => colors::GREEN,
+        LogLevels::WARNING => colors::YELLOW,
+        LogLevels::ERROR => colors::RED,
+    };
+
     #[cfg(not(test))]
     serial_kprint!("[kernel] {}: ", level);
-    #[cfg(not(test))]
-    kprint_color!(color, "[kernel] {}: ", level);
+    if get_focused_pid() == 0 {
+        #[cfg(not(test))]
+        kprint_color!(color, "[kernel] {}: ", level);
+    }
 }

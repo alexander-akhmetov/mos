@@ -1,6 +1,4 @@
 use alloc::boxed::Box;
-use alloc::fmt;
-use alloc::string::String;
 use core::marker::PhantomData;
 
 type NodeLink<T> = Option<Box<Node<T>>>;

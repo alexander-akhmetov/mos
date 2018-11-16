@@ -1,53 +1,4 @@
-use alloc::string::String;
-use core::fmt;
-
-pub unsafe fn exit() -> u64 {
-    /// sends system call "exit"
-    _system_call(1)
-}
-
-pub unsafe fn time() -> u64 {
-    /// sends system call "time" and returns current timestamp
-    _system_call(13)
-}
-
-pub unsafe fn getpid() -> u64 {
-    /// sends system call "getpid" and returns pid of the current process
-    _system_call(20)
-}
-
-pub unsafe fn debug(msg: &str) -> u64 {
-    /// sends system call "debug" with msg string
-    _system_call_2(0, msg.as_ptr() as u64, msg.len() as u64)
-}
-
-pub struct UtsName {
-    pub sysname: String,
-    pub version: String,
-}
-
-impl UtsName {
-    pub fn new() -> UtsName {
-        UtsName {
-            sysname: String::from("unknown"),
-            version: String::from("unknown"),
-        }
-    }
-}
-
-impl fmt::Display for UtsName {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} - {}", self.sysname, self.version)
-    }
-}
-
-pub unsafe fn uname(result: &UtsName) -> u64 {
-    /// get name and information about current kernel
-    _system_call_1(109, result as *const _ as u64);
-    read_rax()
-}
-
-unsafe fn _system_call(number: u32) -> u64 {
+pub unsafe fn _system_call(number: u32) -> u64 {
     /// Executes system call with number: number,
     /// reads the response from eax register and returns it
     asm!("int 0x80;"
@@ -60,7 +11,7 @@ unsafe fn _system_call(number: u32) -> u64 {
     read_rax()
 }
 
-unsafe fn _system_call_1(number: u32, arg_1: u64) -> u64 {
+pub unsafe fn _system_call_1(number: u32, arg_1: u64) -> u64 {
     /// Executes system call with one arg
     /// reads the response from eax register and returns it
     asm!("int 0x80;"
@@ -73,7 +24,7 @@ unsafe fn _system_call_1(number: u32, arg_1: u64) -> u64 {
     read_rax()
 }
 
-unsafe fn _system_call_2(number: u32, arg_1: u64, arg_2: u64) -> u64 {
+pub unsafe fn _system_call_2(number: u32, arg_1: u64, arg_2: u64) -> u64 {
     /// Executes system call with two args
     /// reads the response from eax register and returns it
     asm!("int 0x80;"
@@ -86,7 +37,7 @@ unsafe fn _system_call_2(number: u32, arg_1: u64, arg_2: u64) -> u64 {
     read_rax()
 }
 
-unsafe fn _system_call_3(number: u32, arg_1: u64, arg_2: u64, arg_3: u64) -> u64 {
+pub unsafe fn _system_call_3(number: u32, arg_1: u64, arg_2: u64, arg_3: u64) -> u64 {
     /// Executes system call with three args
     /// reads the response from eax register and returns it
     asm!("int 0x80;"
@@ -99,7 +50,7 @@ unsafe fn _system_call_3(number: u32, arg_1: u64, arg_2: u64, arg_3: u64) -> u64
     read_rax()
 }
 
-unsafe fn _system_call_4(number: u32, arg_1: u64, arg_2: u64, arg_3: u64, arg_4: u64) -> u64 {
+pub unsafe fn _system_call_4(number: u32, arg_1: u64, arg_2: u64, arg_3: u64, arg_4: u64) -> u64 {
     /// Executes system call with four args
     /// reads the response from eax register and returns it
     asm!("int 0x80;"
@@ -112,7 +63,7 @@ unsafe fn _system_call_4(number: u32, arg_1: u64, arg_2: u64, arg_3: u64, arg_4:
     read_rax()
 }
 
-unsafe fn _system_call_5(
+pub unsafe fn _system_call_5(
     number: u32,
     arg_1: u64,
     arg_2: u64,
@@ -132,7 +83,7 @@ unsafe fn _system_call_5(
     read_rax()
 }
 
-unsafe fn read_rax() -> u64 {
+pub unsafe fn read_rax() -> u64 {
     /// returns RAX register's value
     let result: u64;
     asm!("mov $0, rax"

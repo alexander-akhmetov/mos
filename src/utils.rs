@@ -1,4 +1,4 @@
-use sys::collections::linked_list::LinkedList;
+use librust::collections::linked_list::LinkedList;
 
 pub fn divide_by_zero() {
     /// to raise divide by zero exception interrupt
