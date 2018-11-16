@@ -24,7 +24,7 @@ pub fn sys_write(args: &sys::SyscallArgs) -> u64 {
         "syscall write: fd={} pid={} msg='{}'",
         args.arg_1,
         current_pid,
-        utils::read_str(args.arg_3, args.arg_2)
+        utils::read_str(args.arg_3, args.arg_2) // TODO: arg_2&arg_3 перепутано местами ???
     );
     if args.arg_1 != 1 {
         return sys::errno::ENOENT;
@@ -33,9 +33,9 @@ pub fn sys_write(args: &sys::SyscallArgs) -> u64 {
         let process = scheduler::SCHEDULER.as_ref().unwrap().get_task(current_pid);
         if process.is_some() {
             let data = Vec::from_raw_parts(
-                args.arg_2 as *mut u8,
-                args.arg_3 as usize,
-                args.arg_3 as usize,
+                args.arg_3 as *mut u8,
+                args.arg_2 as usize,
+                args.arg_2 as usize,
             );
             process.unwrap().file_descriptors[&args.arg_1].write(data);
         } else {

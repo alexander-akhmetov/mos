@@ -58,10 +58,8 @@ impl FileDescriptor for StdOut {
     }
 
     fn write(&self, buf: Vec<u8>) {
-        system_log!(
-            "STDOUT: pid={} msg='{}'",
-            self.pid,
-            String::from_utf8(buf.clone()).unwrap(),
-        );
+        let s = String::from_utf8(buf.clone()).unwrap();
+        system_log!("STDOUT: pid={} msg='{}'", self.pid, s);
+        kprint!("{}", &s);
     }
 }
