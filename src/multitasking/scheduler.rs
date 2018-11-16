@@ -229,6 +229,7 @@ pub unsafe fn switch() {
             .unwrap()
             .rsp as *mut u64;
         system_log_debug!("[scheduler] switch");
+        #[cfg(not(test))]
         switch_to(current_task_context, next_task_context);
     } else {
         // if there is no process with pid CURRENT_TASK.id,
@@ -236,10 +237,12 @@ pub unsafe fn switch() {
         // so, just call "start_task" function, which does almost the same as switch_to
         // without saving current CPU state and stack
         system_log_debug!("[scheduler] switch (start)");
+        #[cfg(not(test))]
         start_task(next_task_context);
     }
 }
 
+#[cfg(not(test))]
 #[naked]
 extern "C" {
     // from switch_to.asm
@@ -329,11 +332,11 @@ mod test {
 
         sc.spawn(1);
 
-        assert_eq!(CURRENT_TASK.read().id, 1);
+        assert_eq!(CURRENT_TASK.read().id, 0);
 
         let next_id = sc.next_id().unwrap();
-        assert_eq!(next_id, 2);
-        assert_eq!(sc.get_task_mut(next_id).unwrap().id, 2);
+        assert_eq!(next_id, 1);
+        assert_eq!(sc.get_task_mut(next_id).unwrap().id, 1);
     }
 
     #[test]
@@ -344,8 +347,8 @@ mod test {
         assert_eq!(sc.tasks.len(), 1);
 
         let current_id = CURRENT_TASK.read().id;
-        assert_eq!(current_id, 1);
-        assert_eq!(sc.get_task_mut(current_id).unwrap().id, 1);
+        assert_eq!(current_id, 0);
+        assert_eq!(sc.get_task_mut(1).unwrap().id, 1);
 
         let next_id = sc.next_id().unwrap();
         assert_eq!(next_id, 1);
@@ -360,7 +363,7 @@ mod test {
         assert_eq!(sc.tasks.len(), 1);
 
         let current_id = CURRENT_TASK.read().id;
-        assert_eq!(current_id, 1);
-        assert_eq!(sc.get_task_mut(current_id).unwrap().id, 1);
+        assert_eq!(current_id, 0);
+        assert_eq!(sc.get_task_mut(1).unwrap().id, 1);
     }
 }

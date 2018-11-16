@@ -9,7 +9,6 @@
     "executables": true,
     "linker-flavor": "ld.lld",
     "linker": "rust-lld",
-    "relocation-model": "pic",
     "panic-strategy": "abort",
     "relocation-model": "pic",
     "disable-redzone": true,

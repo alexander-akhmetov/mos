@@ -1,9 +1,8 @@
 #![no_std]
 #![feature(alloc_error_handler)]
-use core::alloc::GlobalAlloc;
-use core::alloc::Layout;
+use core::alloc::{GlobalAlloc, Layout};
 
-const PREALLOCATED_HEAP_SIZE: usize = 4 * 1024 * 1024; // 4 Mb
+const PREALLOCATED_HEAP_SIZE: usize = 16 * 1024 * 1024; // 4 Mb
 
 #[repr(C)]
 struct PreAllocatedMemory {
@@ -24,7 +23,7 @@ static mut PREALLOCATED_MEM: PreAllocatedMemory = PreAllocatedMemory::new();
 
 pub struct DummyAlloc;
 
-unsafe impl<'a> GlobalAlloc for &'a DummyAlloc {
+unsafe impl GlobalAlloc for DummyAlloc {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let new_index = PREALLOCATED_MEM.index + layout.size();
         if new_index > PREALLOCATED_HEAP_SIZE {
@@ -38,4 +37,13 @@ unsafe impl<'a> GlobalAlloc for &'a DummyAlloc {
     }
 
     unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {}
+}
+
+#[alloc_error_handler]
+#[no_mangle]
+pub fn rust_oom(layout: Layout) -> ! {
+    panic!(
+        "!!! OOM: memory allocation of {} bytes failed",
+        layout.size(),
+    );
 }

@@ -47,10 +47,11 @@ pub unsafe fn get_elf_entrypoint(addr: *const u8) -> u64 {
     let header = read_header(addr);
     system_log!(
         "Parsed ELF file, entry_point: 0x{:x}, addr: 0{:x}",
-        u64::swap_bytes(header.entry_point),
+        header.entry_point,
         addr as u64,
     );
-    let call_addr = addr as u64 + 0x00001000;
+    // how to find offset?
+    let call_addr = addr.offset(0x00001000) as u64;
     return call_addr;
 }
 
@@ -60,7 +61,7 @@ fn test_read_elf_from_file() {
     use std::io::Read;
     use std::println;
 
-    let mut f = File::open("initrd/asm_hello.bin").expect("file not found");
+    let mut f = File::open("initrd/hello_world.bin").expect("file not found");
     let mut buf: Vec<u8> = Vec::new();
     f.read_to_end(&mut buf).unwrap();
 
@@ -72,8 +73,11 @@ fn test_read_elf_from_file() {
         "-----
         endianness: {:?}
         entry_point: 0x{:x}
+        swapped_bytes: 0x{:x}
         ------",
-        header.endianness, entry_point,
+        header.endianness,
+        entry_point,
+        u64::swap_bytes(entry_point as u64),
     );
-    assert_eq!(entry_point, 0x80000);
+    assert_eq!(entry_point, 0x2010e0);
 }

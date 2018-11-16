@@ -140,6 +140,8 @@ pub fn print_prefix(level: LogLevels) {
         LogLevels::WARNING => color = colors::YELLOW,
         LogLevels::ERROR => color = colors::RED,
     }
+    #[cfg(not(test))]
     serial_kprint!("[kernel] {}: ", level);
+    #[cfg(not(test))]
     kprint_color!(color, "[kernel] {}: ", level);
 }

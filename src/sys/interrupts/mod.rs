@@ -6,7 +6,6 @@ mod idt;
 pub mod tss;
 
 use drivers::{keyboard, pic8259};
-use librust::syscall::SysCallArgument;
 use multitasking;
 use sys;
 
@@ -198,7 +197,6 @@ macro_rules! system_call_handler {
         extern "C" fn wrapper() {
             unsafe {
                 // https://en.wikibooks.org/wiki/X86_Assembly/Interfacing_with_Linux
-                // change to rax
                 save_registers!();
                 asm!("call $0"
                       :: "i"($name as extern "C" fn(syscall_args: &sys::SyscallArgs) -> u64)
