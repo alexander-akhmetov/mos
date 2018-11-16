@@ -1,3 +1,6 @@
+use alloc::string::String;
+use core::fmt;
+
 pub unsafe fn exit() -> u64 {
     /// sends system call "exit"
     _system_call(1)
@@ -16,6 +19,32 @@ pub unsafe fn getpid() -> u64 {
 pub unsafe fn debug(msg: &str) -> u64 {
     /// sends system call "debug" with msg string
     _system_call_2(0, msg.as_ptr() as u64, msg.len() as u64)
+}
+
+pub struct UtsName {
+    pub sysname: String,
+    pub version: String,
+}
+
+impl UtsName {
+    pub fn new() -> UtsName {
+        UtsName {
+            sysname: String::from("unknown"),
+            version: String::from("unknown"),
+        }
+    }
+}
+
+impl fmt::Display for UtsName {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} - {}", self.sysname, self.version)
+    }
+}
+
+pub unsafe fn uname(result: &UtsName) -> u64 {
+    /// get name and information about current kernel
+    _system_call_1(109, result as *const _ as u64);
+    read_rax()
 }
 
 unsafe fn _system_call(number: u32) -> u64 {

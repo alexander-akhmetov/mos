@@ -1,4 +1,6 @@
+use alloc::string::String;
 use cmos;
+use constants;
 use core;
 use multitasking;
 use sys;
@@ -34,11 +36,32 @@ pub fn sys_debug(args: &sys::SyscallArgs) -> u64 {
     sys::errno::SUCCESS
 }
 
-pub fn read(arg_pointer: u64) -> u64 {
+pub struct UtsName {
+    pub sysname: String,
+    pub version: String,
+}
+
+pub fn sys_uname(args: &sys::SyscallArgs) -> u64 {
+    // get name and information about current kernel
+    // http://man7.org/linux/man-pages/man2/uname.2.html
+    unsafe {
+        let info_struct = args.arg_1 as *mut UtsName;
+        (*info_struct).sysname = String::from(constants::KERNEL_SYSNAME);
+        (*info_struct).version = String::from(constants::KERNEL_VERSION);
+    };
+
+    return sys::errno::SUCCESS;
+}
+
+pub fn read(args: &sys::SyscallArgs) -> u64 {
+    // ssize_t read(int fd, void *buf, size_t count);
+    // http://man7.org/linux/man-pages/man2/read.2.html
     0
 }
 
-pub fn write(arg_pointer: u64) -> u64 {
+pub fn write(args: &sys::SyscallArgs) -> u64 {
+    // ssize_t write(int fd, const void *buf, size_t count);
+    // http://man7.org/linux/man-pages/man2/write.2.html
     0
 }
 

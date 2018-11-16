@@ -4,7 +4,7 @@ version = "0.0.1"
 authors = ["Alexander Akhmetov <me@aleks.sh>"]
 
 [dependencies]
-librust = { path = "../../librust" }
+# librust = { path = "../../librust" }
 
 [package.metadata.bootimage]
 default-target = "x86_64-msh.json"

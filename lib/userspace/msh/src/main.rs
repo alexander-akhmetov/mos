@@ -2,7 +2,7 @@
 #![feature(lang_items, start)]
 
 use core::panic::PanicInfo;
-extern crate librust;
+// extern crate librust;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -12,6 +12,6 @@ fn panic(_info: &PanicInfo) -> ! {
 #[start]
 #[no_mangle]
 fn _start(argc: isize, args: *const *const u8) -> isize {
-    unsafe { librust::syscall::debug("msh > Hello mOS!") };
+    // unsafe { librust::syscall::debug("msh > Hello mOS!") };
     return 0;
 }
