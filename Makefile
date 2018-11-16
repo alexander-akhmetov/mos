@@ -76,6 +76,7 @@ iso: build
 
 unit-tests:
 	cargo test
+	cd lib/librust && cargo test
 
 tests: unit-tests
 

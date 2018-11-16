@@ -5,6 +5,12 @@ use core;
 use multitasking;
 use sys;
 
+mod io;
+mod utils;
+
+pub use self::io::{sys_read, sys_write};
+use self::utils::read_str;
+
 pub fn none(args: &sys::SyscallArgs) -> u64 {
     sys::errno::EINTR
 }
@@ -51,22 +57,4 @@ pub fn sys_uname(args: &sys::SyscallArgs) -> u64 {
     };
 
     return sys::errno::SUCCESS;
-}
-
-pub fn read(args: &sys::SyscallArgs) -> u64 {
-    // ssize_t read(int fd, void *buf, size_t count);
-    // http://man7.org/linux/man-pages/man2/read.2.html
-    0
-}
-
-pub fn write(args: &sys::SyscallArgs) -> u64 {
-    // ssize_t write(int fd, const void *buf, size_t count);
-    // http://man7.org/linux/man-pages/man2/write.2.html
-    0
-}
-
-fn read_str(arg_ptr: u64, length: u64) -> &'static str {
-    let bytes_buf: &[u8] =
-        unsafe { core::slice::from_raw_parts(arg_ptr as *const u8, length as usize) };
-    unsafe { core::str::from_utf8_unchecked(bytes_buf) }
 }

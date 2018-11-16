@@ -2,8 +2,7 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt;
-use fs::utils;
-use fs::vfs::{FileDescriptor, FileSystem};
+use fs::{utils, FileDescriptor, FileSystem};
 use tar;
 
 pub struct TarFS {
@@ -86,13 +85,14 @@ impl FileDescriptor for TarFileDescriptor {
     fn name(&self) -> String {
         self.name.clone()
     }
+
+    fn write(&self, buf: Vec<u8>) {}
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use fs::test_data;
-    use fs::vfs::FileDescriptor;
     use std::println;
 
     fn get_fs() -> TarFS {
