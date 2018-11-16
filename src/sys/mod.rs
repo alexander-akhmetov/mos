@@ -8,17 +8,19 @@ pub mod time;
 use spin::Mutex;
 use x86;
 
+#[derive(Debug)]
 pub struct SyscallArgs {
-    pub rdi: u64,
-    pub rsi: u64,
-    pub rdx: u64,
-    pub rcx: u64,
-    pub rbx: u64,
     pub rax: u64,
+    pub arg_1: u64,
+    pub arg_2: u64,
+    pub arg_3: u64,
+    pub arg_4: u64,
+    pub arg_5: u64,
+    pub arg_6: u64,
 }
 
 /// SysCallHandler is a function template which handles system calls from apps
-type SysCallHandler = fn(first_arg: u64) -> u64;
+type SysCallHandler = fn(args: &SyscallArgs) -> u64;
 
 // SysCallDispatcher implements a dispatcher to all system calls
 pub struct SysCallDispatcher {}
@@ -36,9 +38,13 @@ impl SysCallDispatcher {
 
     pub fn process_system_call(&mut self, syscall_args: &SyscallArgs) -> u64 {
         /// Executes a handler for syscall `№ system_call_number`
-        system_log!("system call received: '{}'", syscall_args.rax);
+        system_log!(
+            "system call received: '{}', args: {:?}",
+            syscall_args.rax,
+            syscall_args,
+        );
         let handler = self.get_handler(syscall_args.rax);
-        let result = handler(syscall_args.rbx);
+        let result = handler(syscall_args);
         unsafe { x86::save_rax(result) };
         return result;
     }
