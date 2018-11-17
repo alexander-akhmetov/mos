@@ -71,12 +71,16 @@ fn process_command(buf: &mut Vec<u8>) -> &mut Vec<u8> {
     println!(""); // print empty string with new line to move cursor down
 
     unsafe {
-        match String::from_utf8_unchecked(buf.to_vec()).as_str() {
+        let cmd = String::from_utf8_unchecked(buf.clone().to_vec());
+        let args = cmd.split(" ").collect::<Vec<&str>>();
+        match args[0] {
             "help" => embedded_commands::help_cmd(),
             "uname" => embedded_commands::uname_cmd(),
             "date" => embedded_commands::date_cmd(),
             "pwd" => embedded_commands::pwd_cmd(),
-            cmd => embedded_commands::unknown_cmd(cmd),
+            "cd" => embedded_commands::cd_cmd(args),
+            "ls" => embedded_commands::ls_cmd(),
+            cmd => embedded_commands::unknown_cmd(args[0]),
         }
     }
 
