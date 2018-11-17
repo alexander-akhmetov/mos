@@ -2,6 +2,7 @@ use alloc::collections::vec_deque::VecDeque;
 use alloc::string::String;
 use alloc::vec::Vec;
 use fs::FileDescriptor;
+use multitasking::focus;
 use multitasking::process::Process;
 
 pub struct StdIn {
@@ -61,5 +62,13 @@ impl FileDescriptor for StdOut {
         let s = String::from_utf8(buf.clone()).unwrap();
         system_log!("STDOUT: pid={} msg='{}'", self.pid, s);
         kprint!("{}", &s);
+    }
+}
+
+pub fn write_to_focused_process_stdin(c: char) {
+    // if there is no focused process - write to screen,
+    // probably scheduler is not started yet
+    if focus::get_focused_pid() == 0 {
+        kprint!("{}", c);
     }
 }

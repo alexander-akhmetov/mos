@@ -25,6 +25,7 @@ extern crate uart_16550;
 extern crate x86_64;
 #[macro_use]
 extern crate bitflags;
+#[macro_use]
 extern crate librust;
 
 #[macro_use]
