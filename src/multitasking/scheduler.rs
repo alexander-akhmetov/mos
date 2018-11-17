@@ -107,6 +107,16 @@ impl Scheduler {
         return self.tasks.get(&id);
     }
 
+    pub fn get_active_process(&self) -> Option<&Process> {
+        /// returns active process
+        return self.get_task(CURRENT_TASK.read().id);
+    }
+
+    pub fn get_active_process_mut(&mut self) -> Option<&mut Process> {
+        /// returns active process (mutable)
+        return self.get_task_mut(CURRENT_TASK.read().id);
+    }
+
     pub fn next_id(&self) -> Option<ProcessID> {
         /// returns id of the task which has to be executed next
         //

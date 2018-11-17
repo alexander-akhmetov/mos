@@ -5,14 +5,16 @@ use core;
 use multitasking::scheduler;
 use sys;
 
+mod fs;
 mod io;
 mod utils;
 
+pub use self::fs::*;
 pub use self::io::{sys_read, sys_write};
 use self::utils::read_str;
 
 pub fn none(args: &sys::SyscallArgs) -> u64 {
-    sys::errno::EINTR
+    sys::errno::ENOSYS
 }
 
 pub fn sys_time(args: &sys::SyscallArgs) -> u64 {
@@ -44,6 +46,10 @@ pub fn sys_debug(args: &sys::SyscallArgs) -> u64 {
 }
 
 pub fn sys_execve(args: &sys::SyscallArgs) -> u64 {
+    sys::errno::SUCCESS
+}
+
+pub fn sys_waitpid(args: &sys::SyscallArgs) -> u64 {
     sys::errno::SUCCESS
 }
 

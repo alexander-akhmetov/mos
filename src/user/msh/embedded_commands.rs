@@ -1,5 +1,11 @@
+use alloc::string::String;
+
+use librust;
+
+use super::utils;
+
 pub fn help_cmd() {
-    println!("msh: 0.0.1\nAvailable commands: help, uname, date");
+    println!("msh: 0.0.1\nAvailable commands: help, uname, date, pwd");
 }
 
 pub fn uname_cmd() {
@@ -16,3 +22,9 @@ pub fn date_cmd() {
 pub fn unknown_cmd(cmd: &str) {
     println!("Unknown command: '{}'", cmd)
 }
+
+pub fn pwd_cmd() {
+    println!("{}", utils::get_pwd());
+}
+
+pub fn cd(new_dir: &str) {}

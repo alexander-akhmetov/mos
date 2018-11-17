@@ -1,7 +1,10 @@
 mod calls;
+mod fs;
 mod io;
 mod uname;
+
 pub use self::calls::{_system_call, _system_call_1, _system_call_2, read_rax};
+pub use self::fs::{chdir, getcwd};
 pub use self::io::{read, write, STDIN, STDOUT};
 pub use self::uname::{uname, UtsName};
 
