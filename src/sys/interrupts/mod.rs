@@ -93,7 +93,7 @@ extern "x86-interrupt" fn timer_interrupt_irq(_stack_frame: &ExceptionStackFrame
 extern "x86-interrupt" fn keyboard_irq(_stack_frame: &ExceptionStackFrame) {
     let character = keyboard::read_character();
     if let Some(character) = character {
-        kprint!("{}", character);
+        multitasking::stdio::write_to_focused_process_stdin(character);
     }
     unsafe {
         pic8259::PICS
