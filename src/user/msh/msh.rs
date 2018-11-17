@@ -74,6 +74,7 @@ fn process_command(buf: &mut Vec<u8>) -> &mut Vec<u8> {
         let cmd = String::from_utf8_unchecked(buf.clone().to_vec());
         let args = cmd.split(" ").collect::<Vec<&str>>();
         match args[0] {
+            "" => {}
             "help" => embedded_commands::help_cmd(),
             "uname" => embedded_commands::uname_cmd(),
             "date" => embedded_commands::date_cmd(),

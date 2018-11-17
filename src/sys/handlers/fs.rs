@@ -30,7 +30,6 @@ pub fn sys_readdir(args: &sys::SyscallArgs) -> u64 {
             .get_workdir();
 
         let content = VFS.lock().list_dir(workdir.as_str());
-        system_log!("LS: {:?}", content);
 
         if content.is_none() {
             return sys::errno::ENOENT;
@@ -51,14 +50,18 @@ pub fn sys_readdir(args: &sys::SyscallArgs) -> u64 {
 pub fn sys_chdir(args: &sys::SyscallArgs) -> u64 {
     unsafe {
         let new_workdir = utils::read_str(args.arg_1, args.arg_2);
-        let workdir = scheduler::SCHEDULER
+        let success = scheduler::SCHEDULER
             .as_mut()
             .unwrap()
             .get_active_process_mut()
             .unwrap()
             .set_workdir(&new_workdir);
+        if success {
+            return sys::errno::SUCCESS;
+        } else {
+            return sys::errno::ENOENT;
+        }
     }
-    return sys::errno::SUCCESS;
 }
 
 pub fn sys_getcwd(args: &sys::SyscallArgs) -> u64 {

@@ -46,11 +46,11 @@ pub fn sys_debug(args: &sys::SyscallArgs) -> u64 {
 }
 
 pub fn sys_execve(args: &sys::SyscallArgs) -> u64 {
-    sys::errno::SUCCESS
+    sys::errno::ENOSYS
 }
 
 pub fn sys_waitpid(args: &sys::SyscallArgs) -> u64 {
-    sys::errno::SUCCESS
+    sys::errno::ENOSYS
 }
 
 pub struct UtsName {
