@@ -1,6 +1,7 @@
 use alloc::string::String;
 
 pub fn get_pwd() -> String {
+    /// returns current working directory
     // todo: error check
     unsafe {
         let mut buf: [u8; 255] = ['\0' as u8; 255];
@@ -10,6 +11,7 @@ pub fn get_pwd() -> String {
 }
 
 pub fn read_str(buf: &[u8]) -> String {
+    /// reads string from byte array (null-terminated)
     let mut len = 0;
     for e in buf {
         if *e != '\0' as u8 {

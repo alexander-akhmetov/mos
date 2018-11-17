@@ -44,7 +44,6 @@ pub fn sys_read(args: &sys::SyscallArgs) -> u64 {
             return sys::errno::ENOENT;
         }
     }
-    return sys::errno::SUCCESS;
 }
 
 pub fn sys_write(args: &sys::SyscallArgs) -> u64 {

@@ -60,7 +60,6 @@ impl SysCallDispatcher {
             12 => handlers::sys_chdir,
             13 => handlers::sys_time,
             20 => handlers::sys_getpid,
-            60 => handlers::sys_exit,
             89 => handlers::sys_readdir,
             109 => handlers::sys_uname,
             183 => handlers::sys_getcwd,

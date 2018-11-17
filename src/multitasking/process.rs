@@ -113,8 +113,15 @@ impl Process {
         return self.workdir.clone();
     }
 
-    pub fn set_workdir(&mut self, workdir: &str) {
-        self.workdir = String::from(workdir);
+    pub fn set_workdir(&mut self, workdir: &str) -> bool {
+        let wdir = fs::utils::normalize(workdir);
+        let exists = fs::vfs::VFS.lock().list_dir(&wdir);
+        if exists.is_some() {
+            self.workdir = wdir;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     pub fn print_stack(&self) {
