@@ -44,10 +44,10 @@ build-kernel:
 
 build-os-binaries:
 	cd ./lib/userspace/msh && make build
-	cp ./lib/userspace/msh/target/x86_64-msh/debug/msh ./initrd/msh.bin
+	cp ./lib/userspace/msh/target/x86_64-msh/debug/msh ./initrd/msh
 
 	cd ./lib/userspace/hello_world && make build
-	cp ./lib/userspace/hello_world/target/x86_64-hello_world/debug/hello_world ./initrd/hello_world.bin
+	cp ./lib/userspace/hello_world/target/x86_64-hello_world/debug/hello_world ./initrd/hello_world
 
 
 build-initrd:

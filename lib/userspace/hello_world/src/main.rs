@@ -1,10 +1,22 @@
 #![no_std]
-#![feature(start, alloc)]
+#![feature(start)]
 
 extern crate alloc_dummy;
-extern crate librust;
 use core::panic::PanicInfo;
-extern crate alloc;
+#[macro_use]
+extern crate librust;
+
+/*
+    Just a simple program which prints "Hello, world!"
+    and exits.
+*/
+
+#[start]
+#[no_mangle]
+fn _start(_argc: isize, _args: *const *const u8) -> isize {
+    println!("Hello, world!");
+    return 0;
+}
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -13,16 +25,3 @@ fn panic(_info: &PanicInfo) -> ! {
 
 #[global_allocator]
 static GLOBAL: alloc_dummy::DummyAlloc = alloc_dummy::DummyAlloc;
-
-#[start]
-#[no_mangle]
-fn _start(_argc: isize, _args: *const *const u8) -> isize {
-    unsafe {
-        // doesn't work yet... :-(
-        // let s = alloc::string::String::from("tst");
-        librust::syscall::debug(">$     hello_world > Hello mOS!");
-        // librust::syscall::debug(&s);
-        librust::syscall::getpid();
-    };
-    return 0;
-}
