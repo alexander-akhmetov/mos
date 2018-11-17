@@ -278,6 +278,13 @@ pub fn exit(pid: u32) {
     }
 }
 
+pub fn exit_current() {
+    let pid = current_task_id();
+    unsafe {
+        SCHEDULER.as_mut().unwrap().exit(pid);
+    }
+}
+
 pub fn print_current_process_stack() {
     /// prints current process' stack (only if logging level is DEBUG)
     unsafe {

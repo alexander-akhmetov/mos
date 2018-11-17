@@ -55,6 +55,7 @@ impl SysCallDispatcher {
             1 => handlers::sys_exit,
             3 => handlers::sys_read,
             4 => handlers::sys_write,
+            11 => handlers::sys_execve,
             13 => handlers::sys_time,
             20 => handlers::sys_getpid,
             60 => handlers::sys_exit,

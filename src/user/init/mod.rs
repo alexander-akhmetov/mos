@@ -15,7 +15,6 @@ pub fn hello_world() {
         syscall::write(syscall::STDOUT, s.as_bytes(), s.len() as u64);
 
         system_log!("[init] --- after system call ---");
-
         system_log!("[init] uname: {}", uname_info);
         system_log!("[init] current time: {}", timestamp);
         system_log!("[init] syslog call result: {}", syslog_call_result);

@@ -2,7 +2,7 @@ use alloc::string::String;
 use cmos;
 use constants;
 use core;
-use multitasking;
+use multitasking::scheduler;
 use sys;
 
 mod io;
@@ -22,7 +22,7 @@ pub fn sys_time(args: &sys::SyscallArgs) -> u64 {
 }
 
 pub fn sys_getpid(args: &sys::SyscallArgs) -> u64 {
-    let pid = multitasking::scheduler::current_task_id();
+    let pid = scheduler::current_task_id();
     system_log!("syscall received: 'getpid', pid: {}", pid);
     return pid as u64;
 }
@@ -30,6 +30,7 @@ pub fn sys_getpid(args: &sys::SyscallArgs) -> u64 {
 pub fn sys_exit(args: &sys::SyscallArgs) -> u64 {
     /// handles "exit" syscall
     system_log!("syscall received: 'exit'");
+    scheduler::exit_current();
     sys::errno::SUCCESS
 }
 
@@ -39,6 +40,10 @@ pub fn sys_debug(args: &sys::SyscallArgs) -> u64 {
         "debug syscall received with message: '{}'",
         read_str(args.arg_1, args.arg_2),
     );
+    sys::errno::SUCCESS
+}
+
+pub fn sys_execve(args: &sys::SyscallArgs) -> u64 {
     sys::errno::SUCCESS
 }
 
