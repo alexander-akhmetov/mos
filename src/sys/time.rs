@@ -34,7 +34,9 @@ impl SystemClock {
         if self.fraction > 1.0 {
             self.fraction -= 1.0;
             self.counter += 1;
-            system_log!("{} system clock: +1 sec", self.timestamp());
+            if self.counter % 10 == 0 {
+                system_log!("{} system clock: +10 sec", self.timestamp());
+            }
         }
         if self.switch_counter == constants::SCHEDULER_TICKS_TO_SWITCH {
             self.switch_counter = 0;

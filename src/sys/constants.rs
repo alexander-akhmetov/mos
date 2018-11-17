@@ -8,3 +8,5 @@ pub const TIMER_HERTZ: u32 = 100;
 pub const TIME_BETWEEN_TICKS: f32 = 1.0 / (TIMER_HERTZ as f32);
 
 pub const DEBUG: bool = false;
+pub const STDIN_FD: u64 = 0;
+pub const STDOUT_FD: u64 = 1;

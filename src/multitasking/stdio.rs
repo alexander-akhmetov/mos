@@ -1,66 +1,75 @@
-use alloc::collections::vec_deque::VecDeque;
 use alloc::string::String;
 use alloc::vec::Vec;
 use fs::FileDescriptor;
-use multitasking::focus;
 use multitasking::process::Process;
+use multitasking::{focus, scheduler};
 
 pub struct StdIn {
-    buffer: VecDeque<char>,
+    buffer: Vec<u8>,
     pid: u32,
 }
 
 impl StdIn {
     pub fn new(pid: u32) -> StdIn {
         StdIn {
-            buffer: VecDeque::new(),
+            buffer: Vec::new(),
             pid: pid,
         }
     }
+}
 
-    pub fn push(&mut self, c: char) {
-        self.buffer.push_front(c);
+impl FileDescriptor for StdIn {
+    fn read(&mut self) -> Vec<u8> {
+        let mut vec = self.buffer.clone();
+        self.buffer.clear();
+        vec.reverse();
+        return vec;
     }
 
-    pub fn pop(&mut self, c: char) -> Option<char> {
-        return self.buffer.pop_back();
+    fn readc(&mut self) -> Option<u8> {
+        return self.buffer.pop();
+    }
+
+    fn name(&self) -> String {
+        return String::from("<stdin>");
+    }
+
+    fn write(&mut self, buf: Vec<u8>) {
+        for c in buf.iter() {
+            self.buffer.insert(0, *c);
+        }
     }
 }
 
 pub struct StdOut {
-    buffer: VecDeque<char>,
+    buffer: Vec<u8>,
     pid: u32,
 }
 
 impl StdOut {
     pub fn new(pid: u32) -> StdOut {
         StdOut {
-            buffer: VecDeque::new(),
+            buffer: Vec::new(),
             pid: pid,
         }
-    }
-
-    pub fn push(&mut self, c: char) {
-        self.buffer.push_front(c);
-    }
-
-    pub fn pop(&mut self, c: char) -> Option<char> {
-        return self.buffer.pop_back();
     }
 }
 
 impl FileDescriptor for StdOut {
-    fn read(&self) -> Vec<u8> {
-        return Vec::new();
+    fn read(&mut self) -> Vec<u8> {
+        panic!("unsupported");
+    }
+
+    fn readc(&mut self) -> Option<u8> {
+        panic!("unsupported");
     }
 
     fn name(&self) -> String {
-        return String::from("stdout");
+        return String::from("<stdout>");
     }
 
-    fn write(&self, buf: Vec<u8>) {
+    fn write(&mut self, buf: Vec<u8>) {
         let s = String::from_utf8(buf.clone()).unwrap();
-        system_log!("STDOUT: pid={} msg='{}'", self.pid, s);
         kprint!("{}", &s);
     }
 }
@@ -68,7 +77,16 @@ impl FileDescriptor for StdOut {
 pub fn write_to_focused_process_stdin(c: char) {
     // if there is no focused process - write to screen,
     // probably scheduler is not started yet
-    if focus::get_focused_pid() == 0 {
+    let fpid = focus::get_focused_pid();
+    if fpid == 0 {
         kprint!("{}", c);
+        return;
+    }
+    unsafe {
+        let mut process = scheduler::SCHEDULER.as_mut().unwrap().get_task_mut(fpid);
+        if process.is_some() {
+            let mut fd = process.as_mut().unwrap().file_descriptors.get_mut(&0);
+            fd.as_mut().unwrap().write(vec![c as u8]); // TODO change 0
+        }
     }
 }

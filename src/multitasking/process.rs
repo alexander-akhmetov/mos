@@ -98,6 +98,8 @@ impl Process {
             };
 
             let stdout = stdio::StdOut::new(id);
+            let stdin = stdio::StdIn::new(id);
+            pt.file_descriptors.insert(0, Box::new(stdin));
             pt.file_descriptors.insert(1, Box::new(stdout));
             pt.print_stack(); // if debug, prints new process' stack
             pt

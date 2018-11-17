@@ -37,7 +37,7 @@ impl SysCallDispatcher {
 
     pub fn process_system_call(&mut self, syscall_args: &SyscallArgs) -> u64 {
         /// Executes a handler for syscall `№ system_call_number`
-        system_log!(
+        system_log_debug!(
             "system call received: '{}', args: {:?}",
             syscall_args.rax,
             syscall_args,
