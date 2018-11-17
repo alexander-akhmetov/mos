@@ -78,15 +78,19 @@ impl TarFileDescriptor {
 }
 
 impl FileDescriptor for TarFileDescriptor {
-    fn read(&self) -> Vec<u8> {
+    fn read(&mut self) -> Vec<u8> {
         Vec::from(self.content.to_vec())
+    }
+
+    fn readc(&mut self) -> Option<u8> {
+        panic!("unsupported");
     }
 
     fn name(&self) -> String {
         self.name.clone()
     }
 
-    fn write(&self, buf: Vec<u8>) {}
+    fn write(&mut self, buf: Vec<u8>) {}
 }
 
 #[cfg(test)]

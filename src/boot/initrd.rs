@@ -38,7 +38,7 @@ fn init_filesystem(boot_info: &BootInformation) {
 
 fn run_hello_bin() {
     let f = fs::vfs::VFS.lock().get_file("/initrd/hello_world.bin");
-    if let Some(f) = f {
+    if let Some(mut f) = f {
         unsafe {
             // todo: change me
             // memory are allocated forever, but when deallocate is implemented

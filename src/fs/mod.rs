@@ -23,9 +23,10 @@ impl fmt::Debug for FileSystem {
 
 pub trait FileDescriptor {
     /// Represents a ready to read file
-    fn read(&self) -> Vec<u8>;
+    fn read(&mut self) -> Vec<u8>;
+    fn readc(&mut self) -> Option<u8>;
     fn name(&self) -> String;
-    fn write(&self, buf: Vec<u8>);
+    fn write(&mut self, buf: Vec<u8>);
 }
 
 impl fmt::Debug for FileDescriptor {
