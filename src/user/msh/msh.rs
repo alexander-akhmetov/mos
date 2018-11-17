@@ -5,8 +5,7 @@ use librust;
 use librust::std::screen::{clear, printb};
 use multitasking::focus::focus;
 
-use super::constants;
-use super::embedded_commands;
+use super::{constants, embedded_commands, utils};
 
 /*
     msh is a main shell for the mOS.
@@ -35,7 +34,7 @@ fn cmd_loop() {
     /// and if char is a new line, starts executing program function
     let mut buf = Vec::new();
 
-    printf!(constants::PROMPT);
+    print_prompt();
 
     loop {
         match librust::std::getchar() {
@@ -45,7 +44,7 @@ fn cmd_loop() {
                 // todo: fork + execve + wait for child process to complete
                 //
                 // after command executing print prompt again
-                printf!(constants::PROMPT)
+                print_prompt();
             }
             c => {
                 // this char is not a new line, just append
@@ -60,6 +59,12 @@ fn cmd_loop() {
     }
 }
 
+fn print_prompt() {
+    let prompt = constants::PROMPT;
+    let prompt = prompt.replace("{path}", &utils::get_pwd());
+    printf!("{}", prompt);
+}
+
 fn process_command(buf: &mut Vec<u8>) -> &mut Vec<u8> {
     /// checks if there is a known command in the buf
     /// and if it is, starts execution
@@ -70,6 +75,7 @@ fn process_command(buf: &mut Vec<u8>) -> &mut Vec<u8> {
             "help" => embedded_commands::help_cmd(),
             "uname" => embedded_commands::uname_cmd(),
             "date" => embedded_commands::date_cmd(),
+            "pwd" => embedded_commands::pwd_cmd(),
             cmd => embedded_commands::unknown_cmd(cmd),
         }
     }

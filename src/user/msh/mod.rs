@@ -1,6 +1,7 @@
 mod constants;
 mod embedded_commands;
 mod msh;
+mod utils;
 
 use multitasking::scheduler;
 

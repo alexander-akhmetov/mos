@@ -1,5 +1,6 @@
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
 use alloc::vec::Vec;
 use compiler_builtins::mem::memset;
 use core::mem::size_of;
@@ -26,6 +27,7 @@ pub struct Process {
     pub stack: Vec<u64>,
     pub rsp: u64,
     pub file_descriptors: BTreeMap<u64, Box<fs::FileDescriptor>>,
+    workdir: String,
 }
 
 impl Process {
@@ -95,6 +97,7 @@ impl Process {
                 stack: stack,
                 rsp: rsp,
                 file_descriptors: BTreeMap::new(),
+                workdir: String::from("/"),
             };
 
             let stdout = stdio::StdOut::new(id);
@@ -104,6 +107,15 @@ impl Process {
             pt.print_stack(); // if debug, prints new process' stack
             pt
         }
+    }
+
+    pub fn get_workdir(&self) -> String {
+        return self.workdir.clone();
+    }
+
+    pub fn set_workdir(&mut self, workdir: &str) {
+        self.workdir = String::from(workdir);
+        system_log!("process {} chdir to {}", self.id, self.workdir);
     }
 
     pub fn print_stack(&self) {

@@ -55,11 +55,14 @@ impl SysCallDispatcher {
             1 => handlers::sys_exit,
             3 => handlers::sys_read,
             4 => handlers::sys_write,
+            7 => handlers::sys_waitpid,
             11 => handlers::sys_execve,
+            12 => handlers::sys_chdir,
             13 => handlers::sys_time,
             20 => handlers::sys_getpid,
             60 => handlers::sys_exit,
             109 => handlers::sys_uname,
+            183 => handlers::sys_getcwd,
             _ => {
                 system_log!("unhandled system call: {}", system_call_number);
                 handlers::none
