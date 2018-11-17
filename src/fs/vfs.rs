@@ -53,15 +53,15 @@ impl VirtualFS {
         (None, String::new())
     }
 
-    pub fn list_dir(&self, path: &str) -> Vec<Box<FileDescriptor>> {
+    pub fn list_dir(&self, path: &str) -> Option<Vec<Box<FileDescriptor>>> {
         // todo: no such directory
         let (fs, mountpoint) = self.get_fs(path);
         if let Some(fs) = fs {
             let dirpath = utils::remove_prefix(path, &mountpoint);
             let s_dirpath = utils::add_trailing_slash(&utils::add_prefix_slash(&dirpath));
-            fs.list_dir(&s_dirpath)
+            return Some(fs.list_dir(&s_dirpath));
         } else {
-            Vec::new()
+            return None;
         }
     }
 }

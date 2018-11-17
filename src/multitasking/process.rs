@@ -115,7 +115,6 @@ impl Process {
 
     pub fn set_workdir(&mut self, workdir: &str) {
         self.workdir = String::from(workdir);
-        system_log!("process {} chdir to {}", self.id, self.workdir);
     }
 
     pub fn print_stack(&self) {

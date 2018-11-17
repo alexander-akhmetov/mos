@@ -4,12 +4,12 @@ pub fn get_pwd() -> String {
     // todo: error check
     unsafe {
         let mut buf: [u8; 255] = ['\0' as u8; 255];
-        librust::syscall::getcwd(&mut buf, 255);
+        librust::syscall::getcwd(&mut buf);
         return read_str(&buf);
     }
 }
 
-fn read_str(buf: &[u8]) -> String {
+pub fn read_str(buf: &[u8]) -> String {
     let mut len = 0;
     for e in buf {
         if *e != '\0' as u8 {
