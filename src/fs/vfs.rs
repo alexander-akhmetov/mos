@@ -91,6 +91,7 @@ mod test {
 
         let files_list: Vec<String> = vfs
             .list_dir("/mnt/tarfs/")
+            .unwrap()
             .iter()
             .map(|x| x.name())
             .collect();
@@ -98,12 +99,18 @@ mod test {
 
         let files_list: Vec<String> = vfs
             .list_dir("/mnt/tarfs")
+            .unwrap()
             .iter()
             .map(|x| x.name())
             .collect();
         assert_eq!(files_list, exp_files_list);
 
-        let files_list: Vec<String> = vfs.list_dir("mnt/tarfs").iter().map(|x| x.name()).collect();
+        let files_list: Vec<String> = vfs
+            .list_dir("mnt/tarfs")
+            .unwrap()
+            .iter()
+            .map(|x| x.name())
+            .collect();
         assert_eq!(files_list, exp_files_list);
     }
 

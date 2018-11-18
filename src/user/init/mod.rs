@@ -4,6 +4,7 @@ use librust::syscall;
 use sys;
 
 pub fn hello_world() {
+    /// test function, makes a few system calls and prints the results
     system_log!("[init] --- before system call ---");
 
     unsafe {
@@ -21,10 +22,13 @@ pub fn hello_world() {
         system_log!("[init] current time: {}", timestamp);
         system_log!("[init] syslog call result: {}", syslog_call_result);
     }
+
+    run_hello_bin();
 }
 
 fn run_hello_bin() {
-    let f = fs::vfs::VFS.lock().get_file("/initrd/hello_world.bin");
+    /// starts initrd/hello_world binary (executes elf file)
+    let f = fs::vfs::VFS.lock().get_file("/initrd/hello_world");
     if let Some(mut f) = f {
         unsafe {
             // todo: change me

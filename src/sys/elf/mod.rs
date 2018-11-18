@@ -1,4 +1,5 @@
 use multitasking::scheduler;
+use x86;
 
 #[derive(Default)]
 #[repr(packed)]
@@ -35,7 +36,8 @@ pub fn read_header<'a>(addr: *const u8) -> &'a ELFHeader {
 pub unsafe fn exec(addr: *const u8) {
     let call_addr = get_elf_entrypoint(addr);
     system_log!("Executing ELF: entry_point: 0x{:x}", call_addr);
-    scheduler::spawn_addr(call_addr);
+    // scheduler::spawn_addr(call_addr);
+    x86::call(call_addr);
     system_log!("Executed ELF: entry_point: 0x{:x}", call_addr);
 }
 
@@ -58,7 +60,7 @@ fn test_read_elf_from_file() {
     use std::io::Read;
     use std::println;
 
-    let mut f = File::open("initrd/hello_world.bin").expect("file not found");
+    let mut f = File::open("initrd/hello_world").expect("file not found");
     let mut buf: Vec<u8> = Vec::new();
     f.read_to_end(&mut buf).unwrap();
 
