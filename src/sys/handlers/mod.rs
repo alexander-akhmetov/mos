@@ -1,7 +1,6 @@
 use alloc::string::String;
 use cmos;
 use constants;
-use core;
 use multitasking::scheduler;
 use sys;
 

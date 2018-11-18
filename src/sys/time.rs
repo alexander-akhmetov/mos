@@ -1,6 +1,5 @@
 use cmos::get_timestamp;
 use drivers;
-use multitasking::scheduler::switch;
 use spin::RwLock;
 use sys::constants;
 use x86;

@@ -1,7 +1,6 @@
 use core::ops::{Index, IndexMut};
 use memory::paging::entry::{Entry, EntryFlags};
 use memory::paging::ENTRY_COUNT;
-use memory::FrameAllocator;
 
 pub struct PageTable {
     entries: [Entry; ENTRY_COUNT],

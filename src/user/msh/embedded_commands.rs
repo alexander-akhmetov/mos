@@ -1,4 +1,3 @@
-use alloc::string::String;
 use alloc::vec::Vec;
 
 use librust;
@@ -71,7 +70,7 @@ pub fn ls_cmd() {
                 }
                 break;
             }
-            println!("{}", utils::read_str(&buf));
+            println!("  {}", utils::read_str(&buf));
             offset += 1;
         }
     }

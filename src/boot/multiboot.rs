@@ -1,7 +1,4 @@
-use memory;
-use memory::FrameAllocator;
 use multiboot2::BootInformation;
-use x86;
 
 pub fn get_multiboot_info(multiboot_information_address: usize) -> &'static BootInformation {
     let boot_info = unsafe { multiboot2::load(multiboot_information_address) };

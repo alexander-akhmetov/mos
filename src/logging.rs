@@ -1,6 +1,4 @@
-use constants;
 use core::fmt;
-use drivers::serial;
 use drivers::vga_buffer::colors;
 use multitasking::focus::get_focused_pid;
 

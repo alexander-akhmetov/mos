@@ -14,7 +14,7 @@ extern crate librust;
 #[start]
 #[no_mangle]
 fn _start(_argc: isize, _args: *const *const u8) -> isize {
-    println!("Hello, world!");
+    println!("BIN: Hello, world!");
     return 0;
 }
 

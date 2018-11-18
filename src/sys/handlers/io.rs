@@ -1,6 +1,5 @@
-use super::utils;
 use alloc::vec::Vec;
-use multitasking::{scheduler, stdio};
+use multitasking::scheduler;
 use sys;
 
 pub fn sys_read(args: &sys::SyscallArgs) -> u64 {
@@ -54,7 +53,7 @@ pub fn sys_write(args: &sys::SyscallArgs) -> u64 {
         "syscall write: fd={} pid={} msg='{}'",
         args.arg_1,
         current_pid,
-        utils::read_str(args.arg_3, args.arg_2) // TODO: arg_2&arg_3 перепутано местами ???
+        sys::handlers::utils::read_str(args.arg_3, args.arg_2) // TODO: arg_2&arg_3 перепутано местами ???
     );
     if args.arg_1 != sys::constants::STDOUT_FD {
         return sys::errno::ENOENT;

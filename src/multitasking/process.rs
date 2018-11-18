@@ -7,7 +7,6 @@ use core::mem::size_of;
 use fs;
 use multitasking::context::Context;
 use multitasking::{constants, scheduler};
-use sys;
 use x86;
 
 use super::stdio;

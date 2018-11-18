@@ -1,9 +1,7 @@
 use alloc::collections::BTreeMap;
-use constants;
 use multitasking::process::{Process, ProcessID};
 use spin::RwLock;
 use sys;
-use x86;
 
 #[derive(PartialEq)]
 enum SchedulerStatus {

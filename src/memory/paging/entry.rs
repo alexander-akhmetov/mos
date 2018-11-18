@@ -1,4 +1,3 @@
-use bitflags;
 use memory::Frame;
 
 bitflags! {

@@ -1,8 +1,4 @@
-use alloc::vec::Vec;
-use core::ptr::read_volatile;
-use core::slice;
 use multitasking::scheduler;
-use x86;
 
 #[derive(Default)]
 #[repr(packed)]
@@ -57,6 +53,7 @@ pub unsafe fn get_elf_entrypoint(addr: *const u8) -> u64 {
 
 #[test]
 fn test_read_elf_from_file() {
+    use alloc::vec::Vec;
     use std::fs::File;
     use std::io::Read;
     use std::println;
