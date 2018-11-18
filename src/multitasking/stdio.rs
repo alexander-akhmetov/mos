@@ -1,7 +1,6 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 use fs::FileDescriptor;
-use multitasking::process::Process;
 use multitasking::{focus, scheduler};
 
 pub struct StdIn {

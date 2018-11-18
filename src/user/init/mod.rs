@@ -1,5 +1,7 @@
 use alloc::string::String;
+use fs;
 use librust::syscall;
+use sys;
 
 pub fn hello_world() {
     system_log!("[init] --- before system call ---");
@@ -18,5 +20,17 @@ pub fn hello_world() {
         system_log!("[init] uname: {}", uname_info);
         system_log!("[init] current time: {}", timestamp);
         system_log!("[init] syslog call result: {}", syslog_call_result);
+    }
+}
+
+fn run_hello_bin() {
+    let f = fs::vfs::VFS.lock().get_file("/initrd/hello_world.bin");
+    if let Some(mut f) = f {
+        unsafe {
+            // todo: change me
+            // memory are allocated forever, but when deallocate will be implemented
+            // this stops working
+            sys::elf::exec(f.read().as_ptr());
+        };
     }
 }

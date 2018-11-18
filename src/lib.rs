@@ -14,7 +14,7 @@
     const_vec_new,
     compiler_builtins_lib
 )]
-#![allow(dead_code, unused_imports, unused_doc_comments, unused_variables)]
+#![allow(dead_code, unused_doc_comments, unused_variables)]
 
 extern crate multiboot2;
 extern crate spin;

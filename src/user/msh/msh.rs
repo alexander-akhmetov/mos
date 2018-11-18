@@ -2,7 +2,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 use librust;
-use librust::std::screen::{clear, printb};
+use librust::std::screen::clear;
 use multitasking::focus::focus;
 
 use super::{constants, embedded_commands, utils};
