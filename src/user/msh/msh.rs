@@ -22,7 +22,7 @@ pub fn start() {
 
     // clear screen and print welcome message
     clear();
-    println!("Welcome to mOS!\n");
+    println!("{}", constants::CAT_WELCOME);
 
     // start main command loop of the shell
     cmd_loop();
