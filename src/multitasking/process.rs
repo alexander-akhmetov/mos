@@ -7,6 +7,7 @@ use core::mem::size_of;
 use fs;
 use multitasking::context::Context;
 use multitasking::{constants, scheduler};
+use sys::time;
 use x86;
 
 use super::stdio;
@@ -15,17 +16,18 @@ pub type ProcessID = u32;
 
 #[derive(PartialEq)]
 pub enum ProcessState {
-    /// is not used yet
-    NEW,
+    WAITING,
     RUNNING,
 }
 
 pub struct Process {
     pub id: ProcessID,
     pub state: ProcessState,
+    pub name: String,
     pub stack: Vec<u64>,
     pub rsp: u64,
     pub file_descriptors: BTreeMap<u64, Box<fs::FileDescriptor>>,
+    pub started_at: u64, // timestamp
     workdir: String,
 }
 
@@ -74,6 +76,7 @@ impl Process {
             // fill it with register's data
             (*context_registers).rflags = constants::RFLAGS;
             // and function's addresses
+            (*context_registers).start_func = start_task as *const () as u64;
             (*context_registers).entrypoint_func = func_ptr;
             (*context_registers).finish_func = finish_task as *const () as u64;
             // Base Pointer register (points to the top)
@@ -82,21 +85,20 @@ impl Process {
             let rsp = stack_ptr as u64;
 
             system_log!(
-                "Created new process with entrypoint_func=0x{:x} id={} context=0x{:x} finish_func=0x{:x} rsp=0x{:x}",
-                (*context_registers).entrypoint_func,
+                "[scheduler] created new process id={} entrypoint=0x{:x}",
                 id,
-                context_registers as u64,
-                (*context_registers).finish_func,
-                rsp,
+                (*context_registers).entrypoint_func,
             );
 
             let mut pt = Process {
                 id: id,
-                state: ProcessState::NEW,
+                state: ProcessState::RUNNING,
                 stack: stack,
                 rsp: rsp,
                 file_descriptors: BTreeMap::new(),
                 workdir: String::from("/"),
+                name: format!("process {}", id),
+                started_at: time::timestamp(),
             };
 
             let stdout = stdio::StdOut::new(id);
@@ -139,12 +141,19 @@ impl Process {
     }
 }
 
+fn start_task() {
+    let pid = scheduler::current_process_id();
+    system_log!("[scheduler] process {}: starting...", pid);
+}
+
 fn finish_task() -> ! {
     /// finishes the task and then goes to infinite hlt loop
     /// it must not return anything, because stack is empty and there is no
     /// place to return.
     /// So, this function just executes the switch and waits for the next context switch
-    scheduler::exit(scheduler::current_task_id());
+    let pid = scheduler::current_process_id();
+    system_log!("[scheduler] process {}: completed, finishing...", pid,);
+    scheduler::exit(pid);
     unsafe {
         scheduler::switch();
         x86::hlt_loop();

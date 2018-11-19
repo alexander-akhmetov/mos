@@ -1,9 +1,6 @@
 [[package]]
 name = "alloc_dummy"
 version = "0.1.0"
-dependencies = [
- "librust 0.0.4",
-]
 
 [[package]]
 name = "hello_world"
