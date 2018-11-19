@@ -69,7 +69,11 @@ impl FileDescriptor for StdOut {
 
     fn write(&mut self, buf: Vec<u8>) {
         let s = String::from_utf8(buf.clone()).unwrap();
-        kprint!("{}", &s);
+        let pid = scheduler::current_process_id();
+        system_log!("[pid: {}] stdout: '{}'", pid, s.trim());
+        if pid == focus::get_focused_pid() {
+            kprint!("{}", &s);
+        };
     }
 }
 

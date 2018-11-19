@@ -15,19 +15,19 @@ pub struct Scheduler {
     /// Implements context switching for preemptive multitasking
     // tasks: list of currently active tasks
     tasks: BTreeMap<ProcessID, Process>,
-    // counter to generate ids for new tasks
+    // counter to generate ids for new processes
     process_id_counter: u32,
     status: SchedulerStatus,
 }
 
-pub struct CurrentTask {
+pub struct CurrentProcess {
     /// holds information about current task (thread or process)
     pub id: ProcessID,
 }
 
-impl CurrentTask {
-    const fn new() -> CurrentTask {
-        CurrentTask { id: 0 }
+impl CurrentProcess {
+    const fn new() -> CurrentProcess {
+        CurrentProcess { id: 0 }
     }
 }
 
@@ -64,31 +64,30 @@ impl Scheduler {
         self.status = SchedulerStatus::STARTED;
     }
 
-    pub fn current_task_id(&self) -> u32 {
+    pub fn current_process_id(&self) -> u32 {
         /// returns id of the task which is active now
-        CURRENT_TASK.read().id
+        CURRENT_PROCESS.read().id
     }
 
     pub fn exit_current(&mut self) {
-        let current_task_id = CURRENT_TASK.read().id;
-        self.exit(current_task_id);
-        // todo: proper remove
+        let pid = CURRENT_PROCESS.read().id;
+        self.exit(pid);
     }
 
     pub fn exit(&mut self, pid: u32) {
         /// removes process with `pid` from the tasks list
         self.tasks.remove(&pid);
-        system_log!("[scheduler] task {} exited", pid);
+        system_log!("[scheduler] process {} exited", pid);
     }
 
     pub fn spawn(&mut self, func_ptr: u64) -> ProcessID {
-        // creates a new task from a function pointer
+        // creates a new process from a function pointer
         self.process_id_counter += 1;
         let process = Process::new(self.process_id_counter, func_ptr);
         let pid = process.id;
         self.tasks.insert(pid, process);
         system_log!(
-            "[scheduler] new task created with pid={} func_ptr=0x{:x}",
+            "[scheduler] new process created with id={} func_ptr=0x{:x}",
             pid,
             func_ptr
         );
@@ -107,12 +106,12 @@ impl Scheduler {
 
     pub fn get_active_process(&self) -> Option<&Process> {
         /// returns active process
-        return self.get_task(CURRENT_TASK.read().id);
+        return self.get_task(CURRENT_PROCESS.read().id);
     }
 
     pub fn get_active_process_mut(&mut self) -> Option<&mut Process> {
         /// returns active process (mutable)
-        return self.get_task_mut(CURRENT_TASK.read().id);
+        return self.get_task_mut(CURRENT_PROCESS.read().id);
     }
 
     pub fn next_id(&self) -> Option<ProcessID> {
@@ -122,7 +121,7 @@ impl Scheduler {
         // first it finds id of the current task,
         // then iterates over all tasks (inc ordering)
         // and returns the first task which id is bigger than the current's
-        let current_id = CURRENT_TASK.read().id;
+        let current_id = CURRENT_PROCESS.read().id;
         for (id, task) in self.tasks.iter() {
             if *id > current_id {
                 return Some(*id);
@@ -142,12 +141,12 @@ impl Scheduler {
 pub static mut SCHEDULER: Option<Scheduler> = None;
 
 lazy_static! {
-    pub static ref CURRENT_TASK: RwLock<CurrentTask> = RwLock::new(CurrentTask::new());
+    pub static ref CURRENT_PROCESS: RwLock<CurrentProcess> = RwLock::new(CurrentProcess::new());
 }
 
 pub fn init() {
     /// creates a scheduler instance in the INIT (not started) state
-    /// but after this function it's already possible to spawn new tasks
+    /// but after this function it's already possible to spawn new processes
     unsafe {
         SCHEDULER = Some(Scheduler::new());
     }
@@ -199,7 +198,7 @@ pub unsafe fn switch() {
         .unwrap()
         .rsp;
 
-    let current_id = CURRENT_TASK.read().id;
+    let current_id = CURRENT_PROCESS.read().id;
     system_log_debug!(
         "[scheduler] switching tasks from {} to {} (next task rsp addr: 0x{:x})",
         current_id,
@@ -213,10 +212,10 @@ pub unsafe fn switch() {
     }
 
     // if current
-    let current_task_exists = read_scheduler.get_task(current_id).is_some();
+    let current_process_exists = read_scheduler.get_task(current_id).is_some();
 
     // debugging print current and the next's processes stacks
-    if current_task_exists {
+    if current_process_exists {
         print_current_process_stack();
     };
     read_scheduler
@@ -225,12 +224,12 @@ pub unsafe fn switch() {
         .print_stack();
 
     // update current task information with next task's id
-    CURRENT_TASK.write().id = next_task_id.unwrap();
+    CURRENT_PROCESS.write().id = next_task_id.unwrap();
 
-    if current_task_exists {
+    if current_process_exists {
         // get current tasks's context information (registers)
         // context switch!
-        let current_task_context = &mut SCHEDULER
+        let current_process_context = &mut SCHEDULER
             .as_mut()
             .unwrap()
             .get_task_mut(current_id)
@@ -238,9 +237,9 @@ pub unsafe fn switch() {
             .rsp as *mut u64;
         system_log_debug!("[scheduler] switch");
         #[cfg(not(test))]
-        switch_to(current_task_context, next_task_context);
+        switch_to(current_process_context, next_task_context);
     } else {
-        // if there is no process with pid CURRENT_TASK.id,
+        // if there is no process with pid CURRENT_PROCESS.id,
         // we don't have to save context of the current non-existing process,
         // so, just call "start_task" function, which does almost the same as switch_to
         // without saving current CPU state and stack
@@ -260,9 +259,9 @@ extern "C" {
     fn start_task(rsp: u64);
 }
 
-pub fn current_task_id() -> u32 {
+pub fn current_process_id() -> u32 {
     /// returns current task's id
-    return CURRENT_TASK.read().id;
+    return CURRENT_PROCESS.read().id;
 }
 
 pub fn spawn(func: fn()) {
@@ -287,7 +286,7 @@ pub fn exit(pid: u32) {
 }
 
 pub fn exit_current() {
-    let pid = current_task_id();
+    let pid = current_process_id();
     unsafe {
         SCHEDULER.as_mut().unwrap().exit(pid);
     }
@@ -296,7 +295,7 @@ pub fn exit_current() {
 pub fn print_current_process_stack() {
     /// prints current process' stack (only if logging level is DEBUG)
     unsafe {
-        let pid = CURRENT_TASK.read().id;
+        let pid = CURRENT_PROCESS.read().id;
         let process = SCHEDULER
             .as_ref()
             .unwrap()
@@ -347,7 +346,7 @@ mod test {
 
         sc.spawn(1);
 
-        assert_eq!(CURRENT_TASK.read().id, 0);
+        assert_eq!(CURRENT_PROCESS.read().id, 0);
 
         let next_id = sc.next_id().unwrap();
         assert_eq!(next_id, 1);
@@ -361,7 +360,7 @@ mod test {
         // we had to create init process
         assert_eq!(sc.tasks.len(), 1);
 
-        let current_id = CURRENT_TASK.read().id;
+        let current_id = CURRENT_PROCESS.read().id;
         assert_eq!(current_id, 0);
         assert_eq!(sc.get_task_mut(1).unwrap().id, 1);
 
@@ -377,7 +376,7 @@ mod test {
         // we had to create init process
         assert_eq!(sc.tasks.len(), 1);
 
-        let current_id = CURRENT_TASK.read().id;
+        let current_id = CURRENT_PROCESS.read().id;
         assert_eq!(current_id, 0);
         assert_eq!(sc.get_task_mut(1).unwrap().id, 1);
     }

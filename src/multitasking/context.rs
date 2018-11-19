@@ -11,6 +11,7 @@ pub struct Context {
     r13: u64,
     r14: u64,
     r15: u64,
+    pub start_func: u64,
     pub entrypoint_func: u64,
     pub finish_func: u64,
 }

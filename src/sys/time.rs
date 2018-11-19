@@ -55,6 +55,10 @@ impl SystemClock {
 
 pub static SYSCLOCK: RwLock<SystemClock> = RwLock::new(SystemClock::new());
 
+pub fn timestamp() -> u64 {
+    return SYSCLOCK.read().timestamp();
+}
+
 pub fn init() {
     /// initializes system clock
     // at first it inits PIT and sets proper frequency

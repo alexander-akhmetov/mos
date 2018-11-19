@@ -5,7 +5,6 @@ authors = ["Alexander Akhmetov <me@aleks.sh>"]
 edition = "2018"
 
 [dependencies]
-librust = { path = "../librust" }
 
 [profile.dev]
 panic = "abort"

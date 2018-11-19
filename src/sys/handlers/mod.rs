@@ -23,7 +23,7 @@ pub fn sys_time(args: &sys::SyscallArgs) -> u64 {
 }
 
 pub fn sys_getpid(args: &sys::SyscallArgs) -> u64 {
-    let pid = scheduler::current_task_id();
+    let pid = scheduler::current_process_id();
     system_log!("syscall received: 'getpid', pid: {}", pid);
     return pid as u64;
 }
