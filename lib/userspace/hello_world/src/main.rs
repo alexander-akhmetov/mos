@@ -19,12 +19,11 @@ extern crate alloc;
 #[start]
 #[no_mangle]
 fn _start(_argc: isize, _args: *const *const u8) -> isize {
-    let pid = unsafe { librust::syscall::getpid() };
-    let time = unsafe { librust::syscall::time() };
     unsafe {
-        librust::syscall::debug("# 1 Hello from process");
-    };
-    // println!("# Hello, world! time: {} pid: {}", time, pid);
+        let pid = librust::syscall::getpid();
+        let time = librust::syscall::time();
+        librust::std::screen::print("# Hello, world!");
+    }
     return 0;
 }
 
