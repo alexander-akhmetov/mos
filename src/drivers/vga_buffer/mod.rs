@@ -1,6 +1,8 @@
+use alloc::string::String;
 use core::fmt;
 use spin::Mutex;
 use volatile::Volatile;
+
 #[macro_use]
 pub mod macroses;
 pub mod colors;
@@ -33,19 +35,15 @@ impl Writer {
 
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
-            match byte {
-                // printable ASCII byte or newline 32...126 (code page 437)
-                0x20...0x7e | b'\n' => self.write_byte(byte),
-                // not ASCII
-                _ => self.write_byte(0xfe), // ■
-            }
+            self.write_byte(byte)
         }
     }
 
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
+            0x20...0x7e => self.add_byte(byte),
             b'\n' => self.new_line(),
-            byte => self.add_byte(byte),
+            _ => self.add_byte(0xfe), // ■
         }
     }
 
@@ -91,11 +89,59 @@ impl Writer {
             self.write_byte(b' ');
         }
     }
+
+    pub fn print_colored(&mut self, msg: &str) {
+        /// parses ansi control chars and prints colored text
+        // todo: refactor me
+        let old_color_code = self.color_code;
+        let msg_len = msg.len();
+        let msg_bytes = msg.as_bytes();
+
+        let mut cur_value = String::new();
+
+        for (index, c) in msg_bytes.iter().enumerate() {
+            if *c == '\x1b' as u8 {
+                self.write_string(&cur_value);
+                cur_value.clear();
+            }
+            cur_value.push(*c as char);
+
+            if cur_value.chars().last().unwrap_or('\0') == 'm' {
+                match cur_value.as_str() {
+                    "\x1b[31m" => self.color_code = colors::RED,
+                    "\x1b[91m" => self.color_code = colors::LIGHT_RED,
+                    "\x1b[32m" => self.color_code = colors::GREEN,
+                    "\x1b[92m" => self.color_code = colors::LIGHT_GREEN,
+                    "\x1b[33m" => self.color_code = colors::YELLOW,
+                    "\x1b[93m" => self.color_code = colors::YELLOW,
+                    "\x1b[34m" => self.color_code = colors::BLUE,
+                    "\x1b[94m" => self.color_code = colors::LIGHT_BLUE,
+                    "\x1b[35m" => self.color_code = colors::MAGENTA,
+                    "\x1b[95m" => self.color_code = colors::MAGENTA,
+                    "\x1b[36m" => self.color_code = colors::CYAN,
+                    "\x1b[96m" => self.color_code = colors::LIGHT_CYAN,
+                    "\x1b[97m" => self.color_code = colors::WHITE,
+                    "\x1b[37m" => self.color_code = colors::LIGHT_GRAY,
+                    "\x1b[0m" => self.color_code = colors::LIGHT_GRAY,
+                    "\x1b[?25l" => self.hide_cursor(),
+                    "\x1b[?25h" => self.show_cursor(),
+                    _ => self.write_string(&cur_value),
+                }
+                cur_value.clear();
+            }
+        }
+        self.write_string(&cur_value);
+        self.color_code = old_color_code;
+    }
+
+    fn hide_cursor(&mut self) {}
+
+    fn show_cursor(&mut self) {}
 }
 
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
-        self.write_string(s);
+        self.print_colored(s);
         Ok(())
     }
 }

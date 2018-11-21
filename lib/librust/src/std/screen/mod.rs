@@ -1,5 +1,6 @@
 use super::super::syscall;
 use core::fmt;
+pub mod style;
 
 pub fn clear() {
     let b: [u8; 25] = ['\n' as u8; 25];

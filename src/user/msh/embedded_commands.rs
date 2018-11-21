@@ -22,6 +22,10 @@ pub fn date_cmd() {
     println!("{}", time);
 }
 
+pub fn clear_cmd() {
+    librust::std::screen::clear();
+}
+
 pub fn unknown_cmd(cmd: &str) {
     /// msh executes this function when the command
     /// entered by user is unknown
