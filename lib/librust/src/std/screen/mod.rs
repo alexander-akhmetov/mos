@@ -9,7 +9,7 @@ pub fn clear() {
     }
 }
 
-pub fn _print(s: &str) {
+pub fn print(s: &str) {
     unsafe {
         syscall::write(syscall::STDOUT, &s.as_bytes(), s.len() as u64);
     };
@@ -23,10 +23,10 @@ pub fn printb(s: &[u8]) {
 
 #[macro_export]
 macro_rules! printf {
-    () => ($crate::std::screen::_print(&""));
-    ($fmt:expr) => ($crate::std::screen::_print(&$fmt));
+    () => ($crate::std::screen::print(&""));
+    ($fmt:expr) => ($crate::std::screen::print(&$fmt));
     ($fmt:expr, $($arg:tt)*) => (
-        $crate::std::screen::_print(&format!($fmt, $($arg)*));
+        $crate::std::screen::print(&format!($fmt, $($arg)*));
     );
 }
 
