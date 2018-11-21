@@ -29,6 +29,14 @@ pub fn remove_trailing_slash(path: &str) -> String {
     }
 }
 
+pub fn remove_prefix_slash(path: &str) -> String {
+    if path.starts_with("/") {
+        String::from(path.trim_start_matches("/"))
+    } else {
+        String::from(path)
+    }
+}
+
 pub fn remove_prefix(filepath: &str, path: &str) -> String {
     let n_filepath = remove_trailing_slash(&normalize(filepath));
     let n_path = remove_trailing_slash(&normalize(path));
@@ -54,6 +62,14 @@ pub fn get_filename_and_path(filename: &str) -> (String, String) {
         add_trailing_slash(&normalize(&splitted_filename[0])),
         String::from(splitted_filename[1]),
     );
+}
+
+pub fn get_root_dir(path: &str) -> String {
+    let n_path = remove_prefix_slash(&normalize(path));
+
+    let splitted_path: Vec<&str> = (&n_path).splitn(2, "/").collect();
+
+    return normalize(&splitted_path[0]);
 }
 
 #[cfg(test)]
@@ -118,5 +134,14 @@ mod test {
 
         assert_eq!(remove_prefix("/nginx.conf", "/"), "/nginx.conf");
         assert_eq!(remove_prefix("/initrd/hello.bin", "/initrd"), "/hello.bin");
+    }
+
+    #[test]
+    fn test_get_root_dir() {
+        assert_eq!(get_root_dir("/"), "/");
+        assert_eq!(get_root_dir("/initrd/file1.txt"), "/initrd");
+        assert_eq!(get_root_dir("/initrd/"), "/initrd");
+        assert_eq!(get_root_dir(""), "/");
+        assert_eq!(get_root_dir("/etc/nginx/conf.d/default.conf"), "/etc");
     }
 }

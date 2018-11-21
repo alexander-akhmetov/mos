@@ -81,6 +81,7 @@ fn process_command(buf: &mut Vec<u8>) -> &mut Vec<u8> {
             "pwd" => embedded_commands::pwd_cmd(),
             "cd" => embedded_commands::cd_cmd(args),
             "ls" => embedded_commands::ls_cmd(),
+            "clear" => embedded_commands::clear_cmd(),
             cmd => embedded_commands::unknown_cmd(args[0]),
         }
     }
