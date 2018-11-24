@@ -1,15 +1,20 @@
 use core::ops::{Index, IndexMut};
 use memory::paging::entry::{Entry, EntryFlags};
-use memory::paging::ENTRY_COUNT;
+use memory::paging::{PhysicalAddress, ENTRY_COUNT};
+use memory::{FrameAllocator, FRAME_ALLOCATOR};
 
 pub struct PageTable {
     entries: [Entry; ENTRY_COUNT],
 }
 
 impl PageTable {
-    pub fn new() -> PageTable {
-        PageTable {
-            entries: [Entry::new(); ENTRY_COUNT],
+    pub fn new_address() -> PhysicalAddress {
+        unsafe {
+            let frame = FRAME_ALLOCATOR.as_mut().unwrap().allocate_frame();
+            let frame_address = frame.unwrap().start_address();
+            let page: *mut PageTable = frame_address as *mut PageTable;
+            (*page).zero();
+            return frame_address;
         }
     }
 
@@ -23,15 +28,25 @@ impl PageTable {
         }
     }
 
-    fn next_table_address(&self, index: usize) -> Option<usize> {
+    pub fn next_table_address(&mut self, index: usize) -> usize {
         let entry_flags = self[index].flags();
 
-        if entry_flags.contains(EntryFlags::PRESENT) {
-            let table_address = self as *const _ as usize;
-            Some((table_address << 9) | (index << 12))
+        if !entry_flags.contains(EntryFlags::PRESENT) {
+            system_log!("[page table]: creating a new page");
+            unsafe {
+                let frame = FRAME_ALLOCATOR.as_mut().unwrap().allocate_frame();
+                let frame_address = frame.unwrap().start_address();
+                let page: *mut PageTable = frame_address as *mut PageTable;
+                (*page).zero();
+                self[index].set(
+                    (*page).address() as usize,
+                    EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::USER_ACCESSIBLE,
+                )
+            }
         } else {
-            None
+            system_log!("[page table]: page already exists");
         }
+        return self[index].pointed_frame().unwrap().start_address();
     }
 }
 

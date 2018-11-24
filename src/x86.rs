@@ -63,6 +63,17 @@ pub unsafe fn read_rax() -> u64 {
     result
 }
 
+pub unsafe fn read_cr3() -> u64 {
+    /// returns CR3 register's value
+    let result: u64;
+    asm!("mov $0, cr3"
+         : "=r"(result)           // output
+         :                        // no input
+         :: "volatile", "intel",  // options
+    );
+    result
+}
+
 pub unsafe fn save_rax(value: u64) {
     /// saves value to the RAX register
     asm!("mov rax, $0" :: "m"(value) :: "intel")

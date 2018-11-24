@@ -7,6 +7,8 @@ bits 64
 ; old = RDI
 ; new = RSI
 switch_to:
+    mov rax, cr3  ; can't push cr3 directly
+    push rax
     push r15
     push r14
     push r13
@@ -26,6 +28,9 @@ switch_to:
     pop r14
     pop r15
 
+    pop rax  ; we can't pop directly into cr3
+    mov cr3, rax
+
     sti
 
     ret
@@ -44,11 +49,9 @@ start_task:
     pop r14
     pop r15
 
+    pop rax  ; we can't pop directly into cr3
+    mov cr3, rax
+
     sti
 
-    ret
-
-
-get_eip:
-    mov rax, [rsp]
     ret
