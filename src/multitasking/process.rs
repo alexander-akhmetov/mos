@@ -75,6 +75,7 @@ impl Process {
             let context_registers: *mut Context = stack_ptr as *mut Context;
             // fill it with register's data
             (*context_registers).rflags = constants::RFLAGS;
+            (*context_registers).cr3 = x86::read_cr3();
             // and function's addresses
             (*context_registers).start_func = start_task as *const () as u64;
             (*context_registers).entrypoint_func = func_ptr;

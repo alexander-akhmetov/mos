@@ -12,8 +12,8 @@ extern crate librust;
 extern crate alloc;
 
 /*
-    Just a simple program which prints "Hello, world!"
-    and exits.
+    Just a simple program:
+    prints "Hello, world!" and exits.
 */
 
 #[start]
@@ -22,7 +22,8 @@ fn _start(_argc: isize, _args: *const *const u8) -> isize {
     unsafe {
         let pid = librust::syscall::getpid();
         let time = librust::syscall::time();
-        librust::std::screen::print("# Hello, world!");
+        let m = alloc::string::String::new();
+        librust::std::screen::print("Hello, world!");
     }
     return 0;
 }

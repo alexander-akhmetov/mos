@@ -46,19 +46,19 @@ impl FrameAllocator for SimpleFrameAllocator {
 
             if frame > current_area_last_frame {
                 self.switch_to_next_memory_area();
-            } else if frame >= self.kernel_start && frame <= self.kernel_end {
+            } else if frame <= self.kernel_end {
                 system_log!("[FrameAllocator] found kernel memory area");
                 // memory is used by kernel
                 self.next_free_frame = Frame {
                     index: self.kernel_end.index + 1,
                 }
-            } else if frame >= self.multiboot_start && frame <= self.multiboot_end {
+            } else if frame <= self.multiboot_end {
                 system_log!("[FrameAllocator] found multiboot memory area");
                 // memory is used by multiboot information structure
                 self.next_free_frame = Frame {
                     index: self.multiboot_end.index + 1,
                 }
-            } else if frame >= self.initrd_start && frame <= self.initrd_end {
+            } else if frame <= self.initrd_end {
                 system_log!("[FrameAllocator] found initrd memory area");
                 // memory is used by multiboot information structure
                 self.next_free_frame = Frame {

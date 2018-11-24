@@ -1,3 +1,4 @@
+use memory;
 use multiboot2::BootInformation;
 
 pub fn get_multiboot_info(multiboot_information_address: usize) -> &'static BootInformation {
@@ -40,28 +41,24 @@ pub fn print_multiboot_info(multiboot_information_address: usize) {
             module.end_address(),
             module.name(),
         );
-        // let ptr = module.start_address() as *const func;
-        // unsafe { (*ptr)() };
-        // unsafe { x86::jmp(module.start_address() as u64) };
     }
 
-    // let (initrd_start, initrd_end) = get_module(boot_info, "initrd");
-    // let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
-    // let frame_allocator = memory::SimpleFrameAllocator::new(
-    //     kernel_start as usize,
-    //     kernel_end as usize,
-    //     multiboot_start,
-    //     multiboot_end,
-    //     initrd_start as usize,
-    //     initrd_end as usize,
-    //     memory_map_tag.memory_areas(),
-    // );
-    // for i in 0..2 {
-    //     if let None = frame_allocator.allocate_frame() {
-    //         system_log!("allocated {} frames", i);
-    //         break;
-    //     }
-    // }
+    let (initrd_start, initrd_end) = get_module(boot_info, "initrd");
+    let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
+    memory::init_frame_allocator(
+        kernel_start as usize,
+        kernel_end as usize,
+        multiboot_start,
+        multiboot_end,
+        initrd_start as usize,
+        initrd_end as usize,
+        memory_map_tag.memory_areas(),
+    );
+
+    system_log!("===================");
+    memory::paging::translate(0x80000);
+    memory::paging::translate(0x80000);
+    system_log!("===================");
 }
 
 pub fn get_module(boot_info: &BootInformation, name: &str) -> (u64, u64) {
