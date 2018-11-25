@@ -5,3 +5,9 @@ authors = ["Alexander Akhmetov <me@aleks.sh>"]
 edition = "2018"
 
 [dependencies]
+
+[profile.debug]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

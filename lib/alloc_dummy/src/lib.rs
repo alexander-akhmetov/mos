@@ -3,14 +3,11 @@
 use core::alloc::{GlobalAlloc, Layout};
 
 #[macro_use]
-extern crate lazy_static;
+extern crate librust;
 
-use librust;
+// const PAGE_SIZE: u64 = 4096;
+const PAGE_SIZE: u64 = 1024 * 1024 * 2;
 
-const PAGE_SIZE: u64 = 4096;
-const PREALLOCATED_SIZE: usize = 1024; // * 4096 (page size) = 4 mb
-
-#[repr(C)]
 struct PreAllocatedMemory {
     current_addr: u64,
     max_addr: u64,
@@ -29,35 +26,27 @@ static mut PREALLOCATED_MEM: PreAllocatedMemory = PreAllocatedMemory::new();
 
 pub struct DummyAlloc;
 
-impl DummyAlloc {
-    unsafe fn init(&self) {
-        let current_addr = librust::syscall::mmap(PAGE_SIZE);
-        let mut max_addr = current_addr;
-        for _i in 0..PREALLOCATED_SIZE {
-            max_addr = librust::syscall::mmap(PAGE_SIZE);
-        }
-        PREALLOCATED_MEM.current_addr = current_addr;
-        PREALLOCATED_MEM.max_addr = max_addr;
-    }
-}
-
 unsafe impl GlobalAlloc for DummyAlloc {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        if PREALLOCATED_MEM.current_addr == 0 {
-            self.init();
-        }
+        println!("[dummy_alloc] got alloc request");
 
-        let new_current_addr = PREALLOCATED_MEM.current_addr + layout.size() as u64;
-        if new_current_addr > PREALLOCATED_MEM.max_addr {
-            panic!("allocator: memory allocation error!")
+        let new_current_addr = PREALLOCATED_MEM.current_addr + (layout.size() as u64);
+        for _i in 0..layout.size() {}
+        while new_current_addr >= PREALLOCATED_MEM.max_addr {
+            println!("[dummy_alloc] requesting more memory from the OS...");
+            // librust::syscall::debug_int(new_current_addr);
+            PREALLOCATED_MEM.max_addr = librust::syscall::mmap(PAGE_SIZE);
         }
 
         PREALLOCATED_MEM.current_addr = new_current_addr;
 
+        println!("[dummy_alloc] memory allocated");
         return new_current_addr as *mut u8;
     }
 
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {}
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        println!("[dummy_alloc] got dealloc request");
+    }
 }
 
 #[alloc_error_handler]

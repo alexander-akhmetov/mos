@@ -42,7 +42,7 @@ unsafe impl<'a> GlobalAlloc for &'a MGlobalAlloc {
         ptr
     }
 
-    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
         // system_log!(
         //     "allocator: dealloc called: deallocate {} bytes at {:#X}",
         //     layout.size(),

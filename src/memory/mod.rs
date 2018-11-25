@@ -2,6 +2,7 @@ pub use self::simple_frame_allocator::SimpleFrameAllocator;
 use multiboot2::MemoryAreaIter;
 
 pub mod allocator;
+pub mod constants;
 pub mod paging;
 mod simple_frame_allocator;
 
