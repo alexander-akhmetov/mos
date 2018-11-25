@@ -40,7 +40,7 @@ fn run_hello_bin() {
             // todo: change me
             // memory is allocated forever, but when deallocate will be implemented
             // this stops working
-            sys::elf::exec(copy_f.as_ptr());
+            sys::elf::exec(f_bytes.as_ptr());
         };
     } else {
         system_log_error!("[init] no such file: {}", filename);

@@ -1,3 +1,4 @@
+use memory::constants;
 use memory::paging::translate;
 use multitasking::scheduler;
 use sys;
@@ -11,11 +12,11 @@ pub fn sys_mmap(args: &sys::SyscallArgs) -> u64 {
         pid
     );
 
-    if args.arg_1 % 4096 != 0 {
-        // length must be page aligned for now
-        system_log!("mmap error: length is not page aligned");
-        return sys::errno::EINVAL;
-    }
+    // if args.arg_1 % (constants::PAGE_SIZE as u64) != 0 {
+    //     // length must be page aligned for now
+    //     system_log!("mmap error: length is not page aligned");
+    //     return sys::errno::EINVAL;
+    // }
 
     unsafe {
         let process = scheduler::SCHEDULER

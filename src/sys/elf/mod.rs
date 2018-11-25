@@ -47,7 +47,7 @@ pub unsafe fn get_elf_entrypoint(addr: *const u8) -> u64 {
         addr as u64,
     );
     // how to find offset?
-    let call_addr = addr.offset(0x00001000) as u64;
+    let call_addr = addr.offset(0x1000) as u64;
     return call_addr;
 }
 
