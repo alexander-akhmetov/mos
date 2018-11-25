@@ -1,13 +1,18 @@
 [package]
 name = "alloc_dummy"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Alexander Akhmetov <me@aleks.sh>"]
 edition = "2018"
 
 [dependencies]
+librust = { path = "../librust" }
 
-[profile.dev]
-panic = "abort"
+[dependencies.lazy_static]
+version = "1.0"
+features = ["spin_no_std"]
 
-[profile.release]
-panic = "abort"
+# [profile.dev]
+# panic = "abort"
+
+# [profile.release]
+# panic = "abort"

@@ -28,6 +28,7 @@ pub struct Process {
     pub rsp: u64,
     pub file_descriptors: BTreeMap<u64, Box<fs::FileDescriptor>>,
     pub started_at: u64, // timestamp
+    pub brk_addr: u64,
     workdir: String,
 }
 
@@ -100,6 +101,7 @@ impl Process {
                 workdir: String::from("/"),
                 name: format!("process {}", id),
                 started_at: time::timestamp(),
+                brk_addr: 0x310000, // todo: change me
             };
 
             let stdout = stdio::StdOut::new(id);
@@ -153,7 +155,11 @@ fn finish_task() -> ! {
     /// place to return.
     /// So, this function just executes the switch and waits for the next context switch
     let pid = scheduler::current_process_id();
-    system_log!("[scheduler] process {}: completed, finishing...", pid,);
+    system_log!(
+        "[scheduler] process {}: completed (rax: {}), finishing...",
+        pid,
+        unsafe { x86::read_rax() }
+    );
     scheduler::exit(pid);
     unsafe {
         scheduler::switch();

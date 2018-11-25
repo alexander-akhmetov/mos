@@ -32,7 +32,7 @@ impl PageTable {
         let entry_flags = self[index].flags();
 
         if !entry_flags.contains(EntryFlags::PRESENT) {
-            system_log!("[page table]: creating a new page");
+            system_log_debug!("[page table]: creating a new page");
             unsafe {
                 let frame = FRAME_ALLOCATOR.as_mut().unwrap().allocate_frame();
                 let frame_address = frame.unwrap().start_address();
@@ -44,7 +44,7 @@ impl PageTable {
                 )
             }
         } else {
-            system_log!("[page table]: page already exists");
+            system_log_debug!("[page table]: page already exists");
         }
         return self[index].pointed_frame().unwrap().start_address();
     }

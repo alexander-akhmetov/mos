@@ -27,3 +27,20 @@ pub unsafe fn debug(msg: &str) -> u64 {
     /// sends system call "debug" with msg string
     _system_call_2(0, msg.as_ptr() as u64, msg.len() as u64)
 }
+
+pub unsafe fn mmap(size: u64) -> u64 {
+    /// Initial implementation of mmap.
+    /// Supports only memory allocation with size "size".
+    /// Does not support:
+    ///     * address specification
+    ///     * file descriptors
+    ///     * protection
+    ///     * flags
+    ///     * offset
+    /// Returns start address of the allocated memory area
+    _system_call_1(90, size)
+}
+
+pub unsafe fn munmap(addr: u64, size: u64) -> u64 {
+    _system_call_2(91, addr, size)
+}

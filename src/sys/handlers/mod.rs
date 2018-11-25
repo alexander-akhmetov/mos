@@ -6,10 +6,12 @@ use sys;
 
 mod fs;
 mod io;
+mod mem;
 mod utils;
 
 pub use self::fs::*;
 pub use self::io::{sys_read, sys_write};
+pub use self::mem::{sys_mmap, sys_munmap};
 use self::utils::read_str;
 
 pub fn none(args: &sys::SyscallArgs) -> u64 {
