@@ -33,7 +33,7 @@ pub struct SimpleFrameAllocator {
 
 impl FrameAllocator for SimpleFrameAllocator {
     fn allocate_frame(&mut self) -> Option<Frame> {
-        system_log!("[FrameAllocator] got allocation request");
+        system_log_debug!("[FrameAllocator] got allocation request");
         if let Some(area) = self.current_area {
             // at first we create a frame structure
             let frame = Frame {
@@ -47,32 +47,32 @@ impl FrameAllocator for SimpleFrameAllocator {
             if frame > current_area_last_frame {
                 self.switch_to_next_memory_area();
             } else if frame <= self.kernel_end {
-                system_log!("[FrameAllocator] found kernel memory area");
+                system_log_debug!("[FrameAllocator] found kernel memory area");
                 // memory is used by kernel
                 self.next_free_frame = Frame {
                     index: self.kernel_end.index + 1,
                 }
             } else if frame <= self.multiboot_end {
-                system_log!("[FrameAllocator] found multiboot memory area");
+                system_log_debug!("[FrameAllocator] found multiboot memory area");
                 // memory is used by multiboot information structure
                 self.next_free_frame = Frame {
                     index: self.multiboot_end.index + 1,
                 }
             } else if frame <= self.initrd_end {
-                system_log!("[FrameAllocator] found initrd memory area");
+                system_log_debug!("[FrameAllocator] found initrd memory area");
                 // memory is used by multiboot information structure
                 self.next_free_frame = Frame {
-                    index: self.multiboot_end.index + 1,
+                    index: self.initrd_end.index + 1,
                 }
             } else {
-                system_log!("[FrameAllocator] memory area has been allocated");
+                system_log_debug!("[FrameAllocator] memory area has been allocated");
                 self.next_free_frame.index += 1;
                 return Some(frame);
             }
 
             // if we are here, that means we can' allocate current frame,
             // so let's try again with the new self.next_free_frame.index (we had to do += 1 before!)
-            system_log!("[FrameAllocator] trying next frame...");
+            system_log_debug!("[FrameAllocator] trying next frame...");
             self.allocate_frame()
         } else {
             None // no frames left
@@ -95,7 +95,7 @@ impl SimpleFrameAllocator {
         memory_areas: MemoryAreaIter,
     ) -> SimpleFrameAllocator {
         let mut allocator = SimpleFrameAllocator {
-            next_free_frame: Frame::get_for_address(0),
+            next_free_frame: Frame::get_for_address(initrd_end),
             current_area: None,
             areas: memory_areas,
             kernel_start: Frame::get_for_address(kernel_start),
@@ -111,7 +111,7 @@ impl SimpleFrameAllocator {
     }
 
     fn switch_to_next_memory_area(&mut self) {
-        system_log!("[FrameAllocator] switching to the next area...");
+        system_log_debug!("[FrameAllocator] switching to the next area...");
         self.current_area = self
             .areas
             .clone()

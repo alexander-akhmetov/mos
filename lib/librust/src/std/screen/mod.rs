@@ -1,5 +1,4 @@
 use super::super::syscall;
-use core::fmt;
 pub mod style;
 
 pub fn clear() {
@@ -23,8 +22,8 @@ pub fn printb(s: &[u8]) {
 
 #[macro_export]
 macro_rules! printf {
-    () => ($crate::std::screen::print(&""));
-    ($fmt:expr) => ($crate::std::screen::print(&$fmt));
+    () => ($crate::std::screen::print(""));
+    ($fmt:expr) => ($crate::std::screen::print($fmt));
     ($fmt:expr, $($arg:tt)*) => (
         $crate::std::screen::print(&format!($fmt, $($arg)*));
     );

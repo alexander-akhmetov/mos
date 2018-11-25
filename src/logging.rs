@@ -91,6 +91,30 @@ macro_rules! system_log_warn {
 }
 
 #[macro_export]
+macro_rules! system_log_error {
+    () => (
+        if $crate::constants::LOGLEVEL <= $crate::logging::LogLevels::ERROR {
+            let level = $crate::logging::LogLevels::ERROR;
+            _system_log!(level)
+        }
+    );
+
+    ($fmt:expr) => (
+        if $crate::constants::LOGLEVEL <= $crate::logging::LogLevels::ERROR {
+            let level = $crate::logging::LogLevels::ERROR;
+            _system_log!(level, $fmt)
+        }
+    );
+
+    ($fmt:expr, $($arg:tt)*) => (
+        if $crate::constants::LOGLEVEL <= $crate::logging::LogLevels::ERROR {
+            let level = $crate::logging::LogLevels::ERROR;
+            _system_log!(level, $fmt, $($arg)*);
+        }
+    );
+}
+
+#[macro_export]
 macro_rules! system_log {
     () => (
         let level = $crate::logging::LogLevels::INFO;
@@ -113,9 +137,9 @@ macro_rules! _system_log {
     ($level:expr) => (
         let color = $crate::drivers::vga_buffer::colors::WHITE;
         $crate::logging::print_prefix($level);
-        serial_kprintln!("\n");
+        serial_kprintln!("");
         if $crate::multitasking::focus::get_focused_pid() == 0 {
-            kprintln!();
+            kprintln!("");
         }
     );
 
