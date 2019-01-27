@@ -2,6 +2,9 @@
 
 My attempt to write a small operating system.
 
+![mos: msh](/screenshots/msh.png?raw=true "msh")
+![mos: start-up logs](/screenshots/start.png?raw=true "mos")
+
 ## Development
 
 Start QEMU with mOS inside:
@@ -20,7 +23,7 @@ make run
 
 * Cross compiled binutils (actually only `ld`).
 * NASM
-* Rust nightly
+* Rust nightly (I used `1.31.0-nightly (d586d5d2f 2018-10-29)`)
 * Docker to build iso with GRUB bootloader
 * QEMU
 
@@ -40,7 +43,7 @@ It is a library which provides interface to use all implemented system calls.
 * [x] Syscalls ABI
 * [x] Processes support, context switching
 * [x] Start init process
-* [x] Shell for user's commands: `msh` 
+* [x] Shell for user's commands: `msh`
 
 
 ## ToDo
