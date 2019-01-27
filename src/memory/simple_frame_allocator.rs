@@ -1,23 +1,6 @@
 use memory::{Frame, FrameAllocator};
 use multiboot2::{MemoryArea, MemoryAreaIter};
 
-// #[derive(Debug)]
-// #[repr(C)]
-// pub struct MemoryArea {
-//     // multiboot2 memory entry structure
-//     // http://nongnu.askapache.com/grub/phcoder/multiboot.pdf : "memory map"
-//     length: u64,
-//     base_addr: u64,
-
-//     // type field description
-//     //      1 - available RAM
-//     //      3 - usable memory holding ACPI information
-//     //      4 - reserved memory which needs to be preserved on hibernation
-//     //      * other values currently indicated a reserved area
-//     _type: u32,
-
-//     _reserved: u32,  // set to 0 by the bootloader and must be ignored by OS
-// }
 
 pub struct SimpleFrameAllocator {
     next_free_frame: Frame,

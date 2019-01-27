@@ -95,7 +95,7 @@ integration-tests:
 	bash run-tests.sh
 
 
-qemu-run: iso
+run: iso
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
 		-serial mon:stdio \
 		-m 512M \

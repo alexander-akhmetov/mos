@@ -1,9 +1,6 @@
 # mos
 
-Small operating system.
-
-* QEMU: `qemu-system-x86_64`
-* Always use `/usr/local/bin/nasm`
+My attempt to write a small operating system.
 
 ## Development
 
@@ -17,6 +14,7 @@ make run
 
 * `./initrd`: all files in this directory will be placed into a single archive and mounted as a TarFS to `/initrd`
 * `./src`: kernel source code
+* `./lib`: Contains userspace programs and `librust`: Rust library to write programs for mOS.
 
 ## Requirements
 
@@ -25,16 +23,6 @@ make run
 * Rust nightly
 * Docker to build iso with GRUB bootloader
 * QEMU
-
-### Requirements installation
-
-nasm:
-
-```shell
-brew install nasm
-```
-
-[Binutils installation](https://os.phil-opp.com/cross-compile-binutils/)
 
 ## librust
 
@@ -50,7 +38,15 @@ It is a library which provides interface to use all implemented system calls.
 * [x] Interrupts
 * [x] System clock
 * [x] Syscalls ABI
-* [x] Processes
-* [ ] Start init process
-* [ ] Shell for user's commands: `msh`
-* [ ] `cat`, `ps`
+* [x] Processes support, context switching
+* [x] Start init process
+* [x] Shell for user's commands: `msh` 
+
+
+## ToDo
+
+* Fix paging. It does not work properly, and because of that it's not possible to start separate processes. Now programs are being running as threads inside the OS.
+* After paging mmap call in the `librust` must be completed, so it will be possible to request memory from userspace.
+* Higher Half Kernel
+* `fork` syscall
+...
