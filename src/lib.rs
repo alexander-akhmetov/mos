@@ -10,9 +10,9 @@
     allocator_api,
     lang_items,
     alloc_error_handler,
-    int_to_from_bytes,
     const_vec_new,
-    compiler_builtins_lib
+    compiler_builtins_lib,
+    stmt_expr_attributes
 )]
 #![allow(dead_code, unused_doc_comments, unused_variables)]
 
@@ -113,7 +113,7 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     let boot_info = boot::multiboot::get_multiboot_info(multiboot_information_address);
     boot::initrd::init(&boot_info);
 
-    // and not the OS is ready
+    // and now the OS is ready
     system_log!("----------------------------");
     system_log_ok!("kernel started at {}", cmos::get_datetime());
 
@@ -131,8 +131,14 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // utils::allocator_test();
     // -------------------------------------
 
-    user::msh::start();
+    // user::msh::start();
     multitasking::scheduler::start();
+
+    // raise page fault
+    // let ptr = 0xdeadbeaf as *mut u32;
+    // unsafe {
+    //     *ptr = 42;
+    // }
 
     // loop with hlt forever
     unsafe {

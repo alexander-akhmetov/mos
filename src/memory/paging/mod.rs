@@ -61,6 +61,7 @@ pub fn translate(virtual_address: VirtualAddress) -> PhysicalAddress {
             virtual_address,
             addr,
         );
-        return addr;
+
+        addr
     }
 }

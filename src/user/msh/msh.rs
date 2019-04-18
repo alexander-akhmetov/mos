@@ -68,7 +68,7 @@ fn print_prompt() {
 fn process_command(buf: &mut Vec<u8>) -> &mut Vec<u8> {
     /// checks if there is a known command in the buf
     /// and if it is, starts execution
-    println!(""); // print empty string with new line to move cursor down
+    println!(); // print empty string with new line to move cursor down
 
     unsafe {
         let cmd = String::from_utf8_unchecked(buf.clone().to_vec());
@@ -88,5 +88,5 @@ fn process_command(buf: &mut Vec<u8>) -> &mut Vec<u8> {
 
     // clear buffer to remove just executed command from it
     buf.clear();
-    return buf;
+    buf
 }

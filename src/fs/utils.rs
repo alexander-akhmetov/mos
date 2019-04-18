@@ -2,7 +2,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 pub fn normalize(path: &str) -> String {
-    return add_prefix_slash(path);
+    add_prefix_slash(path)
 }
 
 pub fn add_prefix_slash(path: &str) -> String {
@@ -40,13 +40,13 @@ pub fn remove_prefix_slash(path: &str) -> String {
 pub fn remove_prefix(filepath: &str, path: &str) -> String {
     let n_filepath = remove_trailing_slash(&normalize(filepath));
     let n_path = remove_trailing_slash(&normalize(path));
-    let result = n_filepath.trim_left_matches(&n_path);
+    let result = n_filepath.trim_start_matches(&n_path);
     String::from(add_prefix_slash(result))
 }
 
 pub fn is_file_in_root(filename: &str, path: &str) -> bool {
     let (f, _) = get_filename_and_path(&normalize(filename));
-    return f == add_trailing_slash(&add_prefix_slash(path));
+    f == add_trailing_slash(&add_prefix_slash(path))
 }
 
 pub fn get_filename_and_path(filename: &str) -> (String, String) {
@@ -58,10 +58,10 @@ pub fn get_filename_and_path(filename: &str) -> (String, String) {
     let mut splitted_filename: Vec<&str> = (&n_filename).rsplitn(2, "/").collect();
     splitted_filename.reverse();
 
-    return (
+    (
         add_trailing_slash(&normalize(&splitted_filename[0])),
         String::from(splitted_filename[1]),
-    );
+    )
 }
 
 pub fn get_root_dir(path: &str) -> String {
@@ -69,7 +69,7 @@ pub fn get_root_dir(path: &str) -> String {
 
     let splitted_path: Vec<&str> = (&n_path).splitn(2, "/").collect();
 
-    return normalize(&splitted_path[0]);
+    normalize(&splitted_path[0])
 }
 
 #[cfg(test)]

@@ -28,7 +28,8 @@ pub struct ELFHeader {
 pub fn read_header<'a>(addr: *const u8) -> &'a ELFHeader {
     unsafe {
         let x: *const ELFHeader = addr as *const ELFHeader;
-        return &*x;
+
+        &*x
     }
 }
 
@@ -47,8 +48,7 @@ pub unsafe fn get_elf_entrypoint(addr: *const u8) -> u64 {
         addr as u64,
     );
     // how to find offset?
-    let call_addr = addr.offset(0x1000) as u64;
-    return call_addr;
+    addr.offset(0x1000) as u64
 }
 
 #[test]

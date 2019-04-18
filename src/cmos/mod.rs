@@ -42,12 +42,12 @@ pub fn get_datetime() -> time::DateTime {
     let year = bcd_to_binary(cmos_read(CMOSRegister::Year));
 
     time::DateTime {
-        seconds: seconds,
-        minutes: minutes,
-        hour: hour,
-        day: day,
-        month: month,
-        year: year,
+        seconds,
+        minutes,
+        hour,
+        day,
+        month,
+        year,
     }
 }
 

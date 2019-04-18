@@ -14,12 +14,13 @@ impl PageTable {
             let frame_address = frame.unwrap().start_address();
             let page: *mut PageTable = frame_address as *mut PageTable;
             (*page).zero();
-            return frame_address;
+
+            frame_address
         }
     }
 
     fn address(&self) -> u64 {
-        return (self as *const _) as u64;
+        (self as *const _) as u64
     }
 
     pub fn zero(&mut self) {
@@ -46,7 +47,8 @@ impl PageTable {
         } else {
             system_log_debug!("[page table]: page already exists");
         }
-        return self[index].pointed_frame().unwrap().start_address();
+
+        self[index].pointed_frame().unwrap().start_address()
     }
 }
 

@@ -72,7 +72,7 @@ pub struct Entry {
 impl Entry {
     fn new(gdt_selector: SegmentSelector, handler_fn_pointer: u64) -> Self {
         Entry {
-            gdt_selector: gdt_selector,
+            gdt_selector,
             pointer_low: handler_fn_pointer as u16,
             pointer_middle: (handler_fn_pointer >> 16) as u16,
             pointer_high: (handler_fn_pointer >> 32) as u32,

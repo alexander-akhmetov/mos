@@ -45,7 +45,8 @@ impl SysCallDispatcher {
         let handler = self.get_handler(syscall_args.rax);
         let result = handler(syscall_args);
         unsafe { x86::save_rax(result) };
-        return result;
+
+        result
     }
 
     pub fn get_handler(&self, system_call_number: u64) -> SysCallHandler {

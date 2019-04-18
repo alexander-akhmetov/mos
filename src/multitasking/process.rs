@@ -56,7 +56,7 @@ impl Process {
             let mut stack_ptr: *mut u64 = stack_top as *mut u64;
 
             // for debugging, real code should not ever get this value from stack
-            *stack_ptr = 0xDEADBEEF;
+            *stack_ptr = 0xDEAD_BEEF;
 
             // right now pointer looks at the top of the stack:
             //      +----------+  top (rsp must point to this address): highest memory address
@@ -93,15 +93,15 @@ impl Process {
             );
 
             let mut pt = Process {
-                id: id,
+                id,
                 state: ProcessState::RUNNING,
-                stack: stack,
-                rsp: rsp,
+                stack,
+                rsp,
                 file_descriptors: BTreeMap::new(),
                 workdir: String::from("/"),
                 name: format!("process {}", id),
                 started_at: time::timestamp(),
-                brk_addr: 0x310000, // todo: change me
+                brk_addr: 0x0031_0000, // todo: change me
             };
 
             let stdout = stdio::StdOut::new(id);
@@ -114,17 +114,18 @@ impl Process {
     }
 
     pub fn get_workdir(&self) -> String {
-        return self.workdir.clone();
+        self.workdir.clone()
     }
 
     pub fn set_workdir(&mut self, workdir: &str) -> bool {
         let wdir = fs::utils::normalize(workdir);
         let exists = fs::vfs::VFS.lock().list_dir(&wdir);
+
         if exists.is_some() {
             self.workdir = wdir;
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     }
 

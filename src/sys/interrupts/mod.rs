@@ -8,6 +8,7 @@ pub mod tss;
 use drivers::{keyboard, pic8259};
 use multitasking;
 use sys;
+use x86;
 
 #[repr(C)]
 pub struct ExceptionStackFrame {
@@ -70,6 +71,7 @@ extern "x86-interrupt" fn page_fault_irq(stack_frame: &ExceptionStackFrame, erro
         error_code,
         &*stack_frame,
     );
+    // system_log!("Accessed address: 0x{:x}", unsafe { x86::read_cr2() });
     loop {}
 }
 

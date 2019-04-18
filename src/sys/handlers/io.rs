@@ -12,9 +12,11 @@ pub fn sys_read(args: &sys::SyscallArgs) -> u64 {
         current_pid,
         args.arg_2
     );
+
     if args.arg_1 != sys::constants::STDIN_FD {
         return sys::errno::ENOENT;
     }
+
     unsafe {
         let process = scheduler::SCHEDULER
             .as_mut()
@@ -39,9 +41,9 @@ pub fn sys_read(args: &sys::SyscallArgs) -> u64 {
             } else {
                 return sys::errno::EOF;
             }
-        } else {
-            return sys::errno::ENOENT;
         }
+
+        sys::errno::ENOENT
     }
 }
 
@@ -84,5 +86,6 @@ pub fn sys_write(args: &sys::SyscallArgs) -> u64 {
             );
         }
     };
-    return sys::errno::SUCCESS;
+
+    sys::errno::SUCCESS
 }
