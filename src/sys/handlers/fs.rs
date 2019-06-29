@@ -6,15 +6,15 @@ use multitasking::scheduler;
 use sys;
 
 pub fn sys_rename(args: &sys::SyscallArgs) -> u64 {
-    return sys::errno::ENOSYS;
+    sys::errno::ENOSYS
 }
 
 pub fn sys_mkdir(args: &sys::SyscallArgs) -> u64 {
-    return sys::errno::ENOSYS;
+    sys::errno::ENOSYS
 }
 
 pub fn sys_rmdir(args: &sys::SyscallArgs) -> u64 {
-    return sys::errno::ENOSYS;
+    sys::errno::ENOSYS
 }
 
 pub fn sys_readdir(args: &sys::SyscallArgs) -> u64 {
@@ -42,7 +42,8 @@ pub fn sys_readdir(args: &sys::SyscallArgs) -> u64 {
             &(cnt[args.arg_2 as usize].name()),
         );
     }
-    return sys::errno::SUCCESS;
+
+    sys::errno::SUCCESS
 }
 
 pub fn sys_chdir(args: &sys::SyscallArgs) -> u64 {
@@ -54,10 +55,11 @@ pub fn sys_chdir(args: &sys::SyscallArgs) -> u64 {
             .get_active_process_mut()
             .unwrap()
             .set_workdir(&new_workdir);
+
         if success {
-            return sys::errno::SUCCESS;
+            sys::errno::SUCCESS
         } else {
-            return sys::errno::ENOENT;
+            sys::errno::ENOENT
         }
     }
 }
@@ -73,7 +75,7 @@ pub fn sys_getcwd(args: &sys::SyscallArgs) -> u64 {
         write_to_buf(args.arg_1 as *mut u8, args.arg_2 as usize, &workdir);
     }
 
-    return sys::errno::SUCCESS;
+    sys::errno::SUCCESS
 }
 
 fn write_to_buf(ptr: *mut u8, length: usize, s: &str) {

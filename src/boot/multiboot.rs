@@ -2,8 +2,7 @@ use memory;
 use multiboot2::BootInformation;
 
 pub fn get_multiboot_info(multiboot_information_address: usize) -> &'static BootInformation {
-    let boot_info = unsafe { multiboot2::load(multiboot_information_address) };
-    boot_info
+    unsafe { multiboot2::load(multiboot_information_address) }
 }
 
 pub fn print_multiboot_info(multiboot_information_address: usize) {

@@ -18,13 +18,13 @@ impl TarFS {
         for f in archive.files() {
             files.push(Box::new(f));
         }
-        TarFS { files: files }
+        TarFS { files }
     }
 }
 
 impl FileSystem for TarFS {
     fn fs_name(&self) -> &str {
-        return "TarFS";
+        "TarFS"
     }
 
     fn get_file(&self, path: &str) -> Option<Box<FileDescriptor>> {

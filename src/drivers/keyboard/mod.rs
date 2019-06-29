@@ -9,5 +9,5 @@ lazy_static! {
 
 pub fn read_character() -> Option<char> {
     let code = KEYBOARD.lock().read();
-    return codes::char_from_scancode(code as usize);
+    codes::char_from_scancode(code as usize)
 }

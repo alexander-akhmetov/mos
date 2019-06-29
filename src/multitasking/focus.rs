@@ -8,7 +8,5 @@ pub fn focus(pid: u32) {
 }
 
 pub fn get_focused_pid() -> u32 {
-    unsafe {
-        return FOCUSED_PID;
-    }
+    unsafe { FOCUSED_PID }
 }

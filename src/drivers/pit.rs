@@ -1,6 +1,6 @@
 use cpuio;
 
-const DEFAULT_FREQ: u32 = 1193180;
+const DEFAULT_FREQ: u32 = 1_193_180;
 const PIT_CONTROL_PORT: u16 = 0x43;
 const PIT_DATA_PORT: u16 = 0x40;
 

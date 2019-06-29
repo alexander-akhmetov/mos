@@ -41,7 +41,7 @@ fn init_task() {
         // sys::time::sleep(1000);
         sys::time::stupid_sleep();
         counter += 1;
-        if counter > 100000 {
+        if counter > 100_000 {
             counter = 0;
         }
     }
@@ -91,27 +91,28 @@ impl Scheduler {
             pid,
             func_ptr
         );
-        return pid;
+
+        pid
     }
 
     pub fn get_task_mut(&mut self, id: ProcessID) -> Option<&mut Process> {
         /// returns mutable task from task list by it's id
-        return self.tasks.get_mut(&id);
+        self.tasks.get_mut(&id)
     }
 
     pub fn get_task(&self, id: ProcessID) -> Option<&Process> {
         /// returns task from task list by it's id
-        return self.tasks.get(&id);
+        self.tasks.get(&id)
     }
 
     pub fn get_active_process(&self) -> Option<&Process> {
         /// returns active process
-        return self.get_task(CURRENT_PROCESS.read().id);
+        self.get_task(CURRENT_PROCESS.read().id)
     }
 
     pub fn get_active_process_mut(&mut self) -> Option<&mut Process> {
         /// returns active process (mutable)
-        return self.get_task_mut(CURRENT_PROCESS.read().id);
+        self.get_task_mut(CURRENT_PROCESS.read().id)
     }
 
     pub fn next_id(&self) -> Option<ProcessID> {
@@ -134,7 +135,7 @@ impl Scheduler {
             return Some(*id);
         }
 
-        return None;
+        None
     }
 }
 
@@ -261,7 +262,7 @@ extern "C" {
 
 pub fn current_process_id() -> u32 {
     /// returns current task's id
-    return CURRENT_PROCESS.read().id;
+    CURRENT_PROCESS.read().id
 }
 
 pub fn spawn(func: fn()) {

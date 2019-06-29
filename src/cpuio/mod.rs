@@ -55,7 +55,7 @@ impl InOut for u32 {
 impl<T: InOut> Port<T> {
     pub const unsafe fn new(port: u16) -> Port<T> {
         Port {
-            port: port,
+            port,
             phantom: PhantomData,
         }
     }
@@ -79,7 +79,7 @@ pub struct UnsafePort<T: InOut> {
 impl<T: InOut> UnsafePort<T> {
     pub const unsafe fn new(port: u16) -> UnsafePort<T> {
         UnsafePort {
-            port: port,
+            port,
             phantom: PhantomData,
         }
     }

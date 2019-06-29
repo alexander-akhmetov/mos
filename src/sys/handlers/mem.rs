@@ -1,4 +1,3 @@
-use memory::constants;
 use memory::paging::translate;
 use multitasking::scheduler;
 use sys;

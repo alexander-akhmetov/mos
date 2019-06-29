@@ -10,9 +10,9 @@
     allocator_api,
     lang_items,
     alloc_error_handler,
-    int_to_from_bytes,
     const_vec_new,
-    compiler_builtins_lib
+    compiler_builtins_lib,
+    stmt_expr_attributes
 )]
 #![allow(dead_code, unused_doc_comments, unused_variables)]
 
