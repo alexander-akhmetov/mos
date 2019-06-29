@@ -43,20 +43,20 @@ impl SystemClock {
     }
 
     pub fn timestamp(&self) -> u64 {
-        /// timestamp returns current timestamp in seconds
-        return self.base_timestamp + self.counter;
+        // timestamp returns current timestamp in seconds
+        self.base_timestamp + self.counter
     }
 
     pub fn milliseconds(&self) -> u64 {
-        /// returns current timestamp in milliseconds
-        return ((self.base_timestamp * 1000) + (self.fraction * 1000.0) as u64) as u64;
+        // returns current timestamp in milliseconds
+        ((self.base_timestamp * 1000) + (self.fraction * 1000.0) as u64)
     }
 }
 
 pub static SYSCLOCK: RwLock<SystemClock> = RwLock::new(SystemClock::new());
 
 pub fn timestamp() -> u64 {
-    return SYSCLOCK.read().timestamp();
+    SYSCLOCK.read().timestamp()
 }
 
 pub fn init() {
@@ -105,14 +105,16 @@ fn read_milliseconds_or_none() -> Option<u64> {
     /// if system clock is not blocked by another thread
     /// if it is, returns none
     let read_sysclock = SYSCLOCK.try_read();
+
     if read_sysclock.is_some() {
-        return Some(read_sysclock.unwrap().milliseconds());
-    };
-    return None;
+        Some(read_sysclock.unwrap().milliseconds())
+    } else {
+        None
+    }
 }
 
 pub fn stupid_sleep() {
-    for _in in 0..15 {
+    for _in in 0..10 {
         unsafe { x86::hlt() };
     }
 }

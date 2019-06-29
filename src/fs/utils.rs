@@ -40,7 +40,7 @@ pub fn remove_prefix_slash(path: &str) -> String {
 pub fn remove_prefix(filepath: &str, path: &str) -> String {
     let n_filepath = remove_trailing_slash(&normalize(filepath));
     let n_path = remove_trailing_slash(&normalize(path));
-    let result = n_filepath.trim_left_matches(&n_path);
+    let result = n_filepath.trim_start_matches(&n_path);
     String::from(add_prefix_slash(result))
 }
 

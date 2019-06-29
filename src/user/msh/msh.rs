@@ -88,5 +88,5 @@ fn process_command(buf: &mut Vec<u8>) -> &mut Vec<u8> {
 
     // clear buffer to remove just executed command from it
     buf.clear();
-    return buf;
+    buf
 }

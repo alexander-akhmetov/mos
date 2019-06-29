@@ -84,5 +84,6 @@ pub fn sys_write(args: &sys::SyscallArgs) -> u64 {
             );
         }
     };
-    return sys::errno::SUCCESS;
+
+    sys::errno::SUCCESS
 }

@@ -29,7 +29,8 @@ pub fn sys_mmap(args: &sys::SyscallArgs) -> u64 {
             translate((old_brk_addr + i) as usize);
         }
         process.brk_addr += args.arg_1;
-        return old_brk_addr as u64;
+
+        old_brk_addr as u64
     }
 }
 
@@ -39,5 +40,6 @@ pub fn sys_munmap(args: &sys::SyscallArgs) -> u64 {
         args.arg_1,
         args.arg_2
     );
-    return sys::errno::ENOSYS;
+
+    sys::errno::ENOSYS
 }

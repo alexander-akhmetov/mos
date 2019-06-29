@@ -27,7 +27,7 @@ pub fn sys_time(args: &sys::SyscallArgs) -> u64 {
 pub fn sys_getpid(args: &sys::SyscallArgs) -> u64 {
     let pid = scheduler::current_process_id();
     system_log!("syscall received: 'getpid', pid: {}", pid);
-    return pid as u64;
+    pid as u64
 }
 
 pub fn sys_exit(args: &sys::SyscallArgs) -> u64 {
@@ -68,5 +68,5 @@ pub fn sys_uname(args: &sys::SyscallArgs) -> u64 {
         (*info_struct).version = String::from(constants::KERNEL_VERSION);
     };
 
-    return sys::errno::SUCCESS;
+   sys::errno::SUCCESS
 }

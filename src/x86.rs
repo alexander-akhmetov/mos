@@ -78,3 +78,14 @@ pub unsafe fn save_rax(value: u64) {
     /// saves value to the RAX register
     asm!("mov rax, $0" :: "m"(value) :: "intel")
 }
+
+pub unsafe fn read_cr2() -> u64 {
+    /// returns CR2 register's value
+    let result: u64;
+    asm!("mov $0, cr2"
+         : "=r"(result)           // output
+         :                        // no input
+         :: "volatile", "intel",  // options
+    );
+    result
+}

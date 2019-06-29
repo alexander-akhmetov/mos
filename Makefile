@@ -1,4 +1,4 @@
-NASM=/usr/local/bin/nasm
+NASM=nasm
 QEMU=qemu-system-x86_64
 LD=~/opt/cross/bin/x86_64-elf-ld
 
@@ -10,8 +10,6 @@ install-requirements:
 	# rust nightly
 	cargo install cargo-xbuild
 	rustup component add rust-src
-
-	cargo install bootimage --version "^0.5.0"
 
 
 clean:
@@ -98,7 +96,20 @@ integration-tests:
 run: iso
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
 		-serial mon:stdio \
-		-m 512M \
+		-m 128M \
 		-boot d \
-		# -d int \
-		# -monitor stdio
+
+run-debug: iso
+	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
+		-serial mon:stdio \
+		-m 128M \
+		-boot d \
+		-d int \
+		-monitor stdio
+
+
+run-curses: iso
+	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
+	-m 128M \
+	-boot d \
+	-curses
