@@ -23,6 +23,10 @@ start:
     mov ds, ax  ; data segment
     mov es, ax  ; extra segment
 
+    ;; save test value to memory
+    ;; to check later that identity mappong works
+    mov dword [0x80000], 0x200000
+
     ; jump to long mode!
     jmp gdt64.code:long_mode_start
 
@@ -33,6 +37,9 @@ enable_paging:
     ;   - 2) Enable PAE (physical address extension)
     ;   - 3) Set the "long mode bit"
     ;   - 4) Enable paging
+
+    ;; identity mapping is used, so physical address
+    ;; is mapped to the same virtual address
 
     ;;; page table creation
 
@@ -65,10 +72,6 @@ enable_paging:
     ; move page table address to cr3
     mov eax, p4_table
     mov cr3, eax  ; we can't move directly into cr3, we must move data from another register, so let's do it via eax
-
-    mov eax, p4_table
-    or eax, 0b11 ; present + writable
-    mov [p4_table + 511 * 8], eax
 
     ; enable PAE
     mov eax, cr4
@@ -129,5 +132,3 @@ gdt64:
 ; Export so Rust can access this
 gdt64_code_offset:
     dw gdt64.code
-
-

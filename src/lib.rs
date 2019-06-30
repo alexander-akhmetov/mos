@@ -78,6 +78,7 @@ fn panic(info: &PanicInfo) -> ! {
     }
 }
 
+
 #[cfg(not(test))]
 #[no_mangle]
 pub extern "C" fn main(multiboot_information_address: usize) -> ! {
@@ -134,11 +135,13 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // user::msh::start();
     multitasking::scheduler::start();
 
-    // raise page fault
-    // let ptr = 0xdeadbeaf as *mut u32;
-    // unsafe {
-    //     *ptr = 42;
-    // }
+    // check paging
+    // let ptr = 0x3FFFFFFF as *mut u32;
+    let ptr = 0x80000 as *mut u32;
+    unsafe {
+        // *ptr = 1;
+        system_log!("[check paging] 0x8000000: 0x{:X}", *ptr);
+    }
 
     // loop with hlt forever
     unsafe {

@@ -34,6 +34,7 @@ build-bootloader:
 			$(BUILD_DIR)/checks.o \
 			$(BUILD_DIR)/switch_to.o \
 			$(RUST_BUILD_DIR)/x86_64-mos/debug/libmos.a
+            # $(RUST_BUILD_DIR)/x86_64-mos/debug/gcc
 
 
 build-kernel:
