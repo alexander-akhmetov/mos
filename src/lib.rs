@@ -133,15 +133,19 @@ pub extern "C" fn main(multiboot_information_address: usize) -> ! {
     // -------------------------------------
 
     // user::msh::start();
-    multitasking::scheduler::start();
+    // multitasking::scheduler::start();
 
     // check paging
     // let ptr = 0x3FFFFFFF as *mut u32;
     let ptr = 0x80000 as *mut u32;
     unsafe {
         // *ptr = 1;
-        system_log!("[check paging] 0x8000000: 0x{:X}", *ptr);
+        system_log!("[check paging] 0x80000: 0x{:X}", *ptr);
     }
+
+    system_log!("========== paging test start ==========");
+    memory::paging::translate(0x80000);
+    system_log!("==========  paging test end  ==========");
 
     // loop with hlt forever
     unsafe {

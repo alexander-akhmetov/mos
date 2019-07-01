@@ -53,11 +53,6 @@ pub fn print_multiboot_info(multiboot_information_address: usize) {
         initrd_end as usize,
         memory_map_tag.memory_areas(),
     );
-
-    system_log!("========== paging test start ==========");
-    // memory::paging::translate(0x80000);
-    // memory::paging::translate(0x80000);
-    system_log!("==========  paging test end  ==========");
 }
 
 pub fn get_module(boot_info: &BootInformation, name: &str) -> (u64, u64) {

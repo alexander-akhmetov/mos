@@ -40,16 +40,20 @@ impl Entry {
     }
 
     pub fn pointed_frame(&self) -> Option<Frame> {
-        // extracts physicall address from the entry (12-51 bits)
+        // extracts physical address from the entry (12-51 bits)
         // and returns the Frame
         // if the page is present, else returns None
         if self.flags().contains(EntryFlags::PRESENT) {
             Some(Frame::get_for_address(
-                self.0 as usize & 0x000fffff_fffff000,
+                self.address()
             ))
         } else {
             None
         }
+    }
+
+    pub fn address(&self) -> usize {
+        self.0 as usize & 0x000fffff_fffff000
     }
 
     pub fn set(&mut self, frame_address: paging::PhysicalAddress, flags: EntryFlags) {

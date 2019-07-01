@@ -98,7 +98,7 @@ run: iso
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
 		-serial mon:stdio \
 		-m 128M \
-		-boot d \
+		-boot d
 
 run-debug: iso
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \

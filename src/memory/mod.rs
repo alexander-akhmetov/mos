@@ -6,7 +6,7 @@ pub mod constants;
 pub mod paging;
 mod simple_frame_allocator;
 
-pub const PAGE_SIZE: usize = 4096;
+pub const PAGE_SIZE: usize = 2 * 1024 * 1024;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Frame {
