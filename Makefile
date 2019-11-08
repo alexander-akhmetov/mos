@@ -33,6 +33,7 @@ build-bootloader:
 			$(BUILD_DIR)/checks.o \
 			$(BUILD_DIR)/switch_to.o \
 			$(RUST_BUILD_DIR)/x86_64-mos/debug/libmos.a
+            # $(RUST_BUILD_DIR)/x86_64-mos/debug/gcc
 
 
 build-kernel:
@@ -96,7 +97,7 @@ run: iso
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
 		-serial mon:stdio \
 		-m 128M \
-		-boot d \
+		-boot d
 
 run-debug: iso
 	$(QEMU) -cdrom $(BUILD_DIR)/os.iso \
