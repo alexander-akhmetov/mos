@@ -41,7 +41,7 @@ impl Writer {
 
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
-            0x20...0x7e => self.add_byte(byte),
+            0x20..=0x7e => self.add_byte(byte),
             b'\n' => self.new_line(),
             _ => self.add_byte(0xfe), // ■
         }

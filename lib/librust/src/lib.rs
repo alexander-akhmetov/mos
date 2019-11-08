@@ -1,11 +1,5 @@
 #![no_std]
-#![feature(
-    asm,
-    custom_inner_attributes,
-    custom_attribute,
-    alloc,
-    extern_crate_item_prelude
-)]
+#![feature(asm, custom_inner_attributes, custom_attribute)]
 #![allow(unused_doc_comments, dead_code, unused_variables)]
 
 #[macro_use]

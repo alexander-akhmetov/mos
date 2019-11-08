@@ -27,7 +27,7 @@ impl FileSystem for TarFS {
         "TarFS"
     }
 
-    fn get_file(&self, path: &str) -> Option<Box<FileDescriptor>> {
+    fn get_file(&self, path: &str) -> Option<Box<dyn FileDescriptor>> {
         for f in self.files.iter() {
             if utils::normalize(&f.name()) == utils::normalize(path) {
                 return Some(Box::new(TarFileDescriptor::new(f)));
@@ -37,9 +37,9 @@ impl FileSystem for TarFS {
         None
     }
 
-    fn list_dir(&self, path: &str) -> Vec<Box<FileDescriptor>> {
+    fn list_dir(&self, path: &str) -> Vec<Box<dyn FileDescriptor>> {
         // todo: no such directory
-        let mut files: Vec<Box<FileDescriptor>> = Vec::new();
+        let mut files: Vec<Box<dyn FileDescriptor>> = Vec::new();
         for f in self.files.iter() {
             if utils::is_file_in_root(&f.name(), path) {
                 files.push(Box::new(TarFileDescriptor::new(f)));

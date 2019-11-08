@@ -7,9 +7,8 @@ RUST_BUILD_DIR=target
 
 
 install-requirements:
-	# rust nightly
-	cargo install cargo-xbuild
 	rustup component add rust-src
+	cargo install cargo-xbuild
 
 
 clean:
@@ -37,7 +36,7 @@ build-bootloader:
 
 
 build-kernel:
-	cargo xbuild --target x86_64-mos.json
+	cargo xbuild
 
 
 build-os-binaries:

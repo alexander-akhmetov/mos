@@ -6,11 +6,9 @@
     rustc_private,
     abi_x86_interrupt,
     naked_functions,
-    alloc,
     allocator_api,
     lang_items,
     alloc_error_handler,
-    const_vec_new,
     compiler_builtins_lib,
     stmt_expr_attributes
 )]

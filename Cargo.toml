@@ -1,23 +1,30 @@
 [package]
 name = "mos"
-version = "0.1.0"
+version = "0.2.0"
+edition = "2018"
 authors = ["Alexander Akhmetov <me@aleks.sh>"]
 
 [lib]
 crate-type = ["staticlib"]
 
 [dependencies]
-volatile = "0.2.3"
+volatile = "0.2.6"
 spin = "0.4.10"
 uart_16550 = "0.1.0"
 x86_64 = "0.2.8"
-bitflags = "1.0"
+bitflags = "1.2.1"
 multiboot2 = "0.3.2"
 tar = { git = "ssh://git@gitlab.com/akhmetov/tar.git", tag = "0.3.0" }
 librust = { path = "./lib/librust" }
 
 [package.metadata.bootimage]
 default-target = "x86_64-mos.json"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
 
 [dependencies.lazy_static]
 version = "1.0"

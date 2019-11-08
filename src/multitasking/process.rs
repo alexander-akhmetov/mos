@@ -26,7 +26,7 @@ pub struct Process {
     pub name: String,
     pub stack: Vec<u64>,
     pub rsp: u64,
-    pub file_descriptors: BTreeMap<u64, Box<fs::FileDescriptor>>,
+    pub file_descriptors: BTreeMap<u64, Box<dyn fs::FileDescriptor>>,
     pub started_at: u64, // timestamp
     pub brk_addr: u64,
     workdir: String,
