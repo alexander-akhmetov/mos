@@ -1,6 +1,5 @@
+use crate::cpuio;
 use spin::Mutex;
-
-use cpuio;
 
 // Command sent to begin PIC initialization.
 const CMD_INIT: u8 = 0x11;

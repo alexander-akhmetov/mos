@@ -1,9 +1,9 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use fs;
+use crate::fs;
+use crate::sys;
 use librust::syscall;
-use sys;
 
 pub fn hello_world() {
     /// test function, makes a few system calls and prints the results

@@ -1,4 +1,4 @@
-use logging;
+use crate::logging;
 
 pub const LOGLEVEL: logging::LogLevels = logging::LogLevels::INFO;
 pub const KERNEL_VERSION: &str = env!("CARGO_PKG_VERSION");

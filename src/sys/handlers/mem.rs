@@ -1,6 +1,6 @@
-use memory::paging::translate;
-use multitasking::scheduler;
-use sys;
+use crate::memory::paging::translate;
+use crate::multitasking::scheduler;
+use crate::sys;
 
 pub fn sys_mmap(args: &sys::SyscallArgs) -> u64 {
     let pid = scheduler::current_process_id();

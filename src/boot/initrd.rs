@@ -1,7 +1,7 @@
+use super::multiboot::get_module;
+use crate::fs;
 use alloc::boxed::Box;
-use boot::multiboot::get_module;
 use core::slice;
-use fs;
 use multiboot2::BootInformation;
 use tar;
 

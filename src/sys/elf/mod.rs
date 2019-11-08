@@ -1,4 +1,4 @@
-use multitasking::scheduler;
+use crate::multitasking::scheduler;
 
 #[derive(Default)]
 #[repr(packed)]

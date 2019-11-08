@@ -5,10 +5,10 @@ mod idt;
 
 pub mod tss;
 
-use drivers::{keyboard, pic8259};
-use multitasking;
-use sys;
-use x86;
+use crate::drivers::{keyboard, pic8259};
+use crate::multitasking;
+use crate::sys;
+use crate::x86;
 
 #[repr(C)]
 pub struct ExceptionStackFrame {

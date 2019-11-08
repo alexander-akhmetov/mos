@@ -1,5 +1,5 @@
-use memory::paging;
-use memory::Frame;
+use crate::memory::paging;
+use crate::memory::Frame;
 
 bitflags! {
     pub struct EntryFlags: u64 {

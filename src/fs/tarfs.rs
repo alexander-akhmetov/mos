@@ -1,7 +1,7 @@
+use crate::fs::{utils, FileDescriptor, FileSystem};
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
-use fs::{utils, FileDescriptor, FileSystem};
 use tar;
 
 pub struct TarFS {

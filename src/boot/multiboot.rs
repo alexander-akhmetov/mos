@@ -1,4 +1,4 @@
-use memory;
+use crate::memory;
 use multiboot2::BootInformation;
 
 pub fn get_multiboot_info(multiboot_information_address: usize) -> &'static BootInformation {

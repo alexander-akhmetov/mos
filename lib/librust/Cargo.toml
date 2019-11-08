@@ -1,5 +1,3 @@
-cargo-features = ["named-profiles"]
-
 [package]
 name = "librust"
 version = "0.0.4"
@@ -7,12 +5,9 @@ authors = ["Alexander Akhmetov <me@aleks.sh>"]
 edition = "2018"
 
 [dependencies]
-compiler_builtins = { git = "https://github.com/rust-lang/compiler-builtins" }
 
 [profile.dev]
 panic = "abort"
-lto = true
 
 [profile.release]
 panic = "abort"
-lto = true

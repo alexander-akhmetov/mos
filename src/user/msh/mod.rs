@@ -3,7 +3,7 @@ mod embedded_commands;
 mod msh;
 mod utils;
 
-use multitasking::scheduler;
+use crate::multitasking::scheduler;
 
 pub fn start() {
     scheduler::spawn(msh::start);

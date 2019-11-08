@@ -26,7 +26,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "compiler_builtins"
 version = "0.1.20"
-source = "git+https://github.com/rust-lang/compiler-builtins#a533ae9c5aa325db209659679535fe1f186eae81"
+source = "git+https://github.com/rust-lang/compiler-builtins?tag=0.1.20#a533ae9c5aa325db209659679535fe1f186eae81"
 
 [[package]]
 name = "lazy_static"
@@ -39,9 +39,6 @@ dependencies = [
 [[package]]
 name = "librust"
 version = "0.0.4"
-dependencies = [
- "compiler_builtins 0.1.20 (git+https://github.com/rust-lang/compiler-builtins)",
-]
 
 [[package]]
 name = "mos"
@@ -49,6 +46,7 @@ version = "0.2.0"
 dependencies = [
  "array-init 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "compiler_builtins 0.1.20 (git+https://github.com/rust-lang/compiler-builtins?tag=0.1.20)",
  "lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "librust 0.0.4",
  "multiboot2 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -128,7 +126,7 @@ dependencies = [
 "checksum bit_field 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ed8765909f9009617974ab6b7d332625b320b33c326b1e9321382ef1999b5d56"
 "checksum bitflags 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8dead7461c1127cf637931a1e50934eb6eee8bff2f74433ac7909e9afcee04a3"
 "checksum bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
-"checksum compiler_builtins 0.1.20 (git+https://github.com/rust-lang/compiler-builtins)" = "<none>"
+"checksum compiler_builtins 0.1.20 (git+https://github.com/rust-lang/compiler-builtins?tag=0.1.20)" = "<none>"
 "checksum lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a374c89b9db55895453a74c1e38861d9deec0b01b405a82516e9d5de4820dea1"
 "checksum multiboot2 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "dcea5906310f2607ea39a42b8af0745dc487d7583db9d981142a63b538647f69"
 "checksum nodrop 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)" = "2f9667ddcc6cc8a43afc9b7917599d7216aa09c463919ea32c59ed6cac8bc945"

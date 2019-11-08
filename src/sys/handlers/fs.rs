@@ -1,9 +1,9 @@
 use alloc::vec::Vec;
 
 use super::utils;
-use fs::vfs::VFS;
-use multitasking::scheduler;
-use sys;
+use crate::fs::vfs::VFS;
+use crate::multitasking::scheduler;
+use crate::sys;
 
 pub fn sys_rename(args: &sys::SyscallArgs) -> u64 {
     sys::errno::ENOSYS

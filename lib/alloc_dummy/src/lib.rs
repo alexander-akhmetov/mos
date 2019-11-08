@@ -5,8 +5,6 @@ use core::alloc::{GlobalAlloc, Layout};
 #[macro_use]
 extern crate librust;
 
-extern crate compiler_builtins;
-
 // const PAGE_SIZE: u64 = 4096;
 const PAGE_SIZE: u64 = 1024 * 1024 * 2;
 

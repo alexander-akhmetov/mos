@@ -1,7 +1,7 @@
+use crate::fs::FileDescriptor;
+use crate::multitasking::{focus, scheduler};
 use alloc::string::String;
 use alloc::vec::Vec;
-use fs::FileDescriptor;
-use multitasking::{focus, scheduler};
 
 pub struct StdIn {
     buffer: Vec<u8>,

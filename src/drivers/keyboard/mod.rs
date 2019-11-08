@@ -1,4 +1,4 @@
-use cpuio;
+use crate::cpuio;
 use spin::Mutex;
 
 mod codes;

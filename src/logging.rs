@@ -1,6 +1,6 @@
+use crate::drivers::vga_buffer::colors;
+use crate::multitasking::focus::get_focused_pid;
 use core::fmt;
-use drivers::vga_buffer::colors;
-use multitasking::focus::get_focused_pid;
 
 /// prints output to the screen and serial port 1
 /// so output will be available in the qemu running

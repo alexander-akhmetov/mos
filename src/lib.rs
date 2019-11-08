@@ -30,6 +30,8 @@ extern crate librust;
 extern crate alloc;
 extern crate tar;
 
+extern crate compiler_builtins;
+
 #[macro_use]
 mod drivers;
 #[macro_use]

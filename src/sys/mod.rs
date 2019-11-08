@@ -4,8 +4,8 @@ mod errno;
 mod handlers;
 pub mod interrupts;
 pub mod time;
+use crate::x86;
 use spin::Mutex;
-use x86;
 
 #[derive(Debug)]
 pub struct SyscallArgs {

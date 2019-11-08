@@ -1,7 +1,7 @@
+use crate::memory::paging::entry::{Entry, EntryFlags};
+use crate::memory::paging::{PhysicalAddress, ENTRY_COUNT};
+use crate::memory::{FrameAllocator, FRAME_ALLOCATOR};
 use core::ops::{Index, IndexMut};
-use memory::paging::entry::{Entry, EntryFlags};
-use memory::paging::{PhysicalAddress, ENTRY_COUNT};
-use memory::{FrameAllocator, FRAME_ALLOCATOR};
 
 pub struct PageTable {
     entries: [Entry; ENTRY_COUNT],

@@ -1,5 +1,5 @@
-use multitasking::scheduler;
-use sys::time;
+use crate::multitasking::scheduler;
+use crate::sys::time;
 
 pub fn init() {
     for _i in 0..2 {

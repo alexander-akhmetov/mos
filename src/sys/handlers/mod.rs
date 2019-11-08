@@ -1,8 +1,8 @@
+use crate::cmos;
+use crate::constants;
+use crate::multitasking::scheduler;
+use crate::sys;
 use alloc::string::String;
-use cmos;
-use constants;
-use multitasking::scheduler;
-use sys;
 
 mod fs;
 mod io;
@@ -68,5 +68,5 @@ pub fn sys_uname(args: &sys::SyscallArgs) -> u64 {
         (*info_struct).version = String::from(constants::KERNEL_VERSION);
     };
 
-   sys::errno::SUCCESS
+    sys::errno::SUCCESS
 }

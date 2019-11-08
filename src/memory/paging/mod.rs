@@ -1,7 +1,8 @@
-use memory::PAGE_SIZE;
+use crate::memory::PAGE_SIZE;
+use crate::x86;
+
 pub mod entry;
 pub mod table;
-use x86;
 
 // 4 level paging: each frame address must be found through 3 pages:
 // [P4 -> P3 -> P2 -> P1] points to physical frame

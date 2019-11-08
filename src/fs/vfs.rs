@@ -1,8 +1,8 @@
+use crate::fs::{utils, FileDescriptor, FileSystem};
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use fs::{utils, FileDescriptor, FileSystem};
 use spin::Mutex;
 
 pub struct VirtualFS {

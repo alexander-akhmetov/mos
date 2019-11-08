@@ -1,7 +1,7 @@
+use crate::multitasking::process::{Process, ProcessID};
+use crate::sys;
 use alloc::collections::BTreeMap;
-use multitasking::process::{Process, ProcessID};
 use spin::RwLock;
-use sys;
 
 #[derive(PartialEq)]
 enum SchedulerStatus {

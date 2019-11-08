@@ -1,8 +1,8 @@
-use cmos::get_timestamp;
-use drivers;
+use crate::cmos::get_timestamp;
+use crate::drivers;
+use crate::sys::constants;
+use crate::x86;
 use spin::RwLock;
-use sys::constants;
-use x86;
 
 pub struct SystemClock {
     base_timestamp: u64,

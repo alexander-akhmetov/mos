@@ -1,6 +1,5 @@
-use memory::{Frame, FrameAllocator};
+use crate::memory::{Frame, FrameAllocator};
 use multiboot2::{MemoryArea, MemoryAreaIter};
-
 
 pub struct SimpleFrameAllocator {
     next_free_frame: Frame,

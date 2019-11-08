@@ -1,4 +1,4 @@
-use cpuio;
+use crate::cpuio;
 
 const DEFAULT_FREQ: u32 = 1_193_180;
 const PIT_CONTROL_PORT: u16 = 0x43;

@@ -26,7 +26,7 @@ build-bootloader:
 	$(NASM) -f elf64 src/multitasking/switch_to.asm -o $(BUILD_DIR)/switch_to.o
 	$(LD) --nmagic \
 			-o $(BUILD_DIR)/kernel.bin \
-			-T src/boot/loader/linker.ld \
+			--script=src/boot/loader/linker.ld \
 			$(BUILD_DIR)/multiboot_header.o \
 			$(BUILD_DIR)/boot.o \
 			$(BUILD_DIR)/long_mode_init.o \
@@ -49,7 +49,7 @@ build-os-binaries:
 
 build-initrd:
 	mkdir -p $(BUILD_DIR)/isofiles/boot/
-	cd ./initrd/ && tar --format ustar -c * > ../$(BUILD_DIR)/isofiles/boot/initrd.tar
+	cd ./initrd/ && tar --format ustar --owner=0 --group=0 -c * > ../$(BUILD_DIR)/isofiles/boot/initrd.tar
 
 build:
 	mkdir -p $(BUILD_DIR)
