@@ -14,7 +14,7 @@ uart_16550 = "0.1.0"
 x86_64 = "0.2.8"
 bitflags = "1.2.1"
 multiboot2 = "0.3.2"
-tar = { git = "ssh://git@gitlab.com/akhmetov/tar.git", tag = "0.3.0" }
+tar = { git = "ssh://git@gitlab.com/akhmetov/tar.git", tag = "0.4.0" }
 librust = { path = "./lib/librust" }
 
 [package.metadata.bootimage]
@@ -22,7 +22,7 @@ default-target = "x86_64-mos.json"
 
 [dependencies.compiler_builtins]
 git = "https://github.com/rust-lang/compiler-builtins"
-tag = "0.1.20"
+tag = "0.1.19"
 features = ["mem"]
 
 [package.metadata.cargo-xbuild]

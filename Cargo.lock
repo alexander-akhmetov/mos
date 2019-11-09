@@ -25,8 +25,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "compiler_builtins"
-version = "0.1.20"
-source = "git+https://github.com/rust-lang/compiler-builtins?tag=0.1.20#a533ae9c5aa325db209659679535fe1f186eae81"
+version = "0.1.19"
+source = "git+https://github.com/rust-lang/compiler-builtins?tag=0.1.19#36da64f20e96206ac279f700586817c8abe3bdf8"
 
 [[package]]
 name = "lazy_static"
@@ -46,12 +46,12 @@ version = "0.2.0"
 dependencies = [
  "array-init 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "compiler_builtins 0.1.20 (git+https://github.com/rust-lang/compiler-builtins?tag=0.1.20)",
+ "compiler_builtins 0.1.19 (git+https://github.com/rust-lang/compiler-builtins?tag=0.1.19)",
  "lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "librust 0.0.4",
  "multiboot2 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "tar 0.3.0 (git+ssh://git@gitlab.com/akhmetov/tar.git?tag=0.3.0)",
+ "tar 0.4.0 (git+ssh://git@gitlab.com/akhmetov/tar.git?tag=0.4.0)",
  "uart_16550 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "volatile 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "x86_64 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -82,8 +82,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "tar"
-version = "0.3.0"
-source = "git+ssh://git@gitlab.com/akhmetov/tar.git?tag=0.3.0#ffa17ee087ccabd62b8b8d02cbfcdb9d773e405f"
+version = "0.4.0"
+source = "git+ssh://git@gitlab.com/akhmetov/tar.git?tag=0.4.0#ad66ed773876041273caa0f796f7de50e9b534db"
 
 [[package]]
 name = "uart_16550"
@@ -126,13 +126,13 @@ dependencies = [
 "checksum bit_field 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ed8765909f9009617974ab6b7d332625b320b33c326b1e9321382ef1999b5d56"
 "checksum bitflags 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8dead7461c1127cf637931a1e50934eb6eee8bff2f74433ac7909e9afcee04a3"
 "checksum bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
-"checksum compiler_builtins 0.1.20 (git+https://github.com/rust-lang/compiler-builtins?tag=0.1.20)" = "<none>"
+"checksum compiler_builtins 0.1.19 (git+https://github.com/rust-lang/compiler-builtins?tag=0.1.19)" = "<none>"
 "checksum lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a374c89b9db55895453a74c1e38861d9deec0b01b405a82516e9d5de4820dea1"
 "checksum multiboot2 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "dcea5906310f2607ea39a42b8af0745dc487d7583db9d981142a63b538647f69"
 "checksum nodrop 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)" = "2f9667ddcc6cc8a43afc9b7917599d7216aa09c463919ea32c59ed6cac8bc945"
 "checksum os_bootinfo 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "66481dbeb5e773e7bd85b63cd6042c30786f834338288c5ec4f3742673db360a"
 "checksum spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)" = "ceac490aa12c567115b40b7b7fceca03a6c9d53d5defea066123debc83c5dc1f"
-"checksum tar 0.3.0 (git+ssh://git@gitlab.com/akhmetov/tar.git?tag=0.3.0)" = "<none>"
+"checksum tar 0.4.0 (git+ssh://git@gitlab.com/akhmetov/tar.git?tag=0.4.0)" = "<none>"
 "checksum uart_16550 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "269f953d8de3226f7c065c589c7b4a3e83d10a419c7c3b5e2e0f197e6acc966e"
 "checksum usize_conversions 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "f70329e2cbe45d6c97a5112daad40c34cd9a4e18edb5a2a18fefeb584d8d25e5"
 "checksum ux 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "53d8df5dd8d07fedccd202de1887d94481fadaea3db70479f459e8163a1fab41"

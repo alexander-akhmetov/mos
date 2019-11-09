@@ -38,7 +38,7 @@ make tests
 
 * Cross compiled binutils (actually only `ld`): `docs/binutils.md`
 * NASM
-* Rust nightly (I use `1.31.0-nightly (d586d5d2f 2018-10-29)`)
+* Rust nightly (I use `nightly-2019-11-04`)
 * Docker to build iso with GRUB bootloader
 * QEMU
 * gnu-tar on MacOS (`brew install gnu-tar`)
